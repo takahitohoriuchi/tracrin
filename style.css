@@ -1,0 +1,158 @@
+/* spanタグの折り返し改行が画面左端から始まるように。 */
+.breakable {
+	/* word-break: break-all; */
+	/* color: red; */
+}
+
+body{		
+	/* display: flex;
+	justify-content: center;
+	align-items: center; */
+}
+nav {
+  width: 100%;
+  height: 70px;  
+  padding: 10px 10px;
+  box-sizing: border-box;
+  margin: 0%;
+}
+
+/* :::SECTION */
+
+/* タグ（発話をさらに区切ったもの） */
+.tag {
+	/* border: 1px solid #aaaaaa; */
+	position: absolute; /* absolute指定しないと、widthが出てこない。 */
+	/* font-size: 12px; */
+	margin: 0%;
+	padding: 0%;
+	line-height: 120%
+}
+/* 左の話者ラベルなど */
+.label {
+	/* background: #888; */
+	/* border: 1px solid #22aaaa; */
+	position: absolute;
+	margin: 0%;
+	padding: 0%;
+	line-height: 120%
+	/* font-size: 12px; */
+}
+/* 矢印 */
+.arrow{
+	position: absolute;
+	text-align: center;
+}
+
+.group-line {
+	position: absolute;    
+	overflow: visible;
+    left: 0px;
+    width: 300px;
+    /* border-top: 0.5px dashed #000; 線の色や太さを指定 */
+}
+/* 動画エリア */
+#videoContainer {
+	resize: both;
+	overflow: auto;
+	display: inline-block;
+	/* 初期サイズ指定 */
+	/* width: 480px;
+	height: 270px; */
+}
+.myVideo {
+	width: 100%;
+	height: 100%;
+}
+#ddarea {
+	width: 100%;
+	height: 150px;
+	border: 1px dotted #888;
+	margin: 1em auto;
+	text-align: center;
+	/* display: table-cell; */
+	/* vertical-align: middle; */
+}
+#ddarea.ddefect {
+	border: 1px solid #000;
+}
+#txtarea {
+	padding: 5px;
+	width: 90%;
+	height: 20px;
+	overflow: auto;
+	/* background: lightgray; */
+	color: black;
+	margin: 1em auto;
+}
+/* トラクリのエリア */
+#transcriptArea {
+	/* background-color: #eeeeee; */
+	/* border-color: #000; */
+	/* border-width: thick;	 */
+	display: none;
+	position: relative;
+	height: 600px;
+	width: 600px;
+	top: 0px;
+	/* left: 20px; */
+	margin: 10px;		
+	padding: 0%;
+}
+
+#labelArea{
+	background-color: #eeeeee;
+	border-color: #000;		
+	position: absolute;
+	height: 30px;
+	width: 320px;
+	top: 0px;
+	left: 0px;	
+	padding: 0%;
+	/* margin: 10px; */
+	/* margin-left: 10px; */
+}
+
+#scrollable-div{
+	position: absolute;
+	overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
+	border: 1px solid #ccc; /* 枠線を追加 */
+	top: 30px;
+	left: 0px;
+	width: 600px;/* NOTE:transcriptAreaと同じ！ */
+	height: 570px;/*NOTE:transcriptAreaとおなじ*/
+	margin: none;
+	padding: none;
+}
+
+/* トラクリタグたちが描かれるエリア */
+#dataArea{
+	background-color: #ffffff;
+	border-color: #000;
+	position: absolute;
+	/* position: relative; */
+	height: 570px;
+	width: 200px;
+	top: 0px;
+	left: 120px;	
+	padding: 0%;
+	/* margin-left: 10px; */
+}
+
+/* ラベルのエリア */
+#itemArea{
+	background-color: #eeeeee;
+	border-color: #000;
+	position: absolute;
+	/* position: relative; */
+	height: 570px;
+	width: 120px;
+	top: 0px;
+	left: 0px;
+	/* margin-left: 10px; */
+	padding: 0%;
+}
+.txtareawrap {
+	text-align: center;
+	margin-bottom: 1em;
+}
