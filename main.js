@@ -173,18 +173,17 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 	// グループで最若の発話オブジェクトインデックス
 	let groupStartIndex = 0
 	doGrouping: for (let i = 0; i < hatsuwaObjs.length; i++) {
-		if (i >= groupStartIndex) {
+		console.log('groupStartIndex: ', groupStartIndex)
+		console.log('i: ', i)
+		if (i >= groupStartIndex) {						
 			// 発話グループ生成して、ひとつの発話オブジェクトいれとく
-			let hatsuwaGroup = [hatsuwaObjs[i]]
-			// console.log('hatsuwaGroup: ', hatsuwaGroup)
-
+			let hatsuwaGroup = [hatsuwaObjs[i]]	
 			// この発話グループの発話オブジェクトのうち、Endがもっとも遅い値
-			let maxEndInThisGroup = hatsuwaObjs[i].end
-			// DEBUG:silentが、既存のグループに「かぶる」という境界条件は。
+			let maxEndInThisGroup = hatsuwaObjs[i].end			
 			// 次の発話objから
-			for (let j = i + 1; j < hatsuwaObjs.length; j++) {
+			for (let j = i + 1; j < hatsuwaObjs.length; j++) {				
 				// かぶりがあったら
-				if (hatsuwaObjs[j].start <= maxEndInThisGroup) {
+				if (hatsuwaObjs[j].start < maxEndInThisGroup) {
 					// グループにいれる
 					hatsuwaGroup.push(hatsuwaObjs[j])
 					// maxEndを更新
@@ -209,7 +208,8 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 						break
 					}
 				}
-			}
+			}			
+			
 		} else {
 			// console.log('グループインデックスより小さいのでスルー')
 		}
@@ -586,6 +586,33 @@ async function addEvents() {
 	}
 }
 
+// 設定メニューの開閉
+// function toggleSettingsMenu() {
+//     var menu = document.getElementById('settings-menu');
+//     if (menu.style.display === 'none') {
+//         menu.style.display = 'block';
+//     } else {
+//         menu.style.display = 'none';
+//     }
+// }
+
+// 発話グループごとの水平線のトグル
+function toggleLine() {
+	console.log('toggleLine()')
+    var checkbox = document.getElementById('toggle-line');
+    var lines = document.querySelectorAll('.group-line');
+	console.log('lines: ', lines)
+    if (checkbox.checked) {
+        lines.forEach(function(line) {
+            line.style.borderTop = '0.5px dashed #000';
+        });
+    } else {
+        lines.forEach(function(line) {
+            line.style.borderTop = '';
+        });
+    }
+}
+
 
 // エリアのサイズ調整
 async function resize() {
@@ -751,6 +778,41 @@ window.addEventListener('DOMContentLoaded', () => {
 		ddarea.addEventListener(e, ddEvent[e])
 		document.body.addEventListener(e, ddEvent[e])
 	})	
+
+	// 設定メニュー開く
+	const settingsIcon = document.getElementById('settings-icon');
+    if (settingsIcon) {
+        settingsIcon.addEventListener('click', function(){
+			const menu = document.getElementById('settings-menu');
+        	menu.style.display = 'block'
+		});
+    }
+	// 設定メニュー閉じる
+	const settingsMenu = document.getElementById('settings-menu');
+	document.addEventListener('click', function(e) {
+        // クリックがメニュー内またはアイコン上でなければメニューを閉じる
+        if (!settingsMenu.contains(e.target) && e.target !== settingsIcon) {
+            settingsMenu.style.display = 'none';
+        }
+    });
+	
+	// 設定メニュー：発話グループ水平線をトグル
+	const checkbox = document.getElementById('toggle-line');
+	checkbox.addEventListener('change', ()=>{
+		console.log('toggleLine()')		
+		var lines = document.querySelectorAll('.group-line');
+		console.log('lines: ', lines)
+		if (checkbox.checked) {
+			lines.forEach(function(line) {
+				line.style.borderTop = '0.5px dashed #000';
+			});
+		} else {
+			lines.forEach(function(line) {
+				line.style.borderTop = '';
+			});
+		}
+		}
+	)    
 })
 
 // ウィンドウサイズ変更イベント

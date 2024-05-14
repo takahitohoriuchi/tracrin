@@ -10,6 +10,17 @@
 	<body>
 		<nav>
 			<div>Tracrin2.0.0</div>
+			<!-- 設定アイコン -->
+			<div id="settings-icon">⚙️</div>
+			
+			<!-- 設定メニュー（デフォルトでは非表示） -->
+			<div id="settings-menu" style="display: none;">
+				<label>
+					<input type="checkbox" id="toggle-line">
+					発話グループごとに水平線
+				</label>
+			</div>
+
 		</nav>
 		<div id="ddarea"><p>Drag & Drop your file(.txt) on me!</p></div>
 		<!-- <div class="txtareawrap">
@@ -29,11 +40,14 @@
 				<div id="dataArea"></div>				
 			</div>
 		</div>
+
+	<!-- :::JS読み込み -->
+		<!-- CDN -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
+		<!-- ファイルの読み込み -->
+		<script src="./main.js" type="module"></script>
 	</body>
 </html>
 
 <!-- :::CSS(NOTE:JSより先にかく！) -->
-<!-- CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
-<!-- ファイルの読み込み -->
-<script src="./main.js" type="module"></script>
+
