@@ -41,6 +41,7 @@ let windowSize = {
 let fontSize = 12 //デフォだと12になるぽい
 let lineHeightRatio = 1.2 //フォントサイズに対するテキストのボックス高さの比
 
+
 // SECTION::【関数】
 // メイン関数
 async function main(_file = null) {

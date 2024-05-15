@@ -61,6 +61,16 @@ export function genSpan(_document, _element, _tagText, _id, _fontSize, _tagX = 0
 	return dummy
 }
 
+/**
+ * 
+ * @param {Object} _document 
+ * @param {*} _element 
+ * @param {Number} _x 
+ * @param {Number} _y 
+ * @param {*} _label 
+ * @param {*} _fontSize 
+ * @returns 
+ */
 export function drawLabel(_document, _element, _x, _y, _label, _fontSize){	
 	var dummy = _document.createElement('span')
 	dummy.className = 'label'
