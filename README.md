@@ -23,7 +23,7 @@
 
 ## Creator(制作者)
 - **Ryosaku Makino(牧野 遼作)** - *originator(発案者)* - [RyosakuMakino](https://researchmap.jp/rmakino)
-- **Kohei Kikuchi(菊地 浩平)** - *？？者* - [KoheiKikuchi](https://researchmap.jp/rmakino)
+- **Kohei Kikuchi(菊地 浩平)** - *？？者* - [KoheiKikuchi](https://researchmap.jp/vadise)
 - **Takahito Horiuchi(堀内 隆仁)** - *developer(開発者)* - [TakahitoHoriuchi](https://github.com/takahitohoriuchi)
 - **Masako Ogata(小方雅子)** - *developer(開発者)* - [HarukoOgata]()
 
