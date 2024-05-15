@@ -59,10 +59,8 @@ async function main(_file = null) {
 		// 最初の読み込み時だけ（winリサイズ時はいちいちやらない）
 		if (_file) {
 			const textContent = fileReader.result
-			await genHatsuwaObjs(textContent)	
-			// DEBUG:error
-			tempConvertKukuriMarks(hatsuwaObjs)			
-			// DEBUG:error
+			await genHatsuwaObjs(textContent)				
+			tempConvertKukuriMarks(hatsuwaObjs)						
 			reconvertKukuriMarks(hatsuwaObjs)		// ククリ系記号を元に戻す関数
 			await groupingHatsuwaObjs(hatsuwaObjs)
 			
@@ -218,33 +216,30 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 
 // 3: 発話たちを描画する。
 async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
-	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)
-	let startX = 0
+	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)	
 	let dataAreaW = dataAreaStyle.width
-	let maxCharNumPerRow = Math.floor(dataAreaW / fontSize)
-	console.log('maxCharNumPerRow: ', maxCharNumPerRow)
-	console.log('startX: ', startX)
+	let maxCharNumPerRow = Math.floor(dataAreaW / fontSize)		
 	// 発話グループそれぞれにおいて
 	_hatsuwaGroups.forEach((hatsuwaGroup, groupIndex) => {
 		console.log('====================')
 		console.log(`【グループ${groupIndex}】`, hatsuwaGroup)
-		// <span>三重配列へこのグループ用に空セット
+		// (1) hatsuwaTagSpansの前準備
 		hatsuwaTagSpans.push([])
-
 		hatsuwaGroup.forEach((hatsuwa, i) => {
 			console.log(`発話${i}: `, hatsuwa.text)
 			//グループ内の発話の数だけ、空配列セット
 			hatsuwaTagSpans[groupIndex].push([])
 		})
 						
-		// 発話から子発話に生成・分割（二重配列）
+		// (2) 発話から子発話に生成・分割（二重配列）
 		let tagArrays = genHatsuwaTags(hatsuwaGroup, groupIndex)
 		console.log('tagArrays: ', tagArrays)
-		let maxTagX = startX		
+		
 
+		// (3) 各発話の「先頭タグ」に'bracketID'フィールドを割り振る
 		let bracketID = 1
 		for (let i = 0; i < tagArrays.length; i++) {
-			// 発話iの先頭（=tagArrays[0].text[0]）には[がある？cl
+			// 発話iの先頭（=tagArrays[0].text[0]）には[がある？
 			console.log('tagArrays.length: ', tagArrays.length)
 			if (tagArrays[i][0].text[0] == '[') {
 				if (i < tagArrays.length - 1) {										
@@ -280,7 +275,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 				// 次ループへ
 			}
 		}
-		// (次に、それぞれの発話において、1番目以降のブラケットがあれば、それらは順に+したブラケットIDを振っていく)
+		// (4) 各発話の「非先頭タグ」に'bracketID'フィールドを割り振る（同発話内の直前タグのbracketIDをインクリメントしたバージョンを割り振る)
 		tagArrays.forEach((tagArray) => {
 			tagArray.forEach((tag, i) => {
 				// 発話内先頭タグなら
@@ -299,11 +294,9 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			})
 		})
 
-		// tagArraysを、二次元配列から一次元配列に変えて、
-		const tempTagArray = tagArrays.flatMap((row) => row)
-		// console.log('tempTagArray: ', tempTagArray)
-
-		// ブラケットグループ化する（同じbracketIDのtagどうしをまとめた配列）
+		// (5) ブラケットグループ化する（同じbracketIDのtagどうしをまとめた配列）
+		const tempTagArray = tagArrays.flatMap((row) => row)// tagArraysを、二次元配列から一次元配列に変えて、
+		// console.log('tempTagArray: ', tempTagArray)		
 		const bracketsGroup = tempTagArray.reduce((result, obj) => {
 			const group = result.find((group) => group[0].bracketID === obj.bracketID)
 			if (group) {
@@ -316,76 +309,75 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 		console.log('bracketsGroup: ', bracketsGroup)
 		
 
-		// 同じbracketsGroupのなかで位置決定してく
-		bracketsGroup.forEach((tagsOfThisLoop, i) => {			
+		// (6) 各ブラケットグループの開始X位置を決定してゆく
+		let startX = 0
+		bracketsGroup.forEach((tagsInThisBracketGroup, i) => {						
 			console.log('----------')
-			console.log('ループindex', i, ' (グループ内での[のインデックス)')
-			console.log('tagsOfThisLoop: ', tagsOfThisLoop)
-			const spansOfThisLoop = []
+			console.log('bracketID: ', i, ' (グループ内での[のインデックス)')
+			console.log('tagsInThisBracketGroup: ', tagsInThisBracketGroup)
+			const spansOfThisBracketGroup = []//一時生成であり、最終的には消す
 
-			// (1) 抽出タグそれぞれに対して、span描画する
-			//  「maxケツX」から描画しはじめる（前ループで取得してある。）
-			tagsOfThisLoop.forEach((tag) => {
-				const span = genSpan(document, dataArea, tag.text, tag.id, fontSize, maxTagX)
-				spansOfThisLoop.push(span)
+			// (1) このブラケットグループのspanタグを一時的に描画する
+			tagsInThisBracketGroup.forEach((tag) => {
+				const span = genSpan(document, dataArea, tag.text, tag.id, fontSize, startX)
+				spansOfThisBracketGroup.push(span)
 			})
-			console.log('spansOfThisLoop: ', spansOfThisLoop)
+			console.log('spansOfThisBracketGroup: ', spansOfThisBracketGroup)
 
-			// (2) タグの行分割処理（画面右端オーバーのケース || 中途半端発話記号で改行のケース）
-			// let tempMaxTagX = maxTagX
-			let tempMaxTagX = 0
-			spansOfThisLoop.forEach((span, j) => {
-				// オーバー
-				
-				// NOTE:以下２通りのやりかただと、12pxぶん違いがでる。。。？
-				const spanW = span.getBoundingClientRect().width
+			// (2) spanタグの行分割処理（画面右端オーバーしないよう。）			
+			let maxTagXInThisBracketGroup = 0// このbracketのグループの<span>タグ群の末尾の最右位置
+			spansOfThisBracketGroup.forEach((span, j) => {
+				// spanの幅								
+				const spanW = span.getBoundingClientRect().width// NOTE:下のやりかただと、12pxぶん違いがでる。。。？
 				// const spanW = px2Num(window.getComputedStyle(span).width)
-				console.log('spanW: ', spanW)
-				const remainedHaba = dataAreaW - maxTagX
-				console.log('remainedHaba: ', remainedHaba)
+				// console.log('spanW: ', spanW)
+				// 残りの画面幅
+				const remainedHaba = dataAreaW - startX
+				// console.log('remainedHaba: ', remainedHaba)
+				// この行にはあと何文字ぶんの余白が残っている？
 				const charNumFirstRow = Math.floor(remainedHaba / fontSize)
-				console.log('charNumFirstRow: ', charNumFirstRow)
+				// console.log('charNumFirstRow: ', charNumFirstRow)
 
-				// nコへと分割(DOM操作)
-				const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsOfThisLoop[j])
+				// spanをnコのテキストへと分割(DOM操作。発話特殊記号にかんする境界処理はsplitSpanにて。)
+				const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsInThisBracketGroup[j])
 				console.log(`${span.innerHTML}は以下${splittedSpanTexts.length}つに分割される↓`)
 				console.log('splittedSpanTexts: ', splittedSpanTexts)								
 				const id = span.className.split(' ')[1] //id。例：(10-4-1)みたいな。おおもとのspanは削除しちゃうから、先にidだけとっとく
 				console.log('id: ', id)
-				const hatsuwaID = id.split('-')[1]
-				// NOTE:maxTagXは次のbracketsIndexのループでつかわれる
-
+				const hatsuwaID = id.split('-')[1]				
+				
 				splittedSpanTexts.forEach((splittedTag, k) => {
-					const tagX = k == 0 ? maxTagX : startX
-					// spanタグを生成
+					const tagX = k == 0 ? startX : 0//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
+					// テキストからspanタグを描画
 					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX)
 					// console.log('splitして生み出されたspan: ', e)
 					// 全体の発話span配列に追加する
 					hatsuwaTagSpans[groupIndex][hatsuwaID].push(e)
 					// 分割してできた最終タグが、maxケツXの候補になる！					
+					// 分割された各断片テキストのうち、末尾が最右にあるものの末尾pxを。
 					const tagID = id.split('-')[2]																									
 					if(Number(tagID) < tagArrays[hatsuwaID].length-1){
 						if (k == splittedSpanTexts.length - 1) {
 							const xx = e.getBoundingClientRect().right - dataAreaStyle.x
 							console.log(`splitTag${k}のright`, xx)
-							tempMaxTagX = Math.max(tempMaxTagX, xx)
+							maxTagXInThisBracketGroup = Math.max(maxTagXInThisBracketGroup, xx)														
 						}
-					}					
+					}
 				})
 			})
-			// (3)「maxケツX」を取得、更新する！
-			maxTagX = tempMaxTagX
-			// console.log('maxTagX: ', maxTagX)
+			// (3)「次bracketグループの描画開始X位置」を更新する(現bracketグループの末尾に合わせる)！
+			startX = maxTagXInThisBracketGroup
+			// console.log('startX: ', startX)
 
-			// (4)spanOfThisLoopを[]削除しちゃえ！
-			spansOfThisLoop.forEach((span) => span.remove())
+			// (4)spansOfThisBracketGroup[]は削除
+			spansOfThisBracketGroup.forEach((span) => span.remove())
 		})
 			
 		console.log('dataAreaStyle: ', dataAreaStyle)
 		// console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	})
 
-	// タグspanの、Y位置を決めて、ククリ記号を元に戻す処理
+	// (7) 全タグspanのY位置を決めて、ククリ記号を元に戻す処理
 	accumRowCount = 0 //累積行数
 	hatsuwaTagSpans.forEach((spansOfGroup, i) => {
 		spansOfGroup.forEach((spansOfHatsuwa, j) => {
@@ -441,7 +433,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 		horizontalLine.className = 'group-line'
 		dataArea.appendChild(horizontalLine)
 	})
-	// DEBUG:こいつのタグをそれぞれハックして、記号を元に戻す
+	// TODO:こいつのタグをそれぞれハックして、記号を元に戻す
 	console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	// 更新
 	requestAnimationFrame(function () {})
@@ -451,7 +443,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 	// 行ラベル表示
 	drawLabel(document, labelArea, 0, 0, 'ID', _fontSize) //ID
-	// TODO:ID列の最高rightを取得。
+	// ID列の最高rightを取得。
 	// const maxIDSpanRight = idLabels[idLabels.length-1].getBoundingClientRect().right - transcriptAreaStyle.left
 	// console.log('maxIDSpanRight: ', maxIDSpanRight)
 	

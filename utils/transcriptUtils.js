@@ -1,3 +1,7 @@
+/*NOTE:
+発話特殊記号をいじくるモジュールはここ
+*/
+
 import { getCountOfChar } from './otherUtils.js'
 
 

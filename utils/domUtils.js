@@ -1,3 +1,7 @@
+/*NOTE:
+HTML要素を直接に生成・更新・削除したりするのモジュールはここ
+*/
+
 import { getLastElement, num2Px } from './otherUtils.js'
 import { isIncompleteKakko, isIncompleteKukuri, isSuffixFirst, kukuriMarkObjs } from './transcriptUtils.js'
 
@@ -95,7 +99,7 @@ export function deleteArrow(_parentElem, _arrows){
 	})
 }
 /**
- * spanタグを画面幅との関係で複数に分割する
+ * <span>タグをその行の画面幅余白との関係で複数に分割する（発話特殊記号が中途半端に分割されないように処理）
  * @param {Object} _document 
  * @param {HTMLElement} _span 
  * @param {Number} _charNumFirstRow このタグが書かれ始める最初行の残り文字数
@@ -108,15 +112,11 @@ export function deleteArrow(_parentElem, _arrows){
  * というふうになる。
  */
 export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow, _tag) {
-	// DEBUG:このタグtextに対して、発話特殊記号のまとまり扱いを適用する
+	// NOTE:このタグtextに対して、発話特殊記号のまとまり扱いを適用する
 	const text = _span.innerHTML
 	console.log('spanタグtext: ', text)
 	console.log('_charNumFirstRow: ', _charNumFirstRow)
-	console.log('_maxCharNumPerRow: ', _maxCharNumPerRow)
-	// if(text.includes('(')){
-	// 	console.log('()をふくむspanだよ')
-	// }
-	
+	console.log('_maxCharNumPerRow: ', _maxCharNumPerRow)	
 
 	const id = _span.className
 	let result
