@@ -1,7 +1,7 @@
 // SECTION:【import】
 import { addArrow, deleteArrow, drawLabel, genHatsuwaTags, genSpan, getTagTextsInThisLoop, splitSpan } from './utils/domUtils.js'
 
-import { getMaxBracketsIndex, num2Px } from './utils/otherUtils.js'
+import { formatNumber, getMaxBracketsIndex, num2Px } from './utils/otherUtils.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './utils/transcriptUtils.js'
 
 // SECTION:【グローバル変数】
@@ -442,6 +442,8 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 
 // 4: IDとSpeakerのラベルを左にDOM描画する関数
 async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
+	// TODO:
+	// drawLabel()を、グローバル位置Xを引数にとるようにして、各ラベルの位置を指定する
 	// 行ラベル表示
 	drawLabel(document, labelArea, 0, 0, 'ID', _fontSize) //ID
 	// ID列の最高rightを取得。
@@ -451,7 +453,12 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 	// (1) ヘッダを描く
 	const speakerLabelX = _fontSize * 3
 	drawLabel(document, labelArea, speakerLabelX, 0, 'Speaker', _fontSize) // speaker
-	drawLabel(document, labelArea, dataAreaStyle.left, 0, 'Text', _fontSize) // text
+	
+	// itemArea.right
+	const textLabelX = _fontSize * 8
+	drawLabel(document, labelArea, textLabelX, 0, 'Text', _fontSize) // text
+	// drawLabel(document, labelArea, itemAreaStyle.right, 0, 'Text', _fontSize) // text
+	// drawLabel(document, labelArea, 0, 0, 'Text', _fontSize) // text	
 	console.log('itemAreaStyle: ', itemAreaStyle)
 	console.log('dataAreaStyle: ', dataAreaStyle)
 
@@ -463,8 +470,9 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 				// 行連番を表示
 				const idColX = 0
 				const idColY = _fontSize * lineHeightRatio * (accumRowCount + k)
-
-				const id = accumRowCount + k + 1//NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。
+				
+				const id = formatNumber(accumRowCount + k + 1)//NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。
+				// const id = accumRowCount + k + 1
 				const label = drawLabel(document, itemArea, idColX, idColY, id, _fontSize)
 				idLabels.push(label)
 				// 「話者ラベル」を表示（発話の最初行だけ）

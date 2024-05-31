@@ -35,6 +35,15 @@ export function getCountOfChar(_string, _char1, _char2){
 }
 
 /**
+ * 数値を文字列に変換し、1桁の数値には先頭に0をつける
+ * @param {Number} num 
+ * @returns 
+ */
+export function formatNumber(num) {
+  return num.toString().padStart(2, '0');
+}
+
+/**
  * 配列の最終要素を返す
  * @param {Array} array 
  * @returns {Any} 要素
