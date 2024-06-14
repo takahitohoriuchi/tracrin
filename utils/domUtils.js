@@ -61,6 +61,22 @@ export function genSpan(_document, _element, _tagText, _id, _fontSize, _tagX = 0
 	return dummy
 }
 
+export function genRowDiv(_document, _parentElem, _y){
+	var row = _document.createElement('div')
+	row.className = 'row'
+	// row.innerHTML = _tagText	
+	// row.classList.add(_id) //NOTE: グループID-発話ID-パーツID	
+	// row.style.fontSize = num2Px(_fontSize)
+	// X位置
+	row.style.top = num2Px(_y)
+	row.style.width = '200px'
+	row.style.backgroundColor = 'red'
+	_parentElem.appendChild(row)
+	console.log('row: ', row)
+	return row
+
+}
+
 /**
  * 
  * @param {Object} _document 
@@ -338,7 +354,26 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 	return result
 }
 
+export function toggleSelectionOfSpan(_span){
 
+}
+
+/**
+ * このタグが属する発話オブジェクトを取得する
+ * @param {*} _span 
+ * @param {*} _hatsuwaGroups 
+ * @returns 
+ */
+export function getHatsuwaObjFromSpan(_span, _hatsuwaGroups){
+	let classList = _span.classList
+	let globalTagID = classList[1]
+	console.log('globalTagID: ', globalTagID)
+	let groupID = globalTagID.split('-')[0]
+	let hatsuwaIDInGroup = globalTagID.split('-')[1]
+	let hatsuwaObjOwningThisTag = _hatsuwaGroups[groupID][hatsuwaIDInGroup]
+	console.log('選択されたタグをもつ発話obj: ', hatsuwaObjOwningThisTag)	
+	return hatsuwaObjOwningThisTag
+}
 //
 /**
  * このテキストは、指定フォントサイズだと何px？

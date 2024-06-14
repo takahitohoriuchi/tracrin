@@ -1,5 +1,5 @@
 // SECTION:【import】
-import { addArrow, deleteArrow, drawLabel, genHatsuwaTags, genSpan, getTagTextsInThisLoop, splitSpan } from './utils/domUtils.js'
+import { addArrow, deleteArrow, drawLabel, genHatsuwaTags, genRowDiv, genSpan, getHatsuwaObjFromSpan, getTagTextsInThisLoop, splitSpan } from './utils/domUtils.js'
 
 import { formatNumber, getMaxBracketsIndex, num2Px } from './utils/otherUtils.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './utils/transcriptUtils.js'
@@ -13,8 +13,8 @@ let speakerLabels = []
 let accumRowCount = 0 //最終的に表示されるデータ行数（データの選択箇所&折り返しとか反映後）
 let hatsuwaTimeResolution = 0.05
 // 動画について
-// let video = document.getElementById('myVideo');    
-// let videoPath = './movies/test.mp4';
+let video = document.getElementById('myVideo');    
+let videoPath = './movies/test.mp4';
 let startTime = 0
 let endTime = 100
 // DOM関連
@@ -41,6 +41,16 @@ let windowSize = {
 let fontSize = 12 //デフォだと12になるぽい
 let lineHeightRatio = 1.2 //フォントサイズに対するテキストのボックス高さの比
 
+// 色
+let mouseon4Label = '#F0F8FF'
+let selected4Label = 'red'
+let mouseon4Hatsuwarow = 'grey'
+let selected4Hatsuwatag = 'red'
+
+// DOMの選択
+let selectionStartTag
+let selectionEndTag
+
 
 // SECTION::【関数】
 // メイン関数
@@ -63,8 +73,7 @@ async function main(_file = null) {
 			await genHatsuwaObjs(textContent)				
 			tempConvertKukuriMarks(hatsuwaObjs)						
 			reconvertKukuriMarks(hatsuwaObjs)		// ククリ系記号を元に戻す関数
-			await groupingHatsuwaObjs(hatsuwaObjs)
-			
+			await groupingHatsuwaObjs(hatsuwaObjs)			
 		}
 
 		await drawHatsuwa(hatsuwaGroups, fontSize)
@@ -441,8 +450,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 }
 
 // 4: IDとSpeakerのラベルを左にDOM描画する関数
-async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
-	// TODO:
+async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {	
 	// drawLabel()を、グローバル位置Xを引数にとるようにして、各ラベルの位置を指定する
 	// 行ラベル表示
 	drawLabel(document, labelArea, 0, 0, 'ID', _fontSize) //ID
@@ -467,6 +475,7 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 	_hatsuwaGroups.forEach((hatsuwaGroup, i) => {
 		hatsuwaGroup.forEach((hatsuwaObj, j) => {
 			for (let k = 0; k < hatsuwaObj.rowNum; k++) {
+				
 				// 行連番を表示
 				const idColX = 0
 				const idColY = _fontSize * lineHeightRatio * (accumRowCount + k)
@@ -474,6 +483,9 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 				const id = formatNumber(accumRowCount + k + 1)//NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。
 				// const id = accumRowCount + k + 1
 				const label = drawLabel(document, itemArea, idColX, idColY, id, _fontSize)
+				// DEBUG:ここに、行エレメント（spanタグたちがはいる）を生成して、spanタグたちを追加したらどうなるか？
+				genRowDiv(document, dataArea, idColY)
+				// DEBUG:
 				idLabels.push(label)
 				// 「話者ラベル」を表示（発話の最初行だけ）
 				if (k == 0) {
@@ -487,22 +499,24 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 			accumRowCount += hatsuwaObj.rowNum
 		})
 	})
-	console.log('最終的な全行数: ', accumRowCount)
+	console.log('最終的に描画される行数: ', accumRowCount)
 }
 
-// 5: マウスクリックとマウスオンイベントを追加
+// 5: マウスイベントを追加
 async function addEvents() {
-	// 発話spanタグひとつひとつに（最小単位）
+	// 発話spanタグの選択（最小単位）
 	for (let group of hatsuwaTagSpans) {
 		for (let hatsuwa of group) {
 			for (let span of hatsuwa) {
 				// マウスオン
 				span.addEventListener('mouseover', () => {
-					span.style.color = 'red'
+					// span.style.color = mouseon4Label
+					span.style.backgroundColor = mouseon4Label
 				})
 				// マウスリーブ
 				span.addEventListener('mouseout', () => {
-					span.style.color = 'black'
+					// span.style.color = 'black'
+					span.style.backgroundColor = 'transparent'
 				})
 				// クリック
 				span.addEventListener('click', () => {
@@ -515,9 +529,28 @@ async function addEvents() {
 					let hatsuwaObjOwningThisTag = hatsuwaGroups[groupID][hatsuwaIDInGroup]
 					console.log('選択されたタグをもつ発話obj: ', hatsuwaObjOwningThisTag)
 					startTime = hatsuwaObjOwningThisTag.start
-					// video.currentTime = startTime
+					video.currentTime = startTime
 					endTime = hatsuwaObjOwningThisTag.end
 					console.log('endTime: ', endTime)
+					video.currentTime = endTime
+					// spanの選択状態をトグル
+					/*TODO:
+					 ・ほかのspanを全部非選択状態にする
+					 ・行をドラッグのやつはどうしよう？
+
+					*/
+					if(classList.contains('selected')){						
+						console.log('selectedのspanをクリック')
+						classList.remove('selected')
+						span.style.color = ''
+					}else{
+						console.log('日選択状態のspanを区rっ区')
+						classList.add('selected')
+						span.style.color = selected4Hatsuwatag
+					}
+
+					var style = window.getComputedStyle(span);
+					console.log('style ', style)
 					
 					/*NOTE:
 					上記コンソールには、<span>タグが出力されるが、
@@ -528,10 +561,43 @@ async function addEvents() {
 					まずはそれら時間のコンソール出力を以下に試すべし。
 					*/
 				})
+				// マウスダウン
+				span.addEventListener('mousedown', () => {
+					console.log('mousedownされたspan: ', span)
+					selectionStartTag = span
+					// ダウンとアップを記録するだけで良い。そのあいだのspanタグ全部取得するから。
+				})
+				// マウスムーブ
+				span.addEventListener('mousemove', () => {
+					// console.log('mousedownされたspan: ', span)					
+				})
+				// マウスアップ
+				span.addEventListener('mouseup', () => {
+					console.log('mouseupされたspan: ', span)
+					selectionEndTag = span
+					// console.log('selectionEndTag: ', selectionEndTag)					
+					let sGlobalTagID = selectionStartTag.classList[1]					
+					let eGlobalTagID = selectionEndTag.classList[1]
+					// sGlobalTagIDのタグを含む（最初の）行から
+					// eGlobalTagIDのタグを含む（最後の）行まで
+					// <行エレメント>をすべて色付けする。
+
+					
+					// 部分再生の時間をセット↓
+					// 動画の部分再生begin = そのbeginタグが属する発話obj
+					// 動画の部分再生end = そのendタグが属する発話obj					
+					let sObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)					
+					let eObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)					
+					startTime = sObj.start
+					console.log('startTime: ', startTime)
+					video.currentTime = startTime
+					endTime = eObj.end
+					console.log('endTime: ', endTime)
+				})
 			}
 		}
 	}
-	// 発話行の選択（ID）
+	// 発話行IDラベルの選択
 	for (let [i, label] of idLabels.entries()) {
 		// マウスオン
 		label.addEventListener('mouseover', () => {
@@ -560,7 +626,7 @@ async function addEvents() {
 			}								
 		})
 	}
-	// 発話行の選択（speaker）
+	// 発話行speakerラベルの選択
 	for (let label of speakerLabels) {
 		// マウスオン
 		label.addEventListener('mouseover', () => {
@@ -597,7 +663,7 @@ async function addEvents() {
 //     }
 // }
 
-// 発話グループごとの水平線のトグル
+// 【⚙️設定メニュー】: 発話グループごとの水平線のトグル
 function toggleLine() {
 	console.log('toggleLine()')
     var checkbox = document.getElementById('toggle-line');
@@ -672,50 +738,50 @@ async function reload() {
 
 // イベントの定義
 window.addEventListener('DOMContentLoaded', () => {	
-    // // 動画のソースを設定
-    // video.src = videoPath;
+    // 動画のソースを設定
+    video.src = videoPath;
 	
-    // // メタデータがロードされたら動画情報を取得
-    // video.addEventListener('loadedmetadata', function() {
-	// 	console.log('videoオブジェクト: ', video)
-    //     console.log(`Video Width: ${video.videoWidth}px`);
-    //     console.log(`Video Height: ${video.videoHeight}px`);
-    //     console.log(`Duration: ${video.duration}s`);
-	// 	endTime = video.duration
-	// 	console.log('endTime: ', endTime)
-    //     // ここで必要に応じて他の動作を行う
-    // });
+    // メタデータがロードされたら動画情報を取得
+    video.addEventListener('loadedmetadata', function() {
+		console.log('videoオブジェクト: ', video)
+        console.log(`Video Width: ${video.videoWidth}px`);
+        console.log(`Video Height: ${video.videoHeight}px`);
+        console.log(`Duration: ${video.duration}s`);
+		endTime = video.duration
+		console.log('endTime: ', endTime)
+        // ここで必要に応じて他の動作を行う
+    });
 
-    // // 動画の再生準備ができたら再生を開始
-    // video.addEventListener('canplay', function() {
-    //     // video.play();
-    // });
-	// // 再生が開始されたとき
-    // video.addEventListener('play', function() {
-    //     console.log('再生が開始されました。');
-    // });
+    // 動画の再生準備ができたら再生を開始
+    video.addEventListener('canplay', function() {
+        // video.play();
+    });
+	// 再生が開始されたとき
+    video.addEventListener('play', function() {
+        console.log('再生が開始されました。');
+    });
 
-    // // 一時停止されたとき
-    // video.addEventListener('pause', function() {
-    //     console.log('一時停止されました。');
-	// 	console.log(`currentTime: ${video.currentTime}s`);        
-    // });
+    // 一時停止されたとき
+    video.addEventListener('pause', function() {
+        console.log('一時停止されました。');
+		console.log(`currentTime: ${video.currentTime}s`);        
+    });
 
-	//  // 再生中の現在時刻を監視
-    // video.addEventListener('timeupdate', function() {				
-	// 	console.log('動画コマうごきました（timeupdate）')
-	// 	// TODO:手動スライダで動画を動かしたときに、startTimeとendTimeをどうする？
-    //     if (video.currentTime >= endTime) {
-    //         video.pause(); // 終了時間に達したら一時停止
-    //         video.currentTime = startTime; // 必要に応じて再度開始時間に戻す
-    //         console.log('指定された区間の再生が完了しました。');
-    //     }
-    // });
+	 // 再生中の現在時刻を監視
+    video.addEventListener('timeupdate', function() {				
+		console.log('動画コマうごきました（timeupdate）')
+		// TODO:手動スライダで動画を動かしたときに、startTimeとendTimeをどうする？
+        if (video.currentTime >= endTime) {
+            video.pause(); // 終了時間に達したら一時停止
+            video.currentTime = startTime; // 必要に応じて再度開始時間に戻す
+            console.log('指定された区間の再生が完了しました。');
+        }
+    });
 
-    // // 動画が終了したとき
-    // video.addEventListener('ended', function() {
-    //     console.log('動画が終了しました。');
-    // });
+    // 動画が終了したとき
+    video.addEventListener('ended', function() {
+        console.log('動画が終了しました。');
+    });
 
 	const ddarea = document.getElementById('ddarea')
 	const tarea = document.getElementById('txtarea')
