@@ -53,7 +53,8 @@ export function genSpan(_document, _element, _tagText, _id, _fontSize, _tagX = 0
 	var dummy = _document.createElement('span')
 	dummy.className = 'tag'
 	dummy.innerHTML = _tagText	
-	dummy.classList.add(_id) //NOTE: グループID-発話ID-パーツID	
+	// dummy.classList.add(_id) //NOTE: グループID-発話ID-パーツID	
+	dummy.setAttribute('globalTagID', _id)
 	dummy.style.fontSize = num2Px(_fontSize)
 	// X位置
 	dummy.style.left = num2Px(_tagX)
@@ -61,17 +62,50 @@ export function genSpan(_document, _element, _tagText, _id, _fontSize, _tagX = 0
 	return dummy
 }
 
-export function genRowDiv(_document, _parentElem, _y){
+
+export function genLabelBox(_document, _row){
+	var labelBox = _document.createElement('div')
+	labelBox.className = 'labelBox'
+	let rowID = _row.getAttribute('rowID')
+	labelBox.setAttribute('rowID', rowID)
+	labelBox.style.top = _row.style.top
+	// console.log('_row.top（labelBox）: ', _row.style.top)
+	labelBox.style.height = _row.style.height
+	// console.log('_row.height: ', _row.style.height)
+	labelBox.style.left = '0px'
+	// labelBox.style.backgroundColor = 'blue'
+	labelBox.style.width = '90px'
+	labelBox.style.backgroundColor = 'transparent'
+	_row.appendChild(labelBox)
+	return labelBox
+}
+
+export function genRowDiv(_document, _parentElem, _w, _y, _rowID, _h){
 	var row = _document.createElement('div')
 	row.className = 'row'
-	// row.innerHTML = _tagText	
-	// row.classList.add(_id) //NOTE: グループID-発話ID-パーツID	
-	// row.style.fontSize = num2Px(_fontSize)
+	row.setAttribute('rowID', _rowID)
+	row.style.display = 'flex'		
 	// X位置
 	row.style.top = num2Px(_y)
-	row.style.width = '200px'
-	row.style.backgroundColor = 'red'
+	row.style.width = num2Px(_parentElem.width)
+	row.style.height = num2Px(_h)
+
+	// gendataBox
+	var dataBox = _document.createElement('div')
+	dataBox.className = 'dataBox'	
+	dataBox.setAttribute('rowID', _rowID)
+	// dataBox.style.position = 'absolute'
+	dataBox.style.top = num2Px(_y)
+	dataBox.style.height = num2Px(_h)
+	dataBox.style.width = num2Px(_w)
+	dataBox.style.flex = 1	
+	dataBox.style.backgroundColor = 'transparent'
+			
+	// dataBoxをrowに追加し、	
+	row.appendChild(dataBox)
+	// rowをdataAreaに追加する
 	_parentElem.appendChild(row)
+
 	console.log('row: ', row)
 	return row
 
@@ -87,15 +121,27 @@ export function genRowDiv(_document, _parentElem, _y){
  * @param {*} _fontSize 
  * @returns 
  */
-export function drawLabel(_document, _element, _x, _y, _label, _fontSize){	
+export function drawLabel(_document, _element, _x, _y, _label, _rowID, _fontSize){	
 	var dummy = _document.createElement('span')
-	dummy.className = 'label'
+	dummy.setAttribute('rowID', _rowID)
+	dummy.className = 'label'	
 	dummy.innerHTML = _label
 	dummy.style.fontSize = num2Px(_fontSize)
 	dummy.style.left = num2Px(_x)
-	dummy.style.top = num2Px(_y)
+	dummy.style.top = num2Px(_y)	
 	_element.appendChild(dummy)
 	return dummy
+}
+
+export function drawHeaderLabel(_document, _headerArea, _x, _y, _label, _fontSize){
+	var label = _document.createElement('span')	
+	label.className = 'label'	
+	label.innerHTML = _label
+	label.style.fontSize = num2Px(_fontSize)
+	label.style.left = num2Px(_x)
+	label.style.top = num2Px(_y)	
+	_headerArea.appendChild(label)
+	return label
 }
 
 /**
@@ -113,7 +159,7 @@ export function addArrow(_document, _element, _fontSize, _x, _y){
 	dummy.style.fontSize = num2Px(_fontSize)
 	dummy.style.left = num2Px(_x)
 	dummy.style.top = num2Px(_y)
-	_element.appendChild(dummy)
+	_element.appendChild(dummy)	
 }
 
 export function deleteArrow(_parentElem, _arrows){
@@ -148,14 +194,17 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 	let result
 	// この行におさまらない場合
 	if (text.length > _charNumFirstRow) {		
-		// textのなかに"<"と">"が順番にある・・・isゆっくり = true
-		// textのなかに">"と"<"が順番にある・・・is急いで = true
-		// textのなかに"°"がある・・・is小さい = true
-		// textのなかに".h"がある(正規表現だと、/\.h+/)・・・is吸気音 = true
-		// textのなかに"(hhh)"がある（正規表現だと、\((h+)\)）・・・is笑い = true
-		// textのなかに"(0.4)"的なのがある（正規表現だと、\((\d+(\.\d+)?)\)）・・・短い沈黙
-		// これらそれぞれについて、
-		// これらをなす記号の「開始インデックス」と「終了インデックス」を取得しておき、						
+		/*
+		textのなかに
+		・"<"と">"が順番にある・・・isゆっくり = true
+		・">"と"<"が順番にある・・・is急いで = true
+		・"°"がある・・・is小さい = true
+		・".h"がある(正規表現だと、/\.h+/)・・・is吸気音 = true
+		・"(hhh)"がある（正規表現だと、\((h+)\)）・・・is笑い = true
+		・"(0.4)"的なのがある（正規表現だと、\((\d+(\.\d+)?)\)）・・・短い沈黙
+		これらそれぞれについて、
+		これらをなす記号の「開始インデックス」と「終了インデックス」を取得しておき、						
+		*/
 		function splitText(text, charNumFstRow, maxCharNumPerR) {
 			// まずcharNumFirstRowのぶんだけとりだす
 			var finalSplit = []
@@ -365,8 +414,9 @@ export function toggleSelectionOfSpan(_span){
  * @returns 
  */
 export function getHatsuwaObjFromSpan(_span, _hatsuwaGroups){
-	let classList = _span.classList
-	let globalTagID = classList[1]
+	// let classList = _span.classList
+	// let globalTagID = classList[1]
+	let globalTagID = _span.getAttribute("globalTagID")
 	console.log('globalTagID: ', globalTagID)
 	let groupID = globalTagID.split('-')[0]
 	let hatsuwaIDInGroup = globalTagID.split('-')[1]

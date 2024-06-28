@@ -19,7 +19,7 @@ nav {
 
 /* :::SECTION */
 
-/* タグ（発話をさらに区切ったもの） */
+/* タグspan */
 .tag {
 	/* border: 1px solid #aaaaaa; */
 	position: absolute; /* absolute指定しないと、widthが出てこない。 */
@@ -28,7 +28,7 @@ nav {
 	padding: 0%;
 	line-height: 120%
 }
-/* 左の話者ラベルなど */
+/* ラベルspan（左のspeakerやID） */
 .label {
 	/* background: #888; */
 	/* border: 1px solid #22aaaa; */
@@ -77,15 +77,7 @@ nav {
 #ddarea.ddefect {
 	border: 1px solid #000;
 }
-#txtarea {
-	padding: 5px;
-	width: 90%;
-	height: 20px;
-	overflow: auto;
-	/* background: lightgray; */
-	color: black;
-	margin: 1em auto;
-}
+
 /* トラクリのエリア */
 #transcriptArea {
 	/* background-color: #eeeeee; */
@@ -93,39 +85,34 @@ nav {
 	/* border-width: thick;	 */
 	display: none;
 	position: relative;
-	height: 600px;
-	width: 600px;
-	top: 0px;
-	/* left: 20px; */
+	height: 600px;	
+	top: 0px;	
 	margin: 10px;		
 	padding: 0%;
 }
 
 /* ヘッダ行 */
-#labelArea{
+#headerArea{
 	/* background-color: #eeeeee; */
 	background-color: #ffffff;
 	border-color: #000;		
 	position: absolute;
-	height: 30px;
+	height: 20px;
 	width: 320px;
 	top: 0px;
 	left: 0px;	
 	padding: 0%;
-	margin: 10px;
+	margin-bottom: 0px;
+	/* margin: 10px; */
 	/* margin-left: 10px; */
 }
 
 #scrollable-div{
 	position: absolute;
 	overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
-	border: 1px solid #ccc; /* 枠線を追加 */
-	top: 30px;
-	left: 0px;
-	width: 600px;/* NOTE:transcriptAreaと同じ！ */
-	height: 570px;/*NOTE:transcriptAreaとおなじ*/
-	margin: none;
-	padding: none;
+	border: 1px solid #ccc; /* 枠線を追加 */	
+	left: 0px;	
+	height: 570px;/*NOTE:transcriptAreaとおなじ*/		
 }
 
 /* トラクリタグたちが描かれるエリア */
@@ -134,34 +121,9 @@ nav {
 	border-color: #000;
 	position: absolute;
 	/* position: relative; */
-	height: 570px;
-	width: 200px;
-	top: 0px;
-	left: 90px;	
-	padding: 0%;
-	margin-top: 5px;
-	/* margin-left: 10px; */
-}
-
-/* ラベルのエリア */
-#itemArea{
-	/* background-color: #eeeeee; */
-	background-color: #ffffff;
-	border-color: #000;
-	position: absolute;
-	/* position: relative; */
-	height: 570px;
-	width: 100px;
-	/* width: 400px; */
-	top: 0px;
-	left: 0px;
-	margin-top: 5px;
-	margin-left: 10px;
-	padding: 0%;
-}
-.txtareawrap {
-	text-align: center;
-	margin-bottom: 1em;
+	height: 570px;	
+	top: 0px;	
+	padding: none;		
 }
 
 /* :::設定メニュー */

@@ -85,8 +85,7 @@ function findStartIndexOfSubstring(str, substring) {
 }
 
 export async function tempConvertKukuriMarksInHatsuwa(_hatsuwaObj){
-    console.log('この発話objを変換します', _hatsuwaObj)    
-    console.log('\n\n\n\n\n\n\n\n\n\n\n\n')
+    console.log('この発話objを変換します', _hatsuwaObj)        
     console.log('_hatsuwaObj.text: ', _hatsuwaObj.text)
     console.log('isIncludeAnyKukuriMark(_hatsuwaObj.text): ', isIncludeAnyKukuriMark(_hatsuwaObj.text))    
     while(isIncludeAnyKukuriMark(_hatsuwaObj.text)){

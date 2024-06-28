@@ -5,9 +5,10 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="./style.css" />
-		<title>Tracrin--2.0</title>
+		<title>tracrin--2.0.0</title>
 	</head>
 	<body>
+		<!-- 設定メニュー -->
 		<nav>
 			<div>Tracrin2.0.0</div>
 			<!-- 設定アイコン -->
@@ -15,17 +16,25 @@
 			
 			<!-- 設定メニュー（デフォルトでは非表示） -->
 			<div id="settings-menu" style="display: none;">
-				<label>
-					<input type="checkbox" id="toggle-line">
-					発話グループごとに水平線
-				</label>
+				<ul style="list-style: none">
+					<li>
+						<label>
+							<input type="checkbox" id="toggle-line">
+							発話グループごとに水平線
+						</label>
+					</li>
+					<li>
+						<label>
+							<input type="checkbox" id="toggle-dev">
+							開発用表示モード
+						</label>
+					</li>
+				</ul>				
+				
 			</div>
 
 		</nav>
-		<div id="ddarea"><p>Drag & Drop your file(.txt) on me!</p></div>
-		<!-- <div class="txtareawrap">
-			<textarea id="txtarea"></textarea>
-		</div> -->
+		<div id="ddarea"><p>Drag & Drop your file(.txt) on me!</p></div>		
 		<!-- 動画エリア -->
 		<div id="videoContainer">
 			<video id="myVideo" controls>								
@@ -34,10 +43,13 @@
 
 		<!-- 発話描画エリア -->
 		<div id="transcriptArea">
-			<div id="labelArea"></div>
-			<div id="scrollable-div">
-				<div id="itemArea"></div>
-				<div id="dataArea"></div>				
+			<div id="headerArea">
+				<!-- ヘッダ行エリア -->
+			</div>
+			<div id="scrollable-div">				
+				<div id="dataArea">
+					<!-- データ列エリア -->
+				</div>				
 			</div>
 		</div>
 
@@ -46,6 +58,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
 		<!-- ファイルの読み込み -->
 		<script src="./main.js" type="module"></script>
+
 	</body>
 </html>
 
