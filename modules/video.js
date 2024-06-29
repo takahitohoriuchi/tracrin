@@ -38,10 +38,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	 // 再生中の現在時刻を監視
     video.addEventListener('timeupdate', function() {				
-		console.log('動画コマうごきました（timeupdate）')
+		// console.log('動画コマうごきました（timeupdate）')
         // TODO:currentTimeをつかって、hatsuwaObjsを検索し、そのrowを装飾せよ
         // TODO:hatsuwaObjをどうやってここで受け取るか？constにしないとexportできないが。。    
-        for(let i=0; i<hatsuwaObjs.length; i++){
+        // for(let i=0; i<hatsuwaObjs.length; i++){
             // if(
             //     (currentTime >= hatsuwaObj.start)
             //     &&
@@ -49,14 +49,14 @@ window.addEventListener('DOMContentLoaded', () => {
             // ){
 
             // }                                    
-        }
+        // }
 
 
 		// TODO:手動スライダで動画を動かしたときに、video.startTimeとvideo.endTimeをどうする？
         if (video.currentTime >= video.endTime) {
             video.pause(); // 終了時間に達したら一時停止
             video.currentTime = video.startTime; // TODO:必要に応じて再度開始時間に戻す？それともそのまま？
-            console.log('指定された区間の再生が完了しました。');
+            // console.log('指定された区間の再生が完了しました。');
         }
     });
 

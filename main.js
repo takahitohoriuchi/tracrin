@@ -98,6 +98,7 @@ async function main(_file = null) {
 		console.log('行数: ', rowElems.length)
 		console.log('dataBoxX: ', dataBoxX)
 		console.groupEnd()
+		console.log('-----データロード完了-----')
 	}
 }
 
@@ -377,8 +378,9 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 				splittedSpanTexts.forEach((splittedTag, k) => {
 					const tagX = k == 0 ? startX : 0//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
 					// テキストからspanタグを描画
-					// NOTE:spanの親はいったんdataAreaにしている（各rowとその子のdataBox未生成のため）					
-					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX+labelBoxW)					
+					// NOTE:ここでは一時的に、spanの親をdataAreaにしてある（rowと、その子かつspanの親である「dataBox」がまだ未生成のため）
+					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX+labelBoxW)	
+					e.setAttribute('fragmentID', k)
 					// 全体の発話span配列に追加する
 					hatsuwaTagSpans[groupIndex][hatsuwaID].push(e)
 					// 分割してできた最終タグが、maxケツXの候補になる！					
@@ -597,9 +599,10 @@ async function addMouseEvents() {
 				})				
 				// マウスダウン
 				span.addEventListener('mousedown', () => {
+					console.groupCollapsed('spanのマウスダウン処理')					
 					console.log('mousedownされたspan: ', span)
-					selectionStartTag = span// ダウンとアップを記録するだけで良い。そのあいだのspanタグ全部取得するから。					
-					// TODO:行の色付けをいったんぜんぶ元に戻す
+					selectionStartTag = span// ダウンとアップを記録するだけで良い。そのあいだのspanタグ全部取得するから。										
+					console.groupEnd()
 				})
 				// マウスムーブ
 				span.addEventListener('mousemove', () => {
@@ -607,7 +610,7 @@ async function addMouseEvents() {
 				})
 				// マウスアップ
 				span.addEventListener('mouseup', () => {
-					console.groupCollapsed('マウスアップ')
+					console.groupCollapsed('spanのマウスアップ処理')
 					console.log(span)
 					selectionEndTag = span
 					// console.log('selectionEndTag: ', selectionEndTag)															
@@ -656,7 +659,7 @@ async function addMouseEvents() {
 				})
 				// クリック（NOTE:マウスアップのあとに起こる）
 				span.addEventListener('click', () => {
-					console.groupCollapsed('spanタグがclickされた')
+					console.groupCollapsed('spanのクリック処理')
 					console.log(span)					
 					let globalTagID = span.getAttribute('globalTagID')					
 					console.log('globalTagID: ', globalTagID)
