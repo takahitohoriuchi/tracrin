@@ -4,6 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video } from './modules/video.js'
+import { drawComment } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -32,6 +33,7 @@ let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
+let commentArea = document.getElementById('commentArea')
 
 let windowSize = {
 	w: 0,
@@ -918,4 +920,11 @@ window.addEventListener('resize', () => {
 		main()
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
+})
+
+// コメントを表示
+document.addEventListener("DOMContentLoaded", function() {
+  var container = document.getElementById("commentArea")
+  var paragraph = drawComment()
+  container.appendChild(paragraph)
 })
