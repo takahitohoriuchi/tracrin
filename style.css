@@ -168,8 +168,9 @@ nav {
   margin: 0;
   background-color: #89f0ff;
 }
-.draggable textarea {
+.commentInput {
   width: 100%;
+  min-height: 18px;
   height: 36px;
   box-sizing: border-box;
   background-color: #adf4ff;

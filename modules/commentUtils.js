@@ -8,7 +8,11 @@ export function drawComment(commentObj) {
 
   const inputElement = document.createElement("textarea")
   inputElement.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
-  inputElement.className = 'draggable'
+  inputElement.className = 'commentInput'
+  inputElement.onchange = function() {
+    commentObj.comment = this.value
+    console.log(commentObj.comment)
+  }
 
   divElement.appendChild(inputElement)
   $(divElement).draggable()

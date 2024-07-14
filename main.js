@@ -948,4 +948,3 @@ document.addEventListener("DOMContentLoaded", function() {
     container.appendChild(comment)
   })
 })
-
