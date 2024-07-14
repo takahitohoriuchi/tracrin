@@ -703,6 +703,23 @@ async function addMouseEvents() {
 					console.groupEnd()
 	
 				})
+
+        // ダブルクリックでコメントを追加
+        span.addEventListener("dblclick", () => {
+          let globalTagID = span.getAttribute('globalTagID')
+          let commentObj = {
+            comment: globalTagID + "のコメント",
+            linkedGlobalTagIDs: [ globalTagID ],
+            category: ""
+          }
+          var container = document.getElementById("commentArea")
+          let commentElement = drawComment(commentObj.comment)
+          container.appendChild(commentElement)
+
+          commentObjs.push(commentObj)
+          console.log(commentObjs)
+        })
+
 			}
 		}
 	}
@@ -925,6 +942,9 @@ window.addEventListener('resize', () => {
 // コメントを表示
 document.addEventListener("DOMContentLoaded", function() {
   var container = document.getElementById("commentArea")
-  var paragraph = drawComment()
-  container.appendChild(paragraph)
+  commentObjs.forEach((commentObj) => {
+    let comment = drawComment(commentObj.comment)
+    container.appendChild(comment)
+  })
 })
+

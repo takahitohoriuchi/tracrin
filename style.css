@@ -153,5 +153,19 @@ nav {
 .layerComment {
   position: absolute;
   z-index: 2;
-  color: red;
+}
+
+.container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  border: 1px solid black;
+}
+.draggable {
+  width: 200px;
+  height: 18px;
+  background-color: #b6e8f3;
+  position: absolute;
+  cursor: pointer;
+  font-size: 12px;
 }
