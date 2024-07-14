@@ -155,17 +155,25 @@ nav {
   z-index: 2;
 }
 
-.container {
-  position: relative;
-  width: 500px;
-  height: 500px;
-  border: 1px solid black;
-}
 .draggable {
   width: 200px;
   height: 18px;
-  background-color: #b6e8f3;
   position: absolute;
   cursor: pointer;
   font-size: 12px;
+}
+.header {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  background-color: #89f0ff;
+}
+.draggable textarea {
+  width: 100%;
+  height: 36px;
+  box-sizing: border-box;
+  background-color: #adf4ff;
+  border: none;
+  font-size: 12px;
+  resize: vertical;
 }

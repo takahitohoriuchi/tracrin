@@ -1,7 +1,17 @@
-export function drawComment(comment) {
-  var p = document.createElement("p")
-  p.textContent = comment
-  p.className = 'draggable'
-  $(p).draggable()
-  return p
+export function drawComment(commentObj) {
+  const divElement = document.createElement("div")
+  divElement.className = 'draggable'
+
+  const p = document.createElement("p")
+  p.className = "header"
+  divElement.appendChild(p)
+
+  const inputElement = document.createElement("textarea")
+  inputElement.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
+  inputElement.className = 'draggable'
+
+  divElement.appendChild(inputElement)
+  $(divElement).draggable()
+
+  return divElement
 }

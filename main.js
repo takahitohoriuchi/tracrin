@@ -34,6 +34,7 @@ let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
 let commentArea = document.getElementById('commentArea')
+let commentObjs = []
 
 let windowSize = {
 	w: 0,
@@ -712,8 +713,8 @@ async function addMouseEvents() {
             linkedGlobalTagIDs: [ globalTagID ],
             category: ""
           }
-          var container = document.getElementById("commentArea")
-          let commentElement = drawComment(commentObj.comment)
+          let container = document.getElementById("commentArea")
+          let commentElement = drawComment(commentObj)
           container.appendChild(commentElement)
 
           commentObjs.push(commentObj)
@@ -941,7 +942,7 @@ window.addEventListener('resize', () => {
 
 // コメントを表示
 document.addEventListener("DOMContentLoaded", function() {
-  var container = document.getElementById("commentArea")
+  let container = document.getElementById("commentArea")
   commentObjs.forEach((commentObj) => {
     let comment = drawComment(commentObj.comment)
     container.appendChild(comment)
