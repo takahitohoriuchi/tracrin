@@ -1,22 +1,29 @@
 // 動画について
 export let video = document.getElementById('myVideo'); 
+export let videoAspectRatio;
 let videoPath = './movies/test.mp4';
 video.startTime = 0
 video.endTime = 100
 
 // 動画のソースを設定
 window.addEventListener('DOMContentLoaded', () => {	
-    video.src = videoPath;
+    video.src = videoPath;        
+    
+    // DEBUG:ビデオの縦横サイズをウィンドウにあわせる
+
 	
     // メタデータがロードされたら動画情報を取得
     video.addEventListener('loadedmetadata', function() {
-        console.groupCollapsed('video initialization')
+        console.groupCollapsed('videoデータ')
 		console.log('videoオブジェクト: ', video)
         console.log(`Video Width: ${video.videoWidth}px`);
         console.log(`Video Height: ${video.videoHeight}px`);
+        videoAspectRatio = video.videoWidth / video.videoHeight
+        console.log('videoAspectRatio: ', videoAspectRatio)
+
         console.log(`Duration: ${video.duration}s`);
 		video.endTime = video.duration
-		console.log('video.endTime: ', video.endTime)
+		console.log('video.endTime: ', video.endTime)        
         console.groupEnd()
         // ここで必要に応じて他の動作を行う
     });
