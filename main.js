@@ -4,6 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video, videoAspectRatio } from './modules/video.js'
+import { drawComment, outputCommentFile } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -32,6 +33,8 @@ let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
+
+let commentObjs = []
 
 let windowSize = {
 	w: 0,
@@ -705,6 +708,25 @@ async function addMouseEvents() {
 					console.groupEnd()
 	
 				})
+
+        // ダブルクリックでコメントを追加
+        span.addEventListener("contextmenu", () => {
+          event.preventDefault()
+          let globalTagID = span.getAttribute('globalTagID')
+          let commentObj = {
+            linkedGlobalTagIDs: [ globalTagID ],
+            comment: "",
+            isShown: true,
+            category: ""
+          }
+          let container = document.getElementById("commentArea")
+          let commentElement = drawComment(commentObj)
+          container.appendChild(commentElement)
+
+          commentObjs.push(commentObj)
+          console.log(commentObjs)
+        })
+
 			}
 		}
 	}
@@ -968,4 +990,17 @@ window.addEventListener('resize', () => {
 		main()
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
+})
+
+// コメントを表示
+document.addEventListener("DOMContentLoaded", function() {
+  let container = document.getElementById("commentArea")
+  commentObjs.forEach((commentObj) => {
+    let comment = drawComment(commentObj.comment)
+    container.appendChild(comment)
+  })
+})
+
+document.addEventListener("DOMContentLoaded", function() {
+  outputCommentFile(commentObjs)
 })

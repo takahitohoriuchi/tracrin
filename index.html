@@ -11,6 +11,7 @@
 		<!-- 設定メニュー -->
 		<nav>
 			<div>tracrin2.0.0</div>
+      <button id="buttonOutputComment">コメントファイルを出力</button>
 			<!-- 設定アイコン -->
 			<div id="settings-icon">⚙️</div>
 			
@@ -52,7 +53,7 @@
 		</div>
 
 		<!-- 発話描画エリア -->
-		<div id="transcriptArea">
+		<div id="transcriptArea" class="layerTranscript">
 			<div id="headerArea">
 				<!-- ヘッダ行エリア -->
 			</div>
@@ -63,14 +64,19 @@
 			</div>
 		</div>
 
+    <!-- コメント描画エリア -->
+    <div id="commentArea" class="layerComment">
+    </div>
+
 	<!-- :::JS読み込み -->
 		<!-- CDN -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
 		<!-- ファイルの読み込み -->
 		<script src="./main.js" type="module"></script>
-
+    <!-- コメント表示領域をドラッグ可能にする -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>    
 	</body>
 </html>
 
 <!-- :::CSS(NOTE:JSより先にかく！) -->
-
