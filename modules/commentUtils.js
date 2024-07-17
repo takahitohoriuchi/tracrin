@@ -29,11 +29,11 @@ export function drawComment(commentObj) {
       inputElement.style.display = 'block'
     }
 
-    if ( commentObj.isShow ) {
+    if ( commentObj.isShown ) {
+      header.textContent = ""
+    } else {
       header.textContent = commentObj.comment
       console.log(commentObj.comment)
-    } else {
-      header.textContent = ""
     }
   }
 
