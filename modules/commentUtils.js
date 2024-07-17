@@ -21,8 +21,15 @@ export function drawComment(commentObj) {
   }
 
   header.onclick = function() {
-    inputElement.style.display = (inputElement.style.display === 'none') ? 'block' : 'none'
-    if (inputElement.style.display === 'none') {
+    if ( commentObj.isShown ) {
+      commentObj.isShown = false
+      inputElement.style.display = 'none'
+    } else {
+      commentObj.isShown = true
+      inputElement.style.display = 'block'
+    }
+
+    if ( commentObj.isShow ) {
       header.textContent = commentObj.comment
       console.log(commentObj.comment)
     } else {
