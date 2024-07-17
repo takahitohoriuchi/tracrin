@@ -10,7 +10,7 @@
 	<body>
 		<!-- 設定メニュー -->
 		<nav>
-			<div>Tracrin2.0.0</div>
+			<div>tracrin2.0.0</div>
 			<!-- 設定アイコン -->
 			<div id="settings-icon">⚙️</div>
 			
@@ -36,9 +36,19 @@
 		</nav>
 		<div id="ddarea"><p>Drag & Drop your file(.txt) on me!</p></div>		
 		<!-- 動画エリア -->
-		<div id="videoContainer">
+		<div id="videoContainer">			
 			<video id="myVideo" controls>								
 			</video>
+		</div>
+
+		<!-- TODO:プチ設定エリア -->
+		<div id="editContainer">
+			<h6>設定</h6>
+			<label>
+				<button id = "releaseSelectionButton" class="favorite styled" type="button">
+					選択を解除
+				</button>				
+			</label>
 		</div>
 
 		<!-- 発話描画エリア -->
