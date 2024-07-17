@@ -706,7 +706,8 @@ async function addMouseEvents() {
 				})
 
         // ダブルクリックでコメントを追加
-        span.addEventListener("dblclick", () => {
+        span.addEventListener("contextmenu", () => {
+          event.preventDefault()
           let globalTagID = span.getAttribute('globalTagID')
           let commentObj = {
             linkedGlobalTagIDs: [ globalTagID ],
