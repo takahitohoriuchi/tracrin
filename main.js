@@ -3,8 +3,8 @@ import { addArrow, deleteArrow, drawHeaderLabel, drawLabel, genHatsuwaTags, genL
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
-import { video } from './modules/video.js'
-import { drawComment } from './modules/commentUtils.js'
+import { video, videoAspectRatio } from './modules/video.js'
+import { drawComment, outputCommentFile } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -33,7 +33,7 @@ let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
-let commentArea = document.getElementById('commentArea')
+
 let commentObjs = []
 
 let windowSize = {
@@ -700,17 +700,23 @@ async function addMouseEvents() {
 							spn.style.color = ''
 						});
 					}
-					var style = window.getComputedStyle(span);					
+					var style = window.getComputedStyle(span);		
+					
+					// TODO:選択spanの数が1個以上なら、ボタン表示にする
+
+
 					console.groupEnd()
 	
 				})
 
         // ダブルクリックでコメントを追加
-        span.addEventListener("dblclick", () => {
+        span.addEventListener("contextmenu", () => {
+          event.preventDefault()
           let globalTagID = span.getAttribute('globalTagID')
           let commentObj = {
-            comment: globalTagID + "のコメント",
             linkedGlobalTagIDs: [ globalTagID ],
+            comment: "",
+            isShown: true,
             category: ""
           }
           let container = document.getElementById("commentArea")
@@ -804,11 +810,20 @@ async function addMouseEvents() {
 async function resize() {
 	console.groupCollapsed('リサイズ関数()')
 	console.log('window.innerWidth: ', window.innerWidth)	
+
 	// NOTE:外側の要素からサイズ決定していく（データによらないサイズ情報。）
+	
+	// (0) ウィンドウサイズ変更
+	windowSize.w = window.innerWidth
+	windowSize.h = window.innerHeight
+	console.log('windowSize: ', windowSize)
+
+	
+
 	
 	// (1) transcriptAreaとその子scrollableDivAreaのサイズ（ウィンドウサイズに応じて）
 	transcriptArea.style.display = 'block'
-	transcriptArea.style.width = num2Px(window.innerWidth) //-20はtranscriptAreaのmargin*2ぶん
+	transcriptArea.style.width = num2Px(window.innerWidth)
 	transcriptAreaStyle = transcriptArea.getBoundingClientRect()
 	scrollableDivArea.style.margin = num2Px(scrollableDivAreaMargin)
 	scrollableDivArea.style.width = num2Px(window.innerWidth - 2*scrollableDivAreaMargin) //-20はtranscriptAreaのm
@@ -828,6 +843,16 @@ async function resize() {
 	headerArea.style.width = num2Px(dataAreaStyle.width)
 	headerAreaStyle = headerArea.getBoundingClientRect()
 	// console.log('scrollableDivAreaStyle.margin: ', scrollableDivArea.style.padding)					
+
+	// ビデオをリサイズ（scrollableDivAreaにハバをあわせる）
+	const videoContainer = document.getElementById('videoContainer')
+	// videoContainer.style.width = num2Px(window.innerWidth)
+	// videoContainer.style.height = num2Px(window.innerWidth / videoAspectRatio)
+	
+	videoContainer.style.width = num2Px(scrollableDivAreaStyle.width)
+	videoContainer.style.height = num2Px(scrollableDivAreaStyle.width / videoAspectRatio)
+
+
 	console.groupEnd()
 }
 
@@ -924,6 +949,36 @@ window.addEventListener('DOMContentLoaded', () => {
 	// 開発用表示＠設定メニュー
 	const toggleDevCheckbox = document.getElementById('toggle-dev');	
 	toggleDevCheckbox.addEventListener('change', toggleDev)
+
+	// プチ設定エリア
+	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
+	releaseSelectionButton.addEventListener('click', ()=>{		
+		// ボタン非表示
+		// releaseSelectionButton.style.display = 'none'
+
+		// spanの選択解除
+		let selectedSpans = document.getElementsByClassName('selected')								
+		// このspanが元々selectedなら、		
+		Array.from(selectedSpans).forEach(spn => {
+			spn.classList.remove('selected');
+			spn.style.color = ''
+		});
+
+		// rowの選択解除
+		rowElems.forEach((row,i)=>{			
+			row.removeAttribute('selected')
+			row.style.backgroundColor = 'transparent'			
+		})			
+
+		// ビデオをもどす
+		video.startTime = 0
+		video.currentTime = video.startTime
+		video.endTime = video.duration		
+		
+		// .classList.contains('selected')
+		// rele.classList.remove('selected');			
+		
+	})
 	
 })
 
@@ -931,10 +986,7 @@ window.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('resize', () => {
 	clearTimeout(resizeTimer)
 	resizeTimer = setTimeout(function () {
-		console.log('ウィンドウがリサイズされました')
-		windowSize.w = window.innerWidth
-		windowSize.h = window.innerHeight
-		console.log('windowSize: ', windowSize)
+		console.log('ウィンドウがリサイズされました')		
 		main()
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
@@ -947,4 +999,8 @@ document.addEventListener("DOMContentLoaded", function() {
     let comment = drawComment(commentObj.comment)
     container.appendChild(comment)
   })
+})
+
+document.addEventListener("DOMContentLoaded", function() {
+  outputCommentFile(commentObjs)
 })
