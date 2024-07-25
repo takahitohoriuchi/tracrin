@@ -7,9 +7,20 @@ export function drawComment(commentObj) {
   const divElement = document.createElement('div')
   divElement.className = 'draggable'
 
-  const header = document.createElement('p')
+  const header = document.createElement('div')
   header.className = 'header'
-  
+
+  const headerComment = document.createElement('p')
+  headerComment.className = 'header'
+
+  const deleteButton = document.createElement('p')
+  deleteButton.textContent = '×'
+  deleteButton.className = 'commentDeleteButton'
+  deleteButton.onclick = deleteComment(commentObj)
+
+  header.appendChild(headerComment)
+  header.appendChild(deleteButton)
+
   divElement.appendChild(header)
 
   const inputElement = document.createElement('textarea')
@@ -20,7 +31,7 @@ export function drawComment(commentObj) {
     console.log(commentObj.comment)
   }
 
-  header.onclick = function() {
+  header.ondblclick = function() {
     if ( commentObj.isShown ) {
       commentObj.isShown = false
       inputElement.style.display = 'none'
@@ -30,9 +41,9 @@ export function drawComment(commentObj) {
     }
 
     if ( commentObj.isShown ) {
-      header.textContent = ""
+      headerComment.textContent = ""
     } else {
-      header.textContent = commentObj.comment
+      headerComment.textContent = commentObj.comment
       console.log(commentObj.comment)
     }
   }
@@ -76,4 +87,8 @@ export function outputCommentFile(commentObjs) {
     // 後処理
     URL.revokeObjectURL(url);
   }
+}
+
+function deleteComment(commentObj) {
+  console.log("deleted comment!")
 }

@@ -713,11 +713,15 @@ async function addMouseEvents() {
         span.addEventListener("contextmenu", () => {
           event.preventDefault()
           let globalTagID = span.getAttribute('globalTagID')
+          let commentID = commentObjs.length
           let commentObj = {
             linkedGlobalTagIDs: [ globalTagID ],
             comment: "",
+            category: "",
+            isSelected: false,
             isShown: true,
-            category: ""
+            isDeleted: false,
+            commentID: commentID
           }
           let container = document.getElementById("commentArea")
           let commentElement = drawComment(commentObj)

@@ -176,6 +176,14 @@ video {
   height: 14px;
   margin: 0;
   background-color: #89f0ff;
+  display: flex;
+}
+.commentDeleteButton {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  background-color: #89f0ff;
+  text-align: center;
 }
 .commentInput {
   width: 100%;
