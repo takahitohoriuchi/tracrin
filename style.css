@@ -164,34 +164,74 @@ video {
   z-index: 2;
 }
 
-.draggable {
+.comment {
   width: 200px;
   height: 18px;
   position: absolute;
   cursor: pointer;
   font-size: 12px;
 }
-.header {
+.comment .header {
   width: 100%;
   height: 14px;
   margin: 0;
-  background-color: #89f0ff;
   display: flex;
 }
-.commentDeleteButton {
+.comment .deleteButton {
   width: 14px;
   height: 14px;
   margin: 0;
-  background-color: #89f0ff;
   text-align: center;
 }
-.commentInput {
+.comment .inputfield {
   width: 100%;
   min-height: 18px;
   height: 36px;
   box-sizing: border-box;
-  background-color: #adf4ff;
   border: none;
   font-size: 12px;
   resize: vertical;
+}
+
+/* コメント付箋のカラーパレット */
+.comment.blue .header {
+  background-color: #89f0ff;
+}
+.comment.blue .inputfield {
+  background-color: #adf4ff;
+}
+
+.comment.yellow .header {
+  background-color: #FEEA3D;
+}
+.comment.yellow .inputfield {
+  background-color: #FEF49C;
+}
+
+.comment.green .header {
+  background-color: #83FE83;
+}
+.comment.green .inputfield {
+  background-color: #B2FFA0;
+}
+
+.comment.pink .header {
+  background-color: #FFB2B2;
+}
+.comment.pink .inputfield {
+  background-color: #FFC7C7;
+}
+
+.comment.purple .header {
+  background-color: #9BB6FE;
+}
+.comment.purple .inputfield {
+  background-color: #B6CAFF;
+}
+
+.comment.gray .header {
+  background-color: #DADADA;
+}
+.comment.gray .inputfield {
+  background-color: #EEEEEE;
 }

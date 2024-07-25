@@ -5,7 +5,7 @@
  */
 export function drawComment(commentObj) {
   const divElement = document.createElement('div')
-  divElement.className = 'draggable'
+  divElement.className = 'comment pink'
   divElement.id = 'comment' + commentObj.commentID
 
   const header = document.createElement('div')
@@ -16,7 +16,7 @@ export function drawComment(commentObj) {
 
   const deleteButton = document.createElement('p')
   deleteButton.textContent = '×'
-  deleteButton.className = 'commentDeleteButton'
+  deleteButton.className = 'deleteButton'
   deleteButton.onclick = () => deleteComment(commentObj)
 
   header.appendChild(headerComment)
@@ -26,7 +26,7 @@ export function drawComment(commentObj) {
 
   const inputElement = document.createElement('textarea')
   inputElement.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
-  inputElement.className = 'commentInput'
+  inputElement.className = 'inputfield'
   inputElement.onchange = function() {
     commentObj.comment = this.value
     console.log(commentObj.comment)
