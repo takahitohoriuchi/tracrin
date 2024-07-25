@@ -69,11 +69,13 @@ export function outputCommentFile(commentObjs) {
 
     // 各行データの処理
     for (const row of commentObjs) {
-      const values = headers.map(header => {
-        const escaped = (''+row[header]).replace(/"/g, '\\"'); // クオートのエスケープ
-        return `"${escaped}"`; // 各値をダブルクォートで囲む
-      });
+      if (row.isDeleted === false){
+        const values = headers.map(header => {
+          const escaped = (''+row[header]).replace(/"/g, '\\"'); // クオートのエスケープ
+          return `"${escaped}"`; // 各値をダブルクォートで囲む
+        })
       csvRows.push(values.join(',')); // 行をCSV形式で追加
+      }
     }
 
     // Blobを作成し、リンクを介してダウンロード
