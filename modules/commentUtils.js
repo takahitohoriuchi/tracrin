@@ -6,6 +6,7 @@
 export function drawComment(commentObj) {
   const divElement = document.createElement('div')
   divElement.className = 'draggable'
+  divElement.id = 'comment' + commentObj.commentID
 
   const header = document.createElement('div')
   header.className = 'header'
@@ -16,7 +17,7 @@ export function drawComment(commentObj) {
   const deleteButton = document.createElement('p')
   deleteButton.textContent = '×'
   deleteButton.className = 'commentDeleteButton'
-  deleteButton.onclick = deleteComment(commentObj)
+  deleteButton.onclick = () => deleteComment(commentObj)
 
   header.appendChild(headerComment)
   header.appendChild(deleteButton)
@@ -90,5 +91,8 @@ export function outputCommentFile(commentObjs) {
 }
 
 function deleteComment(commentObj) {
-  console.log("deleted comment!")
+  console.log("deleted comment!: ", commentObj.linkedGlobalTagIDs[0])
+  commentObj.isDeleted = true
+  const target = document.getElementById('comment' + commentObj.commentID)
+  target.remove()
 }
