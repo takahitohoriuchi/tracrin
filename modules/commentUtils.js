@@ -4,9 +4,12 @@
  * @returns {HTMLElement}
  */
 export function drawComment(commentObj) {
+  const colorSelect = document.getElementById('categorycolor-aaa')
+  const color = colorSelect.value
+
   const divElement = document.createElement('div')
-  divElement.className = 'comment pink'
-  divElement.id = 'comment' + commentObj.commentID
+  divElement.className = 'comment ' + color
+  divElement.id = 'commentSticker' + commentObj.commentID
 
   const header = document.createElement('div')
   header.className = 'header'
@@ -95,6 +98,21 @@ export function outputCommentFile(commentObjs) {
 function deleteComment(commentObj) {
   console.log("deleted comment!: ", commentObj.linkedGlobalTagIDs[0])
   commentObj.isDeleted = true
-  const target = document.getElementById('comment' + commentObj.commentID)
+  const target = document.getElementById('commentSticker' + commentObj.commentID)
   target.remove()
+}
+
+document.getElementById('categorycolor-aaa').addEventListener('change', function() {
+  changeCommentColor(this.value)
+})
+
+function changeCommentColor(value) {
+  const colorSelect = value
+  
+  const commentElements = document.querySelectorAll('[id^="commentSticker"')
+
+  commentElements.forEach(function(commentElement) {
+    commentElement.className = 'comment'
+    commentElement.classList.add(colorSelect)
+  })
 }
