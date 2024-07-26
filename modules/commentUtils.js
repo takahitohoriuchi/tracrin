@@ -1,3 +1,18 @@
+let categories = [
+  {
+    categoryName: 'aaa',
+    color: 'blue'
+  },
+  {
+    categoryName: 'bbb',
+    color: 'purple'
+  },
+  {
+    categoryName: 'ccc',
+    color: 'yellow'
+  }
+]
+
 /**
  * 
  * @param {Object} commentObj 
@@ -35,6 +50,17 @@ export function drawComment(commentObj) {
     console.log(commentObj.comment)
   }
 
+  const categorySelectElement = document.createElement('select')
+  categories.forEach(function(category) {
+    const opt = document.createElement('option')
+    opt.value = category.categoryName
+    opt.text = category.categoryName
+    categorySelectElement.add(opt)
+  })
+  categorySelectElement.addEventListener('change', function() {
+    changeCategory(this.value, commentObj)
+  })
+
   header.ondblclick = function() {
     if ( commentObj.isShown ) {
       commentObj.isShown = false
@@ -53,6 +79,7 @@ export function drawComment(commentObj) {
   }
 
   divElement.appendChild(inputElement)
+  divElement.appendChild(categorySelectElement)
   $(divElement).draggable()
 
   return divElement
@@ -115,4 +142,14 @@ function changeCommentColor(value) {
     commentElement.className = 'comment'
     commentElement.classList.add(colorSelect)
   })
+}
+
+function changeCategory(newCategory, commentObj) {
+  commentObj.category = newCategory
+  const index = categories.find(category => category.categoryName === newCategory)
+  if (index) {
+    var newColor = index.color
+  }
+  changeCommentColor(newColor)
+  console.log(commentObj)
 }
