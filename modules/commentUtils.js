@@ -1,15 +1,46 @@
 let categories = [
   {
     categoryName: 'aaa',
+    categoryID: 'category1',
     color: 'blue'
   },
   {
     categoryName: 'bbb',
+    categoryID: 'category2',
     color: 'purple'
   },
   {
     categoryName: 'ccc',
+    categoryID: 'category3',
     color: 'yellow'
+  }
+]
+
+const colorOptions = [
+  {
+    colorName: 'ブルー',
+    colorValue: 'blue'
+  },
+  {
+    colorName: 'イエロー',
+    colorValue: 'yellow'
+  },
+  {
+    colorName: 'グリーン',
+    colorValue: 'green'
+  },
+  {
+    colorName: 'ピンク',
+    colorValue: 'pink'
+  },
+  {
+    colorName: 'パープル',
+    colorValue: 'purple'
+  },
+
+  {
+    colorName: 'グレー',
+    colorValue: 'gray'
   }
 ]
 
@@ -19,8 +50,12 @@ let categories = [
  * @returns {HTMLElement}
  */
 export function drawComment(commentObj) {
-  const colorSelect = document.getElementById('categorycolor-aaa')
-  const color = colorSelect.value
+  const category = commentObj.category
+
+  const index = categories.find(_category => _category.categoryName === category)
+  if (index) {
+    var color = index.color
+  }
 
   const divElement = document.createElement('div')
   divElement.className = 'comment ' + color
@@ -60,6 +95,8 @@ export function drawComment(commentObj) {
   categorySelectElement.addEventListener('change', function() {
     changeCategory(this.value, commentObj)
   })
+
+  setCategoryList()
 
   header.ondblclick = function() {
     if ( commentObj.isShown ) {
@@ -129,9 +166,9 @@ function deleteComment(commentObj) {
   target.remove()
 }
 
-document.getElementById('categorycolor-aaa').addEventListener('change', function() {
-  changeCommentColor(this.value)
-})
+// document.getElementById('categorycolor-aaa').addEventListener('change', function() {
+//   changeCommentColor(this.value)
+// })
 
 function changeCommentColor(value) {
   const colorSelect = value
@@ -152,4 +189,37 @@ function changeCategory(newCategory, commentObj) {
   }
   changeCommentColor(newColor)
   console.log(commentObj)
+}
+
+document.getElementById('editCategoryButton').addEventListener('click', function(){
+  const categoryList = document.getElementById('categoryList')
+  const display = categoryList.style.display
+  if (display == 'none') {
+    categoryList.style.display = 'block'
+  } else {
+    categoryList.style.display = 'none'
+  }
+})
+
+function setCategoryList() {
+  const categoryList = document.getElementById('categoryList')
+  categoryList.className = 'categoryList'
+  const categoryUl = document.createElement('ul')
+  categories.forEach(function(category) {
+    const categoryElement = document.createElement('li')
+    categoryElement.textContent = category.categoryName
+    const colorSelectElement = document.createElement('select')
+    colorSelectElement.addEventListener('change', function() {
+      changeCommentColor(this.value)
+    })
+    colorOptions.forEach(function(colorOption) {
+      const colorOptionElement = document.createElement('option')
+      colorOptionElement.value = colorOption.colorValue
+      colorOptionElement.textContent = colorOption.colorName
+      colorSelectElement.appendChild(colorOptionElement)
+    })
+    categoryElement.appendChild(colorSelectElement)
+    categoryUl.appendChild(categoryElement)
+  })
+  categoryList.appendChild(categoryUl)
 }
