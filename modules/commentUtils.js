@@ -44,6 +44,12 @@ const colorOptions = [
   }
 ]
 
+let commentObjs
+
+export function getCommentObjs(_commentObjs){
+  commentObjs = _commentObjs
+}
+
 /**
  * 
  * @param {Object} commentObj 
@@ -94,9 +100,8 @@ export function drawComment(commentObj) {
   })
   categorySelectElement.addEventListener('change', function() {
     changeCategory(this.value, commentObj)
+    // console.log(this.value)
   })
-
-  setCategoryList()
 
   header.ondblclick = function() {
     if ( commentObj.isShown ) {
@@ -166,29 +171,25 @@ function deleteComment(commentObj) {
   target.remove()
 }
 
-// document.getElementById('categorycolor-aaa').addEventListener('change', function() {
-//   changeCommentColor(this.value)
-// })
+function changeCommentStickerColor(commentObj) {
+  const category = commentObj.category
+  const commentID = commentObj.commentID
+  const commentStickerElementID = 'commentSticker' + commentID
+  const commentStickerElement = document.getElementById(commentStickerElementID)
 
-function changeCommentColor(value) {
-  const colorSelect = value
-  
-  const commentElements = document.querySelectorAll('[id^="commentSticker"')
+  const index = categories.find(_category => _category.categoryName === category)
+  if (index) {
+    var color = index.color
+    console.log(color)
+  }
 
-  commentElements.forEach(function(commentElement) {
-    commentElement.className = 'comment'
-    commentElement.classList.add(colorSelect)
-  })
+  commentStickerElement.className = 'comment ' + color
 }
 
 function changeCategory(newCategory, commentObj) {
+  console.log(newCategory)
   commentObj.category = newCategory
-  const index = categories.find(category => category.categoryName === newCategory)
-  if (index) {
-    var newColor = index.color
-  }
-  changeCommentColor(newColor)
-  console.log(commentObj)
+  changeCommentStickerColor(commentObj)
 }
 
 document.getElementById('editCategoryButton').addEventListener('click', function(){
@@ -201,7 +202,7 @@ document.getElementById('editCategoryButton').addEventListener('click', function
   }
 })
 
-function setCategoryList() {
+export function setCategoryList() {
   const categoryList = document.getElementById('categoryList')
   categoryList.className = 'categoryList'
   const categoryUl = document.createElement('ul')
@@ -210,7 +211,7 @@ function setCategoryList() {
     categoryElement.textContent = category.categoryName
     const colorSelectElement = document.createElement('select')
     colorSelectElement.addEventListener('change', function() {
-      changeCommentColor(this.value)
+      changeCommentCategoryColor(category, this.value)
     })
     colorOptions.forEach(function(colorOption) {
       const colorOptionElement = document.createElement('option')
@@ -222,4 +223,20 @@ function setCategoryList() {
     categoryUl.appendChild(categoryElement)
   })
   categoryList.appendChild(categoryUl)
+}
+
+function changeCommentCategoryColor(category, color) {
+  const index = categories.find(_category => _category.categoryName === category.categoryName)
+  if (index) {
+    index.color = color
+  }
+
+  commentObjs.forEach(function(_commentObj) {
+    if (_commentObj.category === category.categoryName) {
+      changeCommentStickerColor(_commentObj)
+    }
+  })
+  console.log(commentObjs)
+  console.log(category)
+  console.log(color)
 }
