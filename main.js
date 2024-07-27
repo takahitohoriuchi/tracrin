@@ -4,7 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video, videoAspectRatio } from './modules/video.js'
-import { drawComment, getCommentObjs, outputCommentFile, setCategoryList } from './modules/commentUtils.js'
+import { addCommentSticker, getCommentObjs, outputCommentFile, setCategoryList } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -724,7 +724,7 @@ async function addMouseEvents() {
             commentID: commentID
           }
           let container = document.getElementById("commentArea")
-          let commentElement = drawComment(commentObj)
+          let commentElement = addCommentSticker(commentObj)
           container.appendChild(commentElement)
 
           commentObjs.push(commentObj)
@@ -1001,7 +1001,7 @@ window.addEventListener('resize', () => {
 document.addEventListener("DOMContentLoaded", function() {
   let container = document.getElementById("commentArea")
   commentObjs.forEach((commentObj) => {
-    let comment = drawComment(commentObj.comment)
+    let comment = addCommentSticker(commentObj.comment)
     container.appendChild(comment)
   })
 })

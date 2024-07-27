@@ -55,7 +55,7 @@ export function getCommentObjs(_commentObjs){
  * @param {Object} commentObj 
  * @returns {HTMLElement}
  */
-export function drawComment(commentObj) {
+export function addCommentSticker(commentObj) {
   const category = commentObj.category
 
   const index = categories.find(_category => _category.categoryName === category)
@@ -63,12 +63,12 @@ export function drawComment(commentObj) {
     var color = index.color
   }
 
-  const divElement = document.createElement('div')
-  divElement.className = 'comment ' + color
-  divElement.id = 'commentSticker' + commentObj.commentID
+  const commentStickerElement = document.createElement('div')
+  commentStickerElement.className = 'comment ' + color
+  commentStickerElement.id = 'commentSticker' + commentObj.commentID
 
-  const header = document.createElement('div')
-  header.className = 'header'
+  const headerElement = document.createElement('div')
+  headerElement.className = 'header'
 
   const headerComment = document.createElement('p')
   headerComment.className = 'header'
@@ -78,38 +78,41 @@ export function drawComment(commentObj) {
   deleteButton.className = 'deleteButton'
   deleteButton.onclick = () => deleteComment(commentObj)
 
-  header.appendChild(headerComment)
-  header.appendChild(deleteButton)
+  headerElement.appendChild(headerComment)
+  headerElement.appendChild(deleteButton)
 
-  divElement.appendChild(header)
+  commentStickerElement.appendChild(headerElement)
 
-  const inputElement = document.createElement('textarea')
-  inputElement.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
-  inputElement.className = 'inputfield'
-  inputElement.onchange = function() {
+  const fieldElement = document.createElement('div')
+  fieldElement.className = 'field'
+
+  const commentInput = document.createElement('textarea')
+  commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
+  commentInput.className = 'field'
+  commentInput.onchange = function() {
     commentObj.comment = this.value
     console.log(commentObj.comment)
   }
 
-  const categorySelectElement = document.createElement('select')
+  const categorySelect = document.createElement('select')
   categories.forEach(function(category) {
     const opt = document.createElement('option')
     opt.value = category.categoryName
     opt.text = category.categoryName
-    categorySelectElement.add(opt)
+    categorySelect.add(opt)
   })
-  categorySelectElement.addEventListener('change', function() {
+  categorySelect.className = 'select'
+  categorySelect.addEventListener('change', function() {
     changeCategory(this.value, commentObj)
-    // console.log(this.value)
   })
 
-  header.ondblclick = function() {
+  headerElement.ondblclick = function() {
     if ( commentObj.isShown ) {
       commentObj.isShown = false
-      inputElement.style.display = 'none'
+      fieldElement.style.display = 'none'
     } else {
       commentObj.isShown = true
-      inputElement.style.display = 'block'
+      fieldElement.style.display = 'block'
     }
 
     if ( commentObj.isShown ) {
@@ -120,11 +123,16 @@ export function drawComment(commentObj) {
     }
   }
 
-  divElement.appendChild(inputElement)
-  divElement.appendChild(categorySelectElement)
-  $(divElement).draggable()
+  fieldElement.appendChild(commentInput)
+  fieldElement.appendChild(categorySelect)
 
-  return divElement
+  commentStickerElement.appendChild(fieldElement)
+
+  // commentStickerElement.appendChild(commentInput)
+  // commentStickerElement.appendChild(categorySelect)
+  $(commentStickerElement).draggable()
+
+  return commentStickerElement
 }
 
 /**

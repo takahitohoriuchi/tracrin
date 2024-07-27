@@ -183,56 +183,60 @@ video {
   margin: 0;
   text-align: center;
 }
-.comment .inputfield {
+.comment .field {
   width: 100%;
   min-height: 18px;
-  height: 36px;
+  /* height: 36px; */
   box-sizing: border-box;
   border: none;
   font-size: 12px;
   resize: vertical;
+}
+.comment .field .select {
+  background-color: transparent;
+  border: none;
 }
 
 /* コメント付箋のカラーパレット */
 .comment.blue .header {
   background-color: #89f0ff;
 }
-.comment.blue .inputfield {
+.comment.blue .field {
   background-color: #adf4ff;
 }
 
 .comment.yellow .header {
   background-color: #FEEA3D;
 }
-.comment.yellow .inputfield {
+.comment.yellow .field {
   background-color: #FEF49C;
 }
 
 .comment.green .header {
   background-color: #83FE83;
 }
-.comment.green .inputfield {
+.comment.green .field {
   background-color: #B2FFA0;
 }
 
 .comment.pink .header {
   background-color: #FFB2B2;
 }
-.comment.pink .inputfield {
+.comment.pink .field {
   background-color: #FFC7C7;
 }
 
 .comment.purple .header {
   background-color: #9BB6FE;
 }
-.comment.purple .inputfield {
+.comment.purple .field {
   background-color: #B6CAFF;
 }
 
 .comment.gray .header {
   background-color: #DADADA;
 }
-.comment.gray .inputfield {
+.comment.gray .field {
   background-color: #EEEEEE;
 }
 
