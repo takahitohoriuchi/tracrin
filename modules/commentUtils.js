@@ -212,6 +212,7 @@ document.getElementById('editCategoryButton').addEventListener('click', function
 
 export function setCategoryList() {
   const categoryEditElement = document.getElementById('categoryList')
+  categoryEditElement.innerHTML = ''
   categoryEditElement.className = 'categoryList'
 
   const categoryTable = document.createElement('table')
@@ -241,6 +242,7 @@ export function setCategoryList() {
       colorOptionElement.textContent = colorOption.colorName
       colorSelectElement.appendChild(colorOptionElement)
     })
+    colorSelectElement.value = category.color
     colorSelectCell.appendChild(colorSelectElement)
 
     const selectCell = document.createElement('td')
@@ -260,6 +262,22 @@ export function setCategoryList() {
     categoryTable.appendChild(tableRow)
   })
 
+  const newCategoryRow = document.createElement('tr')
+
+  const newCategoryInput = document.createElement('input')
+  newCategoryInput.placeholder = '新しいカテゴリを追加'
+  const newCategoryAddButoon = document.createElement('button')
+  newCategoryAddButoon.textContent = '追加'
+  newCategoryAddButoon.onclick = () => {
+    const newCategoryName = newCategoryInput.value
+    addCategory(newCategoryName)
+    newCategoryInput.value = ''
+  }
+
+  newCategoryRow.appendChild(newCategoryInput)
+  newCategoryRow.appendChild(newCategoryAddButoon)
+  categoryTable.appendChild(newCategoryRow)
+
   categoryEditElement.appendChild(categoryTable)
 }
 
@@ -277,4 +295,15 @@ function changeCommentCategoryColor(category, color) {
   console.log(commentObjs)
   console.log(category)
   console.log(color)
+}
+
+function addCategory(newCategoryName) {
+  const newCategory = {
+    categoryName: newCategoryName,
+    categoryID: 'category' + categories.length,
+    color: 'blue'
+  }
+  categories.push(newCategory)
+  setCategoryList()
+  console.log(categories)
 }
