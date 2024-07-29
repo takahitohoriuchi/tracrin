@@ -95,11 +95,9 @@ export function addCommentSticker(commentObj) {
   }
 
   const categorySelect = document.createElement('select')
+  categorySelect.id = 'commentCategorySelect' + commentObj.commentID
   categories.forEach(function(category) {
-    const opt = document.createElement('option')
-    opt.value = category.categoryName
-    opt.text = category.categoryName
-    categorySelect.add(opt)
+    addCategorySelectOption(categorySelect, category)
   })
   categorySelect.className = 'select'
   categorySelect.addEventListener('change', function() {
@@ -305,5 +303,17 @@ function addCategory(newCategoryName) {
   }
   categories.push(newCategory)
   setCategoryList()
+
+  const categorySelectElements = document.querySelectorAll('[id^="commentCategorySelect"]')
+  categorySelectElements.forEach(element => {
+    addCategorySelectOption(element, newCategory)
+  })
   console.log(categories)
+}
+
+function addCategorySelectOption(categorySelect, category) {
+  const opt = document.createElement('option')
+  opt.value = category.categoryName
+  opt.text = category.categoryName
+  categorySelect.add(opt)
 }
