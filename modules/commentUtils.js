@@ -1,8 +1,8 @@
 let categories = [
   {
-    categoryName: '未選択',
+    categoryName: '名称未設定',
     categoryID: 'category0',
-    color: 'gray'
+    color: 'blue'
   }
 ]
 
@@ -235,6 +235,33 @@ export function setCategoryList() {
     const categoryName = category.categoryName
     const categoryNameCell = document.createElement('td')
     categoryNameCell.textContent = categoryName
+    categoryNameCell.addEventListener('dblclick', function() {
+      const currentCategoryName = this.textContent
+
+      const input = document.createElement('input')
+      input.type = 'text'
+      input.value = currentCategoryName
+      input.style.width = '100%'
+
+      this.textContent = ''
+      this.appendChild(input)
+
+      input.focus()
+      input.select()
+
+      input.addEventListener('blur', function() {
+        const newCategoryName = this.value
+        categoryNameCell.textContent = newCategoryName
+        category.categoryName = newCategoryName
+        editCategorySelectOptions(currentCategoryName, newCategoryName)
+      })
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          this.blur()
+        }
+      })
+    })
 
     const colorSelectCell = document.createElement('td')
     const colorSelectElement = document.createElement('select')
@@ -323,4 +350,15 @@ function addCategorySelectOption(categorySelect, category) {
   opt.value = category.categoryName
   opt.text = category.categoryName
   categorySelect.add(opt)
+}
+
+function editCategorySelectOptions(currentCategoryName, newCategoryName) {
+  const categorySelectElements = document.querySelectorAll('[id^="commentCategorySelect"]')
+
+  categorySelectElements.forEach(function(categorySelectElement) {
+    const targetOptionElement = categorySelectElement.querySelector(`option[value="${currentCategoryName}"]`)
+
+    targetOptionElement.textContent = newCategoryName
+    targetOptionElement.value = newCategoryName
+  })
 }
