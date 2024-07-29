@@ -1,18 +1,8 @@
 let categories = [
   {
-    categoryName: 'aaa',
-    categoryID: 'category1',
-    color: 'blue'
-  },
-  {
-    categoryName: 'bbb',
-    categoryID: 'category2',
-    color: 'purple'
-  },
-  {
-    categoryName: 'ccc',
-    categoryID: 'category3',
-    color: 'yellow'
+    categoryName: '未選択',
+    categoryID: 'category0',
+    color: 'gray'
   }
 ]
 
@@ -37,7 +27,6 @@ const colorOptions = [
     colorName: 'パープル',
     colorValue: 'purple'
   },
-
   {
     colorName: 'グレー',
     colorValue: 'gray'
@@ -243,19 +232,19 @@ export function setCategoryList() {
     colorSelectElement.value = category.color
     colorSelectCell.appendChild(colorSelectElement)
 
-    const selectCell = document.createElement('td')
-    selectCell.textContent = '選択'
-
     const showCell = document.createElement('td')
     showCell.textContent = '表示'
+
+    const selectCell = document.createElement('td')
+    selectCell.textContent = '選択'
 
     const deleteCell = document.createElement('td')
     deleteCell.textContent = '削除'
 
     tableRow.appendChild(categoryNameCell)
     tableRow.appendChild(colorSelectCell)
-    tableRow.appendChild(selectCell)
     tableRow.appendChild(showCell)
+    tableRow.appendChild(selectCell)
     tableRow.appendChild(deleteCell)
     categoryTable.appendChild(tableRow)
   })

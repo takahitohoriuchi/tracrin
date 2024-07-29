@@ -717,7 +717,7 @@ async function addMouseEvents() {
           let commentObj = {
             linkedGlobalTagIDs: [ globalTagID ],
             comment: "",
-            category: "aaa",
+            category: '未選択',
             isSelected: false,
             isShown: true,
             isDeleted: false,
