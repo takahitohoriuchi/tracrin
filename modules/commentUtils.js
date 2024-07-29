@@ -211,12 +211,26 @@ document.getElementById('editCategoryButton').addEventListener('click', function
 })
 
 export function setCategoryList() {
-  const categoryList = document.getElementById('categoryList')
-  categoryList.className = 'categoryList'
-  const categoryUl = document.createElement('ul')
+  const categoryEditElement = document.getElementById('categoryList')
+  categoryEditElement.className = 'categoryList'
+
+  const categoryTable = document.createElement('table')
+  const tableHeaderRow = document.createElement('tr')
+  const tableHeaderTexts = ['カテゴリ名', 'カラー', '表示', '選択', '削除']
+  tableHeaderTexts.forEach(function(tableHeaderText) {
+    const tableHeaderColumn = document.createElement('th')
+    tableHeaderColumn.textContent = tableHeaderText
+    tableHeaderRow.appendChild(tableHeaderColumn) 
+  })
+  categoryTable.appendChild(tableHeaderRow)
   categories.forEach(function(category) {
-    const categoryElement = document.createElement('li')
-    categoryElement.textContent = category.categoryName
+    const tableRow = document.createElement('tr')
+
+    const categoryName = category.categoryName
+    const categoryNameCell = document.createElement('td')
+    categoryNameCell.textContent = categoryName
+
+    const colorSelectCell = document.createElement('td')
     const colorSelectElement = document.createElement('select')
     colorSelectElement.addEventListener('change', function() {
       changeCommentCategoryColor(category, this.value)
@@ -227,10 +241,26 @@ export function setCategoryList() {
       colorOptionElement.textContent = colorOption.colorName
       colorSelectElement.appendChild(colorOptionElement)
     })
-    categoryElement.appendChild(colorSelectElement)
-    categoryUl.appendChild(categoryElement)
+    colorSelectCell.appendChild(colorSelectElement)
+
+    const selectCell = document.createElement('td')
+    selectCell.textContent = '選択'
+
+    const showCell = document.createElement('td')
+    showCell.textContent = '表示'
+
+    const deleteCell = document.createElement('td')
+    deleteCell.textContent = '削除'
+
+    tableRow.appendChild(categoryNameCell)
+    tableRow.appendChild(colorSelectCell)
+    tableRow.appendChild(selectCell)
+    tableRow.appendChild(showCell)
+    tableRow.appendChild(deleteCell)
+    categoryTable.appendChild(tableRow)
   })
-  categoryList.appendChild(categoryUl)
+
+  categoryEditElement.appendChild(categoryTable)
 }
 
 function changeCommentCategoryColor(category, color) {
