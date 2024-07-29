@@ -4,7 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video, videoAspectRatio } from './modules/video.js'
-import { addCommentSticker, getCommentObjs, outputCommentFile, setCategoryList } from './modules/commentUtils.js'
+import { addCommentObj, getCommentObjs, outputCommentFile, setCategoryList } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -713,22 +713,8 @@ async function addMouseEvents() {
         span.addEventListener("contextmenu", () => {
           event.preventDefault()
           let globalTagID = span.getAttribute('globalTagID')
-          let commentID = commentObjs.length
-          let commentObj = {
-            linkedGlobalTagIDs: [ globalTagID ],
-            comment: "",
-            category: '未選択',
-            isSelected: false,
-            isShown: true,
-            isDeleted: false,
-            commentID: commentID
-          }
-          let container = document.getElementById("commentArea")
-          let commentElement = addCommentSticker(commentObj)
-          container.appendChild(commentElement)
-
-          commentObjs.push(commentObj)
           getCommentObjs(commentObjs)
+          addCommentObj(globalTagID)
           console.log(commentObjs)
         })
 

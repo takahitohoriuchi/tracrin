@@ -39,12 +39,30 @@ export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
 }
 
+export function addCommentObj(globalTagID){
+  let commentID = commentObjs.length
+  let commentObj = {
+    linkedGlobalTagIDs: [ globalTagID ],
+    comment: "",
+    category: categories[0].categoryName,
+    isSelected: false,
+    isShown: true,
+    isDeleted: false,
+    commentID: commentID
+  }
+  let container = document.getElementById("commentArea")
+  let commentElement = addCommentSticker(commentObj)
+  container.appendChild(commentElement)
+
+  commentObjs.push(commentObj)
+}
+
 /**
  * 
  * @param {Object} commentObj 
  * @returns {HTMLElement}
  */
-export function addCommentSticker(commentObj) {
+function addCommentSticker(commentObj) {
   const category = commentObj.category
 
   const index = categories.find(_category => _category.categoryName === category)
