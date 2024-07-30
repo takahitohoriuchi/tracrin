@@ -383,6 +383,18 @@ function addCategorySelectOption(categorySelect, category) {
 }
 
 function editCategorySelectOptions(currentCategoryName, newCategoryName) {
+  const targetCategory = categories.find(_category => _category.categoryName === currentCategoryName)
+  if (targetCategory) {
+    targetCategory.categoryName = newCategoryName
+  }
+
+  const targetComments = commentObjs.filter(_commentObj => _commentObj.category === currentCategoryName)
+  if (targetComments) {
+    targetComments.forEach(function(targetComment) {
+      targetComment.category = newCategoryName
+    })
+  }
+
   const categorySelectElements = document.querySelectorAll('[id^="commentCategorySelect"]')
 
   categorySelectElements.forEach(function(categorySelectElement) {
