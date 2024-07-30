@@ -136,10 +136,15 @@ function addCommentSticker(commentObj) {
   commentStickerElement.appendChild(fieldElement)
   $(commentStickerElement).draggable()
 
-  const linkedGlobalTagID = commentObj.linkedGlobalTagIDs[0]
-  const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
+  const linkedGlobalTagIDs = commentObj.linkedGlobalTagIDs
+  let linkedSpans = []
+  linkedGlobalTagIDs.forEach(function(linkedGlobalTagID) {
+    const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
+    console.log(linkedSpan)
+    linkedSpans.push(linkedSpan)
+  })
 
-  const targetY = parseInt(linkedSpan.style.top, 10)
+  const targetY = parseInt(linkedSpans[0].style.top, 10)
   console.log('targetY: ', targetY)
   commentStickerElement.style.top = targetY + 11 + 'px'
   commentStickerElement.style.left = '400px'
@@ -148,6 +153,18 @@ function addCommentSticker(commentObj) {
 
   commentStickerElement.addEventListener('click', function() {
     this.style.zIndex = zIndexCounter++ // クリックされるたびにz-indexを増加
+  })
+
+  commentStickerElement.addEventListener('mouseover', () => {
+    linkedSpans.forEach(function(linkedSpan) {
+      linkedSpan.style.backgroundColor = '#adf4ff'
+    })
+  })
+
+  commentStickerElement.addEventListener('mouseout', () => {
+    linkedSpans.forEach(function(linkedSpan) {
+      linkedSpan.style.backgroundColor = 'transparent'
+    })
   })
 
   return commentStickerElement
