@@ -78,7 +78,7 @@ function addCommentSticker(commentObj) {
   headerElement.className = 'header'
 
   const headerComment = document.createElement('p')
-  headerComment.className = 'header'
+  headerComment.className = 'p'
 
   const deleteButton = document.createElement('p')
   deleteButton.textContent = '×'
@@ -95,7 +95,7 @@ function addCommentSticker(commentObj) {
 
   const commentInput = document.createElement('textarea')
   commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
-  commentInput.className = 'field'
+  commentInput.className = 'input'
   commentInput.onchange = function() {
     commentObj.comment = this.value
     console.log(commentObj.comment)
