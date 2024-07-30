@@ -114,126 +114,57 @@ function addCommentSticker(commentObj) {
     changeCategory(this.value, commentObj)
   })
 
-  const editLinkedSpansButton = document.createElement('button')
-  editLinkedSpansButton.textContent = '対応する要素を編集'
+  // const editLinkedSpansButton = document.createElement('button')
+  // editLinkedSpansButton.textContent = '対応する要素を編集'
   // let isEditing = false
-  // editLinkedSpansButton.onclick = () => {
-  //   console.log('passed here! poh!')
-  //   if (isEditing) {
-  //     console.log('passed here! foo!')
-  //     spans.forEach((span) => {
-  //       span.removeEventListener('click', () => {
-  //         editLinkedSpans(commentObj, span)
-  //       })
-  //       span.style.border = 'none'
-  //     })
-  //   } else {
-  //     spans.forEach((span) => {
-  //       console.log('passed here! yeah!')
-  //       span.addEventListener('click', () => {
-  //         editLinkedSpans(commentObj, span)
-  //       })
-  //       const globalTagID = span.getAttribute('globalTagID')
-  //       const isLinked = linkedGlobalTagIDs.includes(globalTagID)
-  //       if (isLinked) {
-  //         span.style.border = '1px solid black'
-  //       }
-  //     })
-  //   }
-  //   isEditing = !isEditing 
-  // }
 
-  // let isEditing = false
-  // // editLinkedSpansButton.textContent = '対応する要素を編集'
+  // const spanHandlers = new Map()
+
   // editLinkedSpansButton.onclick = () => {
   //   spans.forEach((span) => {
   //     const globalTagID = span.getAttribute('globalTagID')
-  //     const editLinkedSpans = function() {
-  //       if (isLinked) {
-  //         span.style.border = 'none'
-  //         const index = linkedGlobalTagIDs.indexOf(globalTagID)
-  //         if (index !== -1) {
-  //           linkedGlobalTagIDs.splice(index, 1)
-  //           linkedSpans.splice(index, 1)
-  //         }
-  //         isLinked = false
-  //         // editLinkedSpansButton.textContent = '対応する要素を確定'
-  //         console.log(globalTagID, ' is not Linked.')
-  //       } else {
-  //         span.style.border = '1px solid black'
-  //         linkedGlobalTagIDs.push(globalTagID)
-  //         linkedSpans.push(span)
-  //         isLinked = true
-  //         // editLinkedSpansButton.textContent = '対応する要素を編集'
-  //         console.log(globalTagID, ' is Linked!')
-  //       }
-  //       console.log('linkedGlobalTagIDs: ', linkedGlobalTagIDs)
-  //     }
   //     let isLinked = linkedGlobalTagIDs.includes(globalTagID)
-  //     if (isLinked) {
-  //       span.style.border = '1px solid black'
+  
+  //     if (!spanHandlers.has(span)) {
+  //       const editLinkedSpans = () => {
+  //         if (isLinked) {
+  //           span.style.border = 'none'
+  //           const index = linkedGlobalTagIDs.indexOf(globalTagID)
+  //           if (index !== -1) {
+  //             linkedGlobalTagIDs.splice(index, 1)
+  //             linkedSpans.splice(index, 1)
+  //           }
+  //           isLinked = false
+  //         } else {
+  //           span.style.border = '1px solid black'
+  //           linkedGlobalTagIDs.push(globalTagID)
+  //           linkedSpans.push(span)
+  //           isLinked = true
+  //         }
+  //       }
+  
+  //       spanHandlers.set(span, editLinkedSpans)
   //     }
+  
   //     if (isEditing) {
-  //       span.removeEventListener('click', editLinkedSpans)
-  //       console.log('passed here!')
+  //       span.removeEventListener('click', spanHandlers.get(span))
   //       span.style.border = 'none'
-  //       console.log(globalTagID)
   //     } else {
-  //       span.addEventListener('click', editLinkedSpans)
+  //       span.addEventListener('click', spanHandlers.get(span))
+  //       if (isLinked) {
+  //         span.style.border = '1px solid black'
+  //       }
   //     }
   //   })
+  //   if (isEditing) {
+  //     editLinkedSpansButton.textContent = '対応する要素を確定'
+  //   } else {
+  //     editLinkedSpansButton.textContent = '対応する要素を編集'
+  //   }
   //   isEditing = !isEditing
   // }
 
-  let isEditing = false
-
-  const spanHandlers = new Map()
-
-  editLinkedSpansButton.onclick = () => {
-    spans.forEach((span) => {
-      const globalTagID = span.getAttribute('globalTagID')
-      let isLinked = linkedGlobalTagIDs.includes(globalTagID)
-  
-      if (!spanHandlers.has(span)) {
-        const editLinkedSpans = () => {
-          if (isLinked) {
-            span.style.border = 'none'
-            const index = linkedGlobalTagIDs.indexOf(globalTagID)
-            if (index !== -1) {
-              linkedGlobalTagIDs.splice(index, 1)
-              linkedSpans.splice(index, 1)
-            }
-            isLinked = false
-          } else {
-            span.style.border = '1px solid black'
-            linkedGlobalTagIDs.push(globalTagID)
-            linkedSpans.push(span)
-            isLinked = true
-          }
-        }
-  
-        spanHandlers.set(span, editLinkedSpans)
-      }
-  
-      if (isEditing) {
-        span.removeEventListener('click', spanHandlers.get(span))
-        span.style.border = 'none'
-      } else {
-        span.addEventListener('click', spanHandlers.get(span))
-        if (isLinked) {
-          span.style.border = '1px solid black'
-        }
-      }
-    })
-    if (isEditing) {
-      editLinkedSpansButton.textContent = '対応する要素を確定'
-    } else {
-      editLinkedSpansButton.textContent = '対応する要素を編集'
-    }
-    isEditing = !isEditing
-  }
-
-  fieldElement.appendChild(editLinkedSpansButton)
+  // fieldElement.appendChild(editLinkedSpansButton)
 
   headerElement.ondblclick = function() {
     if ( commentObj.isShown ) {
@@ -526,33 +457,3 @@ function editCategorySelectOptions(currentCategoryName, newCategoryName) {
     targetOptionElement.value = newCategoryName
   })
 }
-
-// function editLinkedSpans(commentObj, span) {
-//   console.log('passed here!')
-//   const globalTagID = span.getAttribute('globalTagID')
-//   let linkedGlobalTagIDs = commentObj.linkedGlobalTagIDs
-//   let linkedSpans = []
-//   linkedGlobalTagIDs.forEach(function(linkedGlobalTagID) {
-//     const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
-//     console.log(linkedSpan)
-//     linkedSpans.push(linkedSpan)
-//   })
-  
-//   let isLinked = linkedGlobalTagIDs.includes(globalTagID)
-//   if (isLinked) {
-//     span.style.border = 'none'
-//     const index = linkedGlobalTagIDs.indexOf(globalTagID)
-//     if (index !== -1) {
-//       linkedGlobalTagIDs.splice(index, 1)
-//       linkedSpans.splice(index, 1)
-//     }
-//     isLinked = false
-//     console.log(globalTagID, ' is not Linked.')
-//   } else {
-//     span.style.border = '1px solid black'
-//     linkedGlobalTagIDs.push(globalTagID)
-//     linkedSpans.push(span)
-//     isLinked = true
-//     console.log(globalTagID, ' is Linked!')
-//   }
-// }
