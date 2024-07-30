@@ -132,10 +132,16 @@ function addCommentSticker(commentObj) {
   fieldElement.appendChild(categorySelect)
 
   commentStickerElement.appendChild(fieldElement)
-
-  // commentStickerElement.appendChild(commentInput)
-  // commentStickerElement.appendChild(categorySelect)
   $(commentStickerElement).draggable()
+
+  const linkedGlobalTagID = commentObj.linkedGlobalTagIDs[0]
+  const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
+
+  const targetY = parseInt(linkedSpan.style.top, 10)
+  console.log('targetY: ', targetY)
+  commentStickerElement.style.top = targetY + 11 + 'px'
+  commentStickerElement.style.left = '400px'
+  commentStickerElement.style.position = 'absolute'
 
   return commentStickerElement
 }
