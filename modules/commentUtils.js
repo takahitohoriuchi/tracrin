@@ -35,6 +35,8 @@ const colorOptions = [
 
 let commentObjs
 
+let zIndexCounter = 2
+
 export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
 }
@@ -142,6 +144,11 @@ function addCommentSticker(commentObj) {
   commentStickerElement.style.top = targetY + 11 + 'px'
   commentStickerElement.style.left = '400px'
   commentStickerElement.style.position = 'absolute'
+  commentStickerElement.style.zIndex = zIndexCounter++
+
+  commentStickerElement.addEventListener('click', function() {
+    this.style.zIndex = zIndexCounter++ // クリックされるたびにz-indexを増加
+  })
 
   return commentStickerElement
 }
