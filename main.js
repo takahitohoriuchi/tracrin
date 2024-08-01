@@ -4,7 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video, videoAspectRatio } from './modules/video.js'
-import { drawComment, outputCommentFile } from './modules/commentUtils.js'
+import { addCommentObj, getCommentObjs, setCategoryList } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -713,17 +713,8 @@ async function addMouseEvents() {
         span.addEventListener("contextmenu", () => {
           event.preventDefault()
           let globalTagID = span.getAttribute('globalTagID')
-          let commentObj = {
-            linkedGlobalTagIDs: [ globalTagID ],
-            comment: "",
-            isShown: true,
-            category: ""
-          }
-          let container = document.getElementById("commentArea")
-          let commentElement = drawComment(commentObj)
-          container.appendChild(commentElement)
-
-          commentObjs.push(commentObj)
+          getCommentObjs(commentObjs)
+          addCommentObj(globalTagID)
           console.log(commentObjs)
         })
 
@@ -996,11 +987,12 @@ window.addEventListener('resize', () => {
 document.addEventListener("DOMContentLoaded", function() {
   let container = document.getElementById("commentArea")
   commentObjs.forEach((commentObj) => {
-    let comment = drawComment(commentObj.comment)
+    let comment = addCommentSticker(commentObj.comment)
     container.appendChild(comment)
   })
 })
 
 document.addEventListener("DOMContentLoaded", function() {
-  outputCommentFile(commentObjs)
+  // outputCommentFile(commentObjs)
+  setCategoryList()
 })

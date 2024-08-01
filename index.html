@@ -48,7 +48,20 @@
 			<label>
 				<button id = "releaseSelectionButton" class="favorite styled" type="button">
 					選択を解除
-				</button>				
+				</button>
+        <button id="editCategoryButton">
+          カテゴリを編集
+        </button>
+        <button id="deleteSelectedCommentsButton">
+          選択したコメントを削除
+        </button>
+        <button id="showOrHideSelectedCommentsButton">
+          選択したコメントの表示/非表示を切り替え
+        </button>
+        <button id="outputSelectedCommentsAsFileButton">
+          選択したコメントのファイルを出力
+        </button>
+        <div id="categoryList" style="display: none;"></div>
 			</label>
 		</div>
 
@@ -60,13 +73,11 @@
 			<div id="scrollable-div">				
 				<div id="dataArea">
 					<!-- データ列エリア -->
-				</div>				
+				</div>
+        <!-- コメント描画エリア -->
+        <div id="commentArea" class="layerComment"></div>	
 			</div>
 		</div>
-
-    <!-- コメント描画エリア -->
-    <div id="commentArea" class="layerComment">
-    </div>
 
 	<!-- :::JS読み込み -->
 		<!-- CDN -->
