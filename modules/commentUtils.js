@@ -85,8 +85,6 @@ function addCommentSticker(commentObj) {
   selectCheckbox.style.transform = 'scale(1.5)'
   selectCheckbox.onchange = function() {
     commentObj.isSelected = selectCheckbox.checked
-    console.log(commentObj.isSelected)
-    console.log(commentObjs)
   }
 
   const headerComment = document.createElement('p')
@@ -111,7 +109,6 @@ function addCommentSticker(commentObj) {
   commentInput.className = 'input'
   commentInput.onchange = function() {
     commentObj.comment = this.value
-    console.log(commentObj.comment)
   }
 
   const categorySelect = document.createElement('select')
@@ -192,12 +189,10 @@ function addCommentSticker(commentObj) {
   let linkedSpans = []
   linkedGlobalTagIDs.forEach(function(linkedGlobalTagID) {
     const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
-    console.log(linkedSpan)
     linkedSpans.push(linkedSpan)
   })
 
   const targetY = parseInt(linkedSpans[0].style.top, 10)
-  console.log('targetY: ', targetY)
   commentStickerElement.style.top = targetY + 11 + 'px'
   commentStickerElement.style.left = '400px'
   commentStickerElement.style.position = 'absolute'
@@ -252,14 +247,12 @@ function outputCommentFile(commentObjs) {
 }
 
 function deleteComment(commentObj) {
-  console.log("deleted comment!: ", commentObj.linkedGlobalTagIDs[0])
   commentObj.isDeleted = true
   const target = document.getElementById('commentSticker' + commentObj.commentID)
   target.remove()
 }
 
 function showOrHideComment(commentObj, fieldElement, headerComment) {
-  console.log(fieldElement)
   if ( commentObj.isShown ) {
     commentObj.isShown = false
     fieldElement.style.display = 'none'
@@ -282,14 +275,12 @@ function changeCommentStickerColor(commentObj) {
   const index = categories.find(_category => _category.categoryName === category)
   if (index) {
     var color = index.color
-    console.log(color)
   }
 
   commentStickerElement.className = 'comment ' + color
 }
 
 function changeCategory(newCategory, commentObj) {
-  console.log(newCategory)
   commentObj.category = newCategory
   changeCommentStickerColor(commentObj)
 }
@@ -307,7 +298,6 @@ document.getElementById('editCategoryButton').addEventListener('click', function
 document.getElementById('deleteSelectedCommentsButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    console.log(selectedCommentObjs)
     selectedCommentObjs.forEach(selectedCommentObj => {
       deleteComment(selectedCommentObj)
     })
@@ -317,7 +307,6 @@ document.getElementById('deleteSelectedCommentsButton').addEventListener('click'
 document.getElementById('showOrHideSelectedCommentsButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    console.log(selectedCommentObjs)
     selectedCommentObjs.forEach(selectedCommentObj => {
       const commentID = selectedCommentObj.commentID
       const selectedCommentSticker = document.getElementById('commentSticker' + commentID)
@@ -331,7 +320,6 @@ document.getElementById('showOrHideSelectedCommentsButton').addEventListener('cl
 document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    console.log(selectedCommentObjs)
     outputCommentFile(selectedCommentObjs)
   }
 })
@@ -449,9 +437,6 @@ function changeCommentCategoryColor(category, color) {
       changeCommentStickerColor(_commentObj)
     }
   })
-  console.log(commentObjs)
-  console.log(category)
-  console.log(color)
 }
 
 function addCategory(newCategoryName) {
@@ -467,7 +452,6 @@ function addCategory(newCategoryName) {
   categorySelectElements.forEach(element => {
     addCategorySelectOption(element, newCategory)
   })
-  console.log(categories)
 }
 
 function addCategorySelectOption(categorySelect, category) {
