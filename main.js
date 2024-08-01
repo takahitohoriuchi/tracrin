@@ -4,7 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video, videoAspectRatio } from './modules/video.js'
-import { addCommentObj, getCommentObjs, outputCommentFile, setCategoryList } from './modules/commentUtils.js'
+import { addCommentObj, getCommentObjs, setCategoryList } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -993,6 +993,6 @@ document.addEventListener("DOMContentLoaded", function() {
 })
 
 document.addEventListener("DOMContentLoaded", function() {
-  outputCommentFile(commentObjs)
+  // outputCommentFile(commentObjs)
   setCategoryList()
 })

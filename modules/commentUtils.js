@@ -224,37 +224,29 @@ function addCommentSticker(commentObj) {
  * 
  * @param {Object} commentObjs 
  */
-export function outputCommentFile(commentObjs) {
-  let button = document.getElementById("buttonOutputComment")
+function outputCommentFile(commentObjs) {
+  const headers = Object.keys(commentObjs[0])
+  const csvRows = [headers.join(',')]
 
-  button.onclick = function() {
-    // CSVのヘッダを生成
-    const headers = Object.keys(commentObjs[0]);
-    const csvRows = [headers.join(',')]; // ヘッダ行を追加
-
-    // 各行データの処理
-    for (const row of commentObjs) {
-      if (row.isDeleted === false){
-        const values = headers.map(header => {
-          const escaped = (''+row[header]).replace(/"/g, '\\"'); // クオートのエスケープ
-          return `"${escaped}"`; // 各値をダブルクォートで囲む
-        })
-      csvRows.push(values.join(',')); // 行をCSV形式で追加
-      }
+  for (const row of commentObjs) {
+    if (row.isDeleted === false){
+      const values = headers.map(header => {
+        const escaped = (''+row[header]).replace(/"/g, '\\"')
+        return `"${escaped}"`
+      })
+    csvRows.push(values.join(','))
     }
-
-    // Blobを作成し、リンクを介してダウンロード
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'export.csv'; // ダウンロードファイル名
-    link.click();
-
-    // 後処理
-    URL.revokeObjectURL(url);
   }
+
+  const csvString = csvRows.join('\n')
+  const blob = new Blob([csvString], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'export.csv'
+  link.click()
+
+  URL.revokeObjectURL(url)
 }
 
 function deleteComment(commentObj) {
@@ -332,6 +324,18 @@ document.getElementById('showOrHideSelectedCommentsButton').addEventListener('cl
       showOrHideComment(selectedCommentObj, fieldElement, headerComment)
     })
   }
+})
+
+document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('click', function() {
+  const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
+  if (selectedCommentObjs) {
+    console.log(selectedCommentObjs)
+    outputCommentFile(selectedCommentObjs)
+  }
+})
+
+document.getElementById("buttonOutputComment").addEventListener('click', function() {
+  outputCommentFile(commentObjs)
 })
 
 export function setCategoryList() {
