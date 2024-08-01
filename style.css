@@ -183,6 +183,9 @@ video {
   height: 14px;
   margin: 0;
   display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .comment .header .deleteButton {
   width: 14px;
