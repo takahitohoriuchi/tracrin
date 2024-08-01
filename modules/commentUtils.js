@@ -308,6 +308,16 @@ document.getElementById('editCategoryButton').addEventListener('click', function
   }
 })
 
+document.getElementById('deleteSelectedCommentsButton').addEventListener('click', function() {
+  const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
+  if (selectedCommentObjs) {
+    console.log(selectedCommentObjs)
+    selectedCommentObjs.forEach(selectedCommentObj => {
+      deleteComment(selectedCommentObj)
+    })
+  }
+})
+
 export function setCategoryList() {
   const categoryEditElement = document.getElementById('categoryList')
   categoryEditElement.innerHTML = ''
