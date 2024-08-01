@@ -265,16 +265,17 @@ function deleteComment(commentObj) {
 }
 
 function showOrHideComment(commentObj, fieldElement, headerComment) {
+  console.log(fieldElement)
   if ( commentObj.isShown ) {
     commentObj.isShown = false
     fieldElement.style.display = 'none'
 
-    headerComment.textContent = ""
+    headerComment.textContent = commentObj.comment
   } else {
     commentObj.isShown = true
     fieldElement.style.display = 'block'
 
-    headerComment.textContent = commentObj.comment
+    headerComment.textContent = ""
   }
 }
 
@@ -315,6 +316,20 @@ document.getElementById('deleteSelectedCommentsButton').addEventListener('click'
     console.log(selectedCommentObjs)
     selectedCommentObjs.forEach(selectedCommentObj => {
       deleteComment(selectedCommentObj)
+    })
+  }
+})
+
+document.getElementById('showOrHideSelectedCommentsButton').addEventListener('click', function() {
+  const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
+  if (selectedCommentObjs) {
+    console.log(selectedCommentObjs)
+    selectedCommentObjs.forEach(selectedCommentObj => {
+      const commentID = selectedCommentObj.commentID
+      const selectedCommentSticker = document.getElementById('commentSticker' + commentID)
+      const fieldElement = selectedCommentSticker.getElementsByClassName('field')[0]
+      const headerComment = selectedCommentSticker.querySelector('p')
+      showOrHideComment(selectedCommentObj, fieldElement, headerComment)
     })
   }
 })
