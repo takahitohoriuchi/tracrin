@@ -80,6 +80,15 @@ function addCommentSticker(commentObj) {
   const headerElement = document.createElement('div')
   headerElement.className = 'header'
 
+  const selectCheckbox = document.createElement('input')
+  selectCheckbox.setAttribute('type', 'checkbox')
+  selectCheckbox.style.transform = 'scale(1.5)'
+  selectCheckbox.onchange = function() {
+    commentObj.isSelected = selectCheckbox.checked
+    console.log(commentObj.isSelected)
+    console.log(commentObjs)
+  }
+
   const headerComment = document.createElement('p')
   headerComment.className = 'p'
 
@@ -88,6 +97,7 @@ function addCommentSticker(commentObj) {
   deleteButton.className = 'deleteButton'
   deleteButton.onclick = () => deleteComment(commentObj)
 
+  headerElement.appendChild(selectCheckbox)
   headerElement.appendChild(headerComment)
   headerElement.appendChild(deleteButton)
 
