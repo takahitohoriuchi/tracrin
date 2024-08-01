@@ -184,7 +184,9 @@ function addCommentSticker(commentObj) {
   fieldElement.appendChild(categorySelect)
 
   commentStickerElement.appendChild(fieldElement)
-  $(commentStickerElement).draggable()
+  $(commentStickerElement).draggable({
+    containment: '#scrollable-div'
+  })
 
   const linkedGlobalTagIDs = commentObj.linkedGlobalTagIDs
   let linkedSpans = []
