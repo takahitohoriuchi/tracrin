@@ -177,20 +177,7 @@ function addCommentSticker(commentObj) {
   // fieldElement.appendChild(editLinkedSpansButton)
 
   headerElement.ondblclick = function() {
-    if ( commentObj.isShown ) {
-      commentObj.isShown = false
-      fieldElement.style.display = 'none'
-    } else {
-      commentObj.isShown = true
-      fieldElement.style.display = 'block'
-    }
-
-    if ( commentObj.isShown ) {
-      headerComment.textContent = ""
-    } else {
-      headerComment.textContent = commentObj.comment
-      console.log(commentObj.comment)
-    }
+    showOrHideComment(commentObj, fieldElement, headerComment)
   }
 
   fieldElement.appendChild(commentInput)
@@ -275,6 +262,20 @@ function deleteComment(commentObj) {
   commentObj.isDeleted = true
   const target = document.getElementById('commentSticker' + commentObj.commentID)
   target.remove()
+}
+
+function showOrHideComment(commentObj, fieldElement, headerComment) {
+  if ( commentObj.isShown ) {
+    commentObj.isShown = false
+    fieldElement.style.display = 'none'
+
+    headerComment.textContent = ""
+  } else {
+    commentObj.isShown = true
+    fieldElement.style.display = 'block'
+
+    headerComment.textContent = commentObj.comment
+  }
 }
 
 function changeCommentStickerColor(commentObj) {
