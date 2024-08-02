@@ -54,6 +54,8 @@ export function addCommentObj(globalTagID){
     commentID: commentID
   }
 
+  addCommentSticker(commentObj)
+
   commentObjs.push(commentObj)
 }
 
