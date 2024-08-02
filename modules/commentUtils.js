@@ -53,9 +53,6 @@ export function addCommentObj(globalTagID){
     isDeleted: false,
     commentID: commentID
   }
-  let container = document.getElementById("commentArea")
-  let commentElement = addCommentSticker(commentObj)
-  container.appendChild(commentElement)
 
   commentObjs.push(commentObj)
 }
@@ -214,7 +211,8 @@ function addCommentSticker(commentObj) {
     })
   })
 
-  return commentStickerElement
+  let container = document.getElementById("commentArea")
+  container.appendChild(commentStickerElement)
 }
 
 /**
@@ -324,9 +322,73 @@ document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('
   }
 })
 
-document.getElementById("buttonOutputComment").addEventListener('click', function() {
+document.getElementById("outputCommentFileButton").addEventListener('click', function() {
   outputCommentFile(commentObjs)
 })
+
+document.getElementById('inputCommentFileButton').addEventListener('click', function() {
+  document.getElementById('commentFileInput').click()
+})
+
+document.getElementById('commentFileInput').addEventListener('change', function(event) {
+  const file = event.target.files[0]
+  if (file) {
+    console.log("ファイルが選択されました:", file.name)
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      const text = e.target.result
+      const data = readCommentFile(text)
+      commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
+      addCommentStickersFromCommentFile(data)
+    }
+    reader.readAsText(file)
+  }
+})
+
+function readCommentFile(csvText) {
+  const lines = csvText.split('\n')
+  const headers = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''))
+
+  return lines.slice(1).map(line => {
+    const data = line.split(',').map(cell => cell.trim())
+    let obj = {}
+    headers.forEach((header, index) => {
+      obj[header] = parseValue(data[index])
+    })
+    return obj
+  })
+}
+
+function parseValue(value) {
+  // 値が配列の形式をしている場合 (例: "[item1,item2,item3]")
+  if (value.includes('-')) {
+    return value.substring(1, value.length - 1).split(',').map(item => item.trim().replace(/^"|"$/g, ''))
+  }
+
+  // 値がブール値の形式をしている場合 (例: "true" または "false")
+  if (value === '"true"') {
+    return true
+  }
+  if (value === '"false"') {
+    return false
+  }
+
+  // 値が数値の形式をしている場合
+  if (/^"\d+"$/.test(value)) {
+    return parseFloat(value.replace(/^"|"$/g, ''))
+  }
+
+  // それ以外の場合は、クォーテーションを取り除いた文字列を返す
+  return value.replace(/^"|"$/g, '')
+}
+
+function addCommentStickersFromCommentFile(commentObjsFromFile) {
+  commentObjsFromFile.forEach(commentObjFromFile => {
+    // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
+    // addCommentObj(globalTagID)
+    addCommentSticker(commentObjFromFile)
+  })
+}
 
 export function setCategoryList() {
   const categoryEditElement = document.getElementById('categoryList')
