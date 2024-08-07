@@ -460,7 +460,13 @@ function setCategoryList() {
     showCell.textContent = '表示'
 
     const selectCell = document.createElement('td')
-    selectCell.textContent = '選択'
+    // selectCell.textContent = '選択'
+    const selectCategoryButton = document.createElement('button')
+    selectCategoryButton.textContent = '選択'
+    selectCategoryButton.onclick = () => {
+      selectCategoryComments(category)
+    }
+    selectCell.appendChild(selectCategoryButton)
 
     const deleteCell = document.createElement('td')
     deleteCell.textContent = '削除'
@@ -596,6 +602,16 @@ function showOrHideCategorySelect() {
   } else {
     categorySelectElements.forEach(function(categorySelectElement) {
       categorySelectElement.style.display = 'none'
+    })
+  }
+}
+
+function selectCategoryComments(category) {
+  console.log('選択したカテゴリ: ', category.categoryName)
+  const targetComments = commentObjs.filter(commentObj => commentObj.category === category)
+  if (targetComments) {
+    targetComments.forEach(function(targetComment) {
+      targetComment.isSelected = true
     })
   }
 }
