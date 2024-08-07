@@ -578,3 +578,23 @@ function confirmDeleteComments(targetCommentObjs) {
   deleteConfirmationDialog.appendChild(backButton)
   deleteConfirmationDialog.appendChild(confirmDeleteButton)
 }
+
+let categorySelectDisplay = true
+
+document.getElementById('showOrHideCategorySelectButton').addEventListener('click', function() {
+  categorySelectDisplay = !categorySelectDisplay
+  showOrHideCategorySelect()
+})
+
+function showOrHideCategorySelect() {
+  const categorySelectElements = document.querySelectorAll('[id^="commentCategorySelect"]')
+  if (categorySelectDisplay) {
+    categorySelectElements.forEach(function(categorySelectElement) {
+      categorySelectElement.style.display = 'block'
+    })
+  } else {
+    categorySelectElements.forEach(function(categorySelectElement) {
+      categorySelectElement.style.display = 'none'
+    })
+  }
+}
