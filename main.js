@@ -4,7 +4,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { video, videoAspectRatio } from './modules/video.js'
-import { addCommentObj, getCommentObjs, setCategoryList } from './modules/commentUtils.js'
+import { addCommentObj, getCommentObjs } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -981,18 +981,4 @@ window.addEventListener('resize', () => {
 		main()
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
-})
-
-// コメントを表示
-document.addEventListener("DOMContentLoaded", function() {
-  let container = document.getElementById("commentArea")
-  commentObjs.forEach((commentObj) => {
-    let comment = addCommentSticker(commentObj.comment)
-    container.appendChild(comment)
-  })
-})
-
-document.addEventListener("DOMContentLoaded", function() {
-  // outputCommentFile(commentObjs)
-  setCategoryList()
 })

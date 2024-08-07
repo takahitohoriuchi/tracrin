@@ -392,7 +392,9 @@ function addCommentStickersFromCommentFile(commentObjsFromFile) {
   })
 }
 
-export function setCategoryList() {
+setCategoryList()
+
+function setCategoryList() {
   const categoryEditElement = document.getElementById('categoryList')
   categoryEditElement.innerHTML = ''
   categoryEditElement.className = 'categoryList'
