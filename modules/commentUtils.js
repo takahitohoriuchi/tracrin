@@ -106,6 +106,7 @@ function addCommentSticker(commentObj) {
   const commentInput = document.createElement('textarea')
   commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
   commentInput.className = 'input'
+  commentInput.value = commentObj.comment
   commentInput.onchange = function() {
     commentObj.comment = this.value
   }
