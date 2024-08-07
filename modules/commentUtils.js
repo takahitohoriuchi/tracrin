@@ -92,7 +92,7 @@ function addCommentSticker(commentObj) {
   const deleteButton = document.createElement('p')
   deleteButton.textContent = '×'
   deleteButton.className = 'deleteButton'
-  deleteButton.onclick = () => deleteComment(commentObj)
+  deleteButton.onclick = () => confirmDeleteComments([commentObj])
 
   headerElement.appendChild(selectCheckbox)
   headerElement.appendChild(headerComment)
@@ -298,9 +298,8 @@ document.getElementById('editCategoryButton').addEventListener('click', function
 document.getElementById('deleteSelectedCommentsButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    selectedCommentObjs.forEach(selectedCommentObj => {
-      deleteComment(selectedCommentObj)
-    })
+    console.log(selectedCommentObjs)
+    confirmDeleteComments(selectedCommentObjs)
   }
 })
 
@@ -548,4 +547,34 @@ function editCategorySelectOptions(currentCategoryName, newCategoryName) {
     targetOptionElement.textContent = newCategoryName
     targetOptionElement.value = newCategoryName
   })
+}
+
+function confirmDeleteComments(targetCommentObjs) {
+  const deleteConfirmationDialog = document.getElementById('deleteConfirmationDialog')
+  deleteConfirmationDialog.textContent = 'コメントを削除しますか？'
+  deleteConfirmationDialog.className = 'categoryList'
+  const display = deleteConfirmationDialog.style.display
+  if (display == 'none') {
+    deleteConfirmationDialog.style.display = 'block'
+  } else {
+    deleteConfirmationDialog.style.display = 'none'
+  }
+
+  const confirmDeleteButton = document.createElement('button')
+  confirmDeleteButton.textContent = '削除'
+  confirmDeleteButton.onclick = () => {
+    targetCommentObjs.forEach(function(targetCommentObj) {
+      deleteComment(targetCommentObj)
+    })
+    deleteConfirmationDialog.style.display = 'none'
+  }
+
+  const backButton = document.createElement('button')
+  backButton.textContent = '戻る'
+  backButton.onclick = () => {
+    deleteConfirmationDialog.style.display = 'none'
+  }
+
+  deleteConfirmationDialog.appendChild(backButton)
+  deleteConfirmationDialog.appendChild(confirmDeleteButton)
 }
