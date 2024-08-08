@@ -9,36 +9,47 @@ let categories = [
 const colorOptions = [
   {
     colorName: 'ブルー',
-    colorValue: 'blue'
+    colorValue: 'blue',
+    colorCodeLight: '#adf4ff'
   },
   {
     colorName: 'イエロー',
-    colorValue: 'yellow'
+    colorValue: 'yellow',
+    colorCodeLight: '#FEF49C'
   },
   {
     colorName: 'グリーン',
-    colorValue: 'green'
+    colorValue: 'green',
+    colorCodeLight: '#B2FFA0'
   },
   {
     colorName: 'ピンク',
-    colorValue: 'pink'
+    colorValue: 'pink',
+    colorCodeLight: '#FFC7C7'
   },
   {
     colorName: 'パープル',
-    colorValue: 'purple'
+    colorValue: 'purple',
+    colorCodeLight: '#B6CAFF'
   },
   {
     colorName: 'グレー',
-    colorValue: 'gray'
+    colorValue: 'gray',
+    colorCodeLight: '#EEEEEE'
   }
 ]
 
 let commentObjs
 let spans
 let zIndexCounter = 2
+let isEditingGlobal = false // コメントに対応するspanタグ要素を編集状態を制御、わかりやすい変数名に変更予定
 
 export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
+  getSpans()
+}
+
+function getSpans() {
   spans = document.querySelectorAll('[globalTagID]')
 }
 
@@ -53,9 +64,8 @@ export function addCommentObj(globalTagID){
     isDeleted: false,
     commentID: commentID
   }
-  let container = document.getElementById("commentArea")
-  let commentElement = addCommentSticker(commentObj)
-  container.appendChild(commentElement)
+
+  addCommentSticker(commentObj)
 
   commentObjs.push(commentObj)
 }
@@ -73,6 +83,11 @@ function addCommentSticker(commentObj) {
     var color = index.color
   }
 
+  const colorIndex = colorOptions.find(colorOption => colorOption.colorValue === color)
+  if (colorIndex) {
+    var colorCode = colorIndex.colorCodeLight
+  }
+
   const commentStickerElement = document.createElement('div')
   commentStickerElement.className = 'comment ' + color
   commentStickerElement.id = 'commentSticker' + commentObj.commentID
@@ -85,8 +100,6 @@ function addCommentSticker(commentObj) {
   selectCheckbox.style.transform = 'scale(1.5)'
   selectCheckbox.onchange = function() {
     commentObj.isSelected = selectCheckbox.checked
-    console.log(commentObj.isSelected)
-    console.log(commentObjs)
   }
 
   const headerComment = document.createElement('p')
@@ -95,7 +108,7 @@ function addCommentSticker(commentObj) {
   const deleteButton = document.createElement('p')
   deleteButton.textContent = '×'
   deleteButton.className = 'deleteButton'
-  deleteButton.onclick = () => deleteComment(commentObj)
+  deleteButton.onclick = () => confirmDeleteComments([commentObj])
 
   headerElement.appendChild(selectCheckbox)
   headerElement.appendChild(headerComment)
@@ -109,9 +122,9 @@ function addCommentSticker(commentObj) {
   const commentInput = document.createElement('textarea')
   commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
   commentInput.className = 'input'
+  commentInput.value = commentObj.comment
   commentInput.onchange = function() {
     commentObj.comment = this.value
-    console.log(commentObj.comment)
   }
 
   const categorySelect = document.createElement('select')
@@ -119,69 +132,90 @@ function addCommentSticker(commentObj) {
   categories.forEach(function(category) {
     addCategorySelectOption(categorySelect, category)
   })
+  categorySelect.value = commentObj.category
+  categorySelect.text = commentObj.category
+  console.log(commentObj.category)
+  console.log(categorySelect.value)
+  console.log(categorySelect.text)
   categorySelect.className = 'select'
   categorySelect.addEventListener('change', function() {
     changeCategory(this.value, commentObj)
   })
 
-  // const editLinkedSpansButton = document.createElement('button')
-  // editLinkedSpansButton.textContent = '対応する要素を編集'
-  // let isEditing = false
+  // コメントに対応する要素選択機能【ここから】
+  const editLinkedSpansButton = document.createElement('button')
+  editLinkedSpansButton.textContent = '対応要素を編集'
+  let isEditing = false
 
-  // const spanHandlers = new Map()
+  const spanHandlers = new Map()
 
-  // editLinkedSpansButton.onclick = () => {
-  //   spans.forEach((span) => {
-  //     const globalTagID = span.getAttribute('globalTagID')
-  //     let isLinked = linkedGlobalTagIDs.includes(globalTagID)
+  editLinkedSpansButton.onclick = () => {
+    if (isEditingGlobal & !isEditing) {
+      alert('他のコメントの対応要素を編集中です。')
+    } else {
+      spans.forEach((span) => {
+        const globalTagID = span.getAttribute('globalTagID')
+        let isLinked = linkedGlobalTagIDs.includes(globalTagID)
+    
+        if (!spanHandlers.has(span)) {
+          const editLinkedSpans = () => {
+            if (isLinked) {
+              span.style.border = 'none'
+              const index = linkedGlobalTagIDs.indexOf(globalTagID)
+              if (index !== -1) {
+                linkedGlobalTagIDs.splice(index, 1)
+                linkedSpans.splice(index, 1)
+              }
+              isLinked = false
+            } else {
+              span.style.border = '1px solid black'
+              linkedGlobalTagIDs.push(globalTagID)
+              linkedSpans.push(span)
+              isLinked = true
+            }
+          }
+    
+          spanHandlers.set(span, editLinkedSpans)
+        }
+    
+        if (isEditing) {
+          span.removeEventListener('click', spanHandlers.get(span))
+          span.style.border = 'none'
+          commentStickerElement.style.border = 'none'
+        } else {
+          span.addEventListener('click', spanHandlers.get(span))
+          if (isLinked) {
+            span.style.border = '1px solid black'
+            commentStickerElement.style.border = '1px solid black'
+          }
+        }
+      })
+      if (isEditing) {
+        editLinkedSpansButton.textContent = '対応要素を編集'
+      } else {
+        editLinkedSpansButton.textContent = '対応要素を確定'
+      }
   
-  //     if (!spanHandlers.has(span)) {
-  //       const editLinkedSpans = () => {
-  //         if (isLinked) {
-  //           span.style.border = 'none'
-  //           const index = linkedGlobalTagIDs.indexOf(globalTagID)
-  //           if (index !== -1) {
-  //             linkedGlobalTagIDs.splice(index, 1)
-  //             linkedSpans.splice(index, 1)
-  //           }
-  //           isLinked = false
-  //         } else {
-  //           span.style.border = '1px solid black'
-  //           linkedGlobalTagIDs.push(globalTagID)
-  //           linkedSpans.push(span)
-  //           isLinked = true
-  //         }
-  //       }
-  
-  //       spanHandlers.set(span, editLinkedSpans)
-  //     }
-  
-  //     if (isEditing) {
-  //       span.removeEventListener('click', spanHandlers.get(span))
-  //       span.style.border = 'none'
-  //     } else {
-  //       span.addEventListener('click', spanHandlers.get(span))
-  //       if (isLinked) {
-  //         span.style.border = '1px solid black'
-  //       }
-  //     }
-  //   })
-  //   if (isEditing) {
-  //     editLinkedSpansButton.textContent = '対応する要素を確定'
-  //   } else {
-  //     editLinkedSpansButton.textContent = '対応する要素を編集'
-  //   }
-  //   isEditing = !isEditing
-  // }
+      isEditing = !isEditing
+      isEditingGlobal = isEditing
+    }
+  }
 
-  // fieldElement.appendChild(editLinkedSpansButton)
+  // コメントに対応する要素選択機能【ここまで】
 
   headerElement.ondblclick = function() {
     showOrHideComment(commentObj, fieldElement, headerComment)
   }
 
   fieldElement.appendChild(commentInput)
-  fieldElement.appendChild(categorySelect)
+  
+  const optionElement = document.createElement('div')
+  optionElement.id = 'commentOption' + commentObj.commentID
+
+  optionElement.appendChild(categorySelect)
+  optionElement.appendChild(editLinkedSpansButton)
+
+  fieldElement.appendChild(optionElement)
 
   commentStickerElement.appendChild(fieldElement)
   $(commentStickerElement).draggable({
@@ -192,12 +226,11 @@ function addCommentSticker(commentObj) {
   let linkedSpans = []
   linkedGlobalTagIDs.forEach(function(linkedGlobalTagID) {
     const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
-    console.log(linkedSpan)
     linkedSpans.push(linkedSpan)
   })
 
+  console.log(linkedGlobalTagIDs)
   const targetY = parseInt(linkedSpans[0].style.top, 10)
-  console.log('targetY: ', targetY)
   commentStickerElement.style.top = targetY + 11 + 'px'
   commentStickerElement.style.left = '400px'
   commentStickerElement.style.position = 'absolute'
@@ -209,7 +242,7 @@ function addCommentSticker(commentObj) {
 
   commentStickerElement.addEventListener('mouseover', () => {
     linkedSpans.forEach(function(linkedSpan) {
-      linkedSpan.style.backgroundColor = '#adf4ff'
+      linkedSpan.style.backgroundColor = colorCode
     })
   })
 
@@ -219,47 +252,78 @@ function addCommentSticker(commentObj) {
     })
   })
 
-  return commentStickerElement
+  let container = document.getElementById("commentArea")
+  container.appendChild(commentStickerElement)
 }
 
-/**
- * 
- * @param {Object} commentObjs 
- */
-function outputCommentFile(commentObjs) {
-  const headers = Object.keys(commentObjs[0])
-  const csvRows = [headers.join(',')]
+// /**
+//  * 
+//  * @param {Object} commentObjs 
+//  */
+// function outputCommentFile(commentObjs) {
+//   const headers = Object.keys(commentObjs[0])
+//   const csvRows = [headers.join(',')]
 
+//   for (const row of commentObjs) {
+//     if (row.isDeleted === false){
+//       const values = headers.map(header => {
+//         const escaped = (''+row[header]).replace(/"/g, '\\"')
+//         return `"${escaped}"`
+//       })
+//     csvRows.push(values.join(','))
+//     }
+//   }
+
+//   const csvString = csvRows.join('\n')
+//   const blob = new Blob([csvString], { type: 'text/csv' })
+//   const url = URL.createObjectURL(blob)
+//   const link = document.createElement('a')
+//   link.href = url
+//   link.download = 'export.csv'
+//   link.click()
+
+//   URL.revokeObjectURL(url)
+// }
+
+function outputCommentFile(commentObjs) {
+  // オブジェクトのキーからヘッダーを生成
+  const headers = Object.keys(commentObjs[0])
+  // ヘッダー行をタブで結合
+  const tsvRows = [headers.join('\t')]
+
+  // 各オブジェクトを行に変換
   for (const row of commentObjs) {
     if (row.isDeleted === false){
+      // 各値をタブで結合し、必要に応じてエスケープ
       const values = headers.map(header => {
-        const escaped = (''+row[header]).replace(/"/g, '\\"')
-        return `"${escaped}"`
+        const value = '' + row[header]; // 数値などを文字列に変換
+        const escaped = value.replace(/[\t\n\r]/g, ' '); // TSVの制御文字を空白に置換
+        return escaped;
       })
-    csvRows.push(values.join(','))
+      tsvRows.push(values.join('\t'));
     }
   }
 
-  const csvString = csvRows.join('\n')
-  const blob = new Blob([csvString], { type: 'text/csv' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'export.csv'
-  link.click()
+  // TSV文字列を生成し、Blobとして保存
+  const tsvString = tsvRows.join('\n');
+  const blob = new Blob([tsvString], { type: 'text/tab-separated-values' })
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'export.tsv'; // 拡張子を.tsvに変更
+  link.click();
 
-  URL.revokeObjectURL(url)
+  // 生成したURLを解放
+  URL.revokeObjectURL(url);
 }
 
 function deleteComment(commentObj) {
-  console.log("deleted comment!: ", commentObj.linkedGlobalTagIDs[0])
   commentObj.isDeleted = true
   const target = document.getElementById('commentSticker' + commentObj.commentID)
   target.remove()
 }
 
 function showOrHideComment(commentObj, fieldElement, headerComment) {
-  console.log(fieldElement)
   if ( commentObj.isShown ) {
     commentObj.isShown = false
     fieldElement.style.display = 'none'
@@ -282,14 +346,36 @@ function changeCommentStickerColor(commentObj) {
   const index = categories.find(_category => _category.categoryName === category)
   if (index) {
     var color = index.color
-    console.log(color)
+  }
+
+  const colorIndex = colorOptions.find(colorOption => colorOption.colorValue === color)
+  if (colorIndex) {
+    var colorCode = colorIndex.colorCodeLight
   }
 
   commentStickerElement.className = 'comment ' + color
+
+  const linkedGlobalTagIDs = commentObj.linkedGlobalTagIDs
+  let linkedSpans = []
+  linkedGlobalTagIDs.forEach(function(linkedGlobalTagID) {
+    const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
+    linkedSpans.push(linkedSpan)
+  })
+
+  commentStickerElement.addEventListener('mouseover', () => {
+    linkedSpans.forEach(function(linkedSpan) {
+      linkedSpan.style.backgroundColor = colorCode
+    })
+  })
+
+  commentStickerElement.addEventListener('mouseout', () => {
+    linkedSpans.forEach(function(linkedSpan) {
+      linkedSpan.style.backgroundColor = 'transparent'
+    })
+  })
 }
 
 function changeCategory(newCategory, commentObj) {
-  console.log(newCategory)
   commentObj.category = newCategory
   changeCommentStickerColor(commentObj)
 }
@@ -308,16 +394,13 @@ document.getElementById('deleteSelectedCommentsButton').addEventListener('click'
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
     console.log(selectedCommentObjs)
-    selectedCommentObjs.forEach(selectedCommentObj => {
-      deleteComment(selectedCommentObj)
-    })
+    confirmDeleteComments(selectedCommentObjs)
   }
 })
 
 document.getElementById('showOrHideSelectedCommentsButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    console.log(selectedCommentObjs)
     selectedCommentObjs.forEach(selectedCommentObj => {
       const commentID = selectedCommentObj.commentID
       const selectedCommentSticker = document.getElementById('commentSticker' + commentID)
@@ -331,16 +414,80 @@ document.getElementById('showOrHideSelectedCommentsButton').addEventListener('cl
 document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    console.log(selectedCommentObjs)
     outputCommentFile(selectedCommentObjs)
   }
 })
 
-document.getElementById("buttonOutputComment").addEventListener('click', function() {
+document.getElementById("outputCommentFileButton").addEventListener('click', function() {
   outputCommentFile(commentObjs)
 })
 
-export function setCategoryList() {
+document.getElementById('inputCommentFileButton').addEventListener('click', function() {
+  document.getElementById('commentFileInput').click()
+})
+
+document.getElementById('commentFileInput').addEventListener('change', function(event) {
+  const file = event.target.files[0]
+  if (file) {
+    console.log("ファイルが選択されました:", file.name)
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      const text = e.target.result
+      const data = readCommentFile(text)
+      commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
+      console.log(commentObjs)
+      addCommentStickersFromCommentFile(data)
+    }
+    reader.readAsText(file)
+  }
+})
+
+function readCommentFile(tsvText) {
+  const lines = tsvText.split('\n');
+  const headers = lines[0].split('\t').map(header => header.trim());
+  categories = []
+  let existingCategories = []
+
+  return lines.slice(1).map(line => {
+    const data = line.split('\t').map((cell, index) => {
+      cell = cell.trim()
+      if (index === 0) {
+        return cell.includes(',') ? cell.split(',').map(item => item.trim()) : [cell]
+      } else {
+        return cell
+      }
+    })
+    let obj = {}
+    headers.forEach((header, index) => {
+      obj[header] = data[index];
+      if (header === 'category' & !existingCategories.includes(data[index])) {
+        categories.push({
+          categoryName: data[index],
+          categoryID: 'category' + categories.length,
+          color: 'blue'
+        })
+        existingCategories.push(data[index])
+        console.log(existingCategories)
+      }
+    })
+    setCategoryList()
+    getSpans()
+    console.log(categories)
+    return obj
+  })
+}
+
+function addCommentStickersFromCommentFile(commentObjsFromFile) {
+  commentObjsFromFile.forEach(commentObjFromFile => {
+    // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
+    // addCommentObj(globalTagID)
+    addCommentSticker(commentObjFromFile)
+  })
+}
+
+setCategoryList()
+
+function setCategoryList() {
   const categoryEditElement = document.getElementById('categoryList')
   categoryEditElement.innerHTML = ''
   categoryEditElement.className = 'categoryList'
@@ -403,13 +550,29 @@ export function setCategoryList() {
     colorSelectCell.appendChild(colorSelectElement)
 
     const showCell = document.createElement('td')
-    showCell.textContent = '表示'
+    const showOrHideCategoryCommentsButton = document.createElement('button')
+    showOrHideCategoryCommentsButton.textContent = '表示切り替え'
+    showOrHideCategoryCommentsButton.onclick = () => {
+      alert('ご要望がありましたらカテゴリ「' + category.categoryName + '」に含まれるコメント付箋の表示/非表示を切り替える機能を実装します。')
+    }
+    showCell.appendChild(showOrHideCategoryCommentsButton)
 
     const selectCell = document.createElement('td')
-    selectCell.textContent = '選択'
+    const selectCategoryButton = document.createElement('button')
+    selectCategoryButton.textContent = '選択'
+    selectCategoryButton.onclick = () => {
+      selectCategoryComments(category)
+      alert('カテゴリ「' + category.categoryName + '」に含まれるコメント付箋を全て選択状態にする機能を実装予定です。')
+    }
+    selectCell.appendChild(selectCategoryButton)
 
     const deleteCell = document.createElement('td')
-    deleteCell.textContent = '削除'
+    const deleteCategoryButton = document.createElement('button')
+    deleteCategoryButton.textContent = '削除'
+    deleteCategoryButton.onclick = () => {
+      alert('カテゴリ「' + category.categoryName + '」を削除する機能を実装予定です。')
+    }
+    deleteCell.appendChild(deleteCategoryButton)
 
     tableRow.appendChild(categoryNameCell)
     tableRow.appendChild(colorSelectCell)
@@ -449,9 +612,6 @@ function changeCommentCategoryColor(category, color) {
       changeCommentStickerColor(_commentObj)
     }
   })
-  console.log(commentObjs)
-  console.log(category)
-  console.log(color)
 }
 
 function addCategory(newCategoryName) {
@@ -467,7 +627,6 @@ function addCategory(newCategoryName) {
   categorySelectElements.forEach(element => {
     addCategorySelectOption(element, newCategory)
   })
-  console.log(categories)
 }
 
 function addCategorySelectOption(categorySelect, category) {
@@ -498,4 +657,47 @@ function editCategorySelectOptions(currentCategoryName, newCategoryName) {
     targetOptionElement.textContent = newCategoryName
     targetOptionElement.value = newCategoryName
   })
+}
+
+function confirmDeleteComments(targetCommentObjs) {
+  const isConfirmed = confirm('コメントを削除しますか？')
+
+  if (isConfirmed) {
+    targetCommentObjs.forEach(function(targetCommentObj) {
+      deleteComment(targetCommentObj)
+    })
+  }
+  spans.forEach(function(span) {
+    span.style.backgroundColor = 'transparent'
+  })
+}
+
+let commentOptionDisplay = true
+
+document.getElementById('showOrHideCommentOptionButton').addEventListener('click', function() {
+  commentOptionDisplay = !commentOptionDisplay
+  showOrHideCommentOption()
+})
+
+function showOrHideCommentOption() {
+  const commentOptionElements = document.querySelectorAll('[id^="commentOption"]')
+  if (commentOptionDisplay) {
+    commentOptionElements.forEach(function(commentOptionElement) {
+      commentOptionElement.style.display = 'block'
+    })
+  } else {
+    commentOptionElements.forEach(function(commentOptionElement) {
+      commentOptionElement.style.display = 'none'
+    })
+  }
+}
+
+function selectCategoryComments(category) {
+  console.log('選択したカテゴリ: ', category.categoryName)
+  const targetComments = commentObjs.filter(commentObj => commentObj.category === category)
+  if (targetComments) {
+    targetComments.forEach(function(targetComment) {
+      targetComment.isSelected = true
+    })
+  }
 }

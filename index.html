@@ -11,7 +11,6 @@
 		<!-- 設定メニュー -->
 		<nav>
 			<div>tracrin2.0.0</div>
-      <button id="buttonOutputComment">コメントファイルを出力</button>
 			<!-- 設定アイコン -->
 			<div id="settings-icon">⚙️</div>
 			
@@ -47,10 +46,13 @@
 			<h6>設定</h6>
 			<label>
 				<button id = "releaseSelectionButton" class="favorite styled" type="button">
-					選択を解除
+					発話要素の選択を解除
 				</button>
         <button id="editCategoryButton">
           カテゴリを編集
+        </button>
+        <button id="showOrHideCommentOptionButton">
+          コメントオプション欄の表示/非表示を切り替え
         </button>
         <button id="deleteSelectedCommentsButton">
           選択したコメントを削除
@@ -61,6 +63,11 @@
         <button id="outputSelectedCommentsAsFileButton">
           選択したコメントのファイルを出力
         </button>
+        <button id="outputCommentFileButton">コメントファイルを出力</button>
+        <button id="inputCommentFileButton">
+          コメントファイルを入力
+        </button>
+        <input type="file" id="commentFileInput" style="display:none;" accept=".tsv">
         <div id="categoryList" style="display: none;"></div>
 			</label>
 		</div>
