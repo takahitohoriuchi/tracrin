@@ -42,6 +42,7 @@ const colorOptions = [
 let commentObjs
 let spans
 let zIndexCounter = 2
+let isEditingGlobal = false // コメントに対応するspanタグ要素を編集状態を制御、わかりやすい変数名に変更予定
 
 export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
@@ -132,57 +133,67 @@ function addCommentSticker(commentObj) {
     changeCategory(this.value, commentObj)
   })
 
-  // const editLinkedSpansButton = document.createElement('button')
-  // editLinkedSpansButton.textContent = '対応する要素を編集'
-  // let isEditing = false
+  // コメントに対応する要素選択機能【ここから】
+  const editLinkedSpansButton = document.createElement('button')
+  editLinkedSpansButton.textContent = '対応する要素を編集'
+  let isEditing = false
 
-  // const spanHandlers = new Map()
+  const spanHandlers = new Map()
 
-  // editLinkedSpansButton.onclick = () => {
-  //   spans.forEach((span) => {
-  //     const globalTagID = span.getAttribute('globalTagID')
-  //     let isLinked = linkedGlobalTagIDs.includes(globalTagID)
+  editLinkedSpansButton.onclick = () => {
+    if (isEditingGlobal & !isEditing) {
+      alert('他のコメントの対応する要素を編集中です。')
+    } else {
+      spans.forEach((span) => {
+        const globalTagID = span.getAttribute('globalTagID')
+        let isLinked = linkedGlobalTagIDs.includes(globalTagID)
+    
+        if (!spanHandlers.has(span)) {
+          const editLinkedSpans = () => {
+            if (isLinked) {
+              span.style.border = 'none'
+              const index = linkedGlobalTagIDs.indexOf(globalTagID)
+              if (index !== -1) {
+                linkedGlobalTagIDs.splice(index, 1)
+                linkedSpans.splice(index, 1)
+              }
+              isLinked = false
+            } else {
+              span.style.border = '1px solid black'
+              linkedGlobalTagIDs.push(globalTagID)
+              linkedSpans.push(span)
+              isLinked = true
+            }
+          }
+    
+          spanHandlers.set(span, editLinkedSpans)
+        }
+    
+        if (isEditing) {
+          span.removeEventListener('click', spanHandlers.get(span))
+          span.style.border = 'none'
+          commentStickerElement.style.border = 'none'
+        } else {
+          span.addEventListener('click', spanHandlers.get(span))
+          if (isLinked) {
+            span.style.border = '1px solid black'
+            commentStickerElement.style.border = '1px solid black'
+          }
+        }
+      })
+      if (isEditing) {
+        editLinkedSpansButton.textContent = '対応する要素を編集'
+      } else {
+        editLinkedSpansButton.textContent = '対応する要素を確定'
+      }
   
-  //     if (!spanHandlers.has(span)) {
-  //       const editLinkedSpans = () => {
-  //         if (isLinked) {
-  //           span.style.border = 'none'
-  //           const index = linkedGlobalTagIDs.indexOf(globalTagID)
-  //           if (index !== -1) {
-  //             linkedGlobalTagIDs.splice(index, 1)
-  //             linkedSpans.splice(index, 1)
-  //           }
-  //           isLinked = false
-  //         } else {
-  //           span.style.border = '1px solid black'
-  //           linkedGlobalTagIDs.push(globalTagID)
-  //           linkedSpans.push(span)
-  //           isLinked = true
-  //         }
-  //       }
-  
-  //       spanHandlers.set(span, editLinkedSpans)
-  //     }
-  
-  //     if (isEditing) {
-  //       span.removeEventListener('click', spanHandlers.get(span))
-  //       span.style.border = 'none'
-  //     } else {
-  //       span.addEventListener('click', spanHandlers.get(span))
-  //       if (isLinked) {
-  //         span.style.border = '1px solid black'
-  //       }
-  //     }
-  //   })
-  //   if (isEditing) {
-  //     editLinkedSpansButton.textContent = '対応する要素を確定'
-  //   } else {
-  //     editLinkedSpansButton.textContent = '対応する要素を編集'
-  //   }
-  //   isEditing = !isEditing
-  // }
+      isEditing = !isEditing
+      isEditingGlobal = isEditing
+    }
+  }
 
-  // fieldElement.appendChild(editLinkedSpansButton)
+  fieldElement.appendChild(editLinkedSpansButton)
+  // コメントに対応する要素選択機能【ここまで】
 
   headerElement.ondblclick = function() {
     showOrHideComment(commentObj, fieldElement, headerComment)
@@ -500,7 +511,6 @@ function setCategoryList() {
     showCell.appendChild(showOrHideCategoryCommentsButton)
 
     const selectCell = document.createElement('td')
-    // selectCell.textContent = '選択'
     const selectCategoryButton = document.createElement('button')
     selectCategoryButton.textContent = '選択'
     selectCategoryButton.onclick = () => {

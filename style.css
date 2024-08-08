@@ -166,7 +166,7 @@ video {
 
 .comment {
   width: 200px;
-  height: 18px;
+  /* height: 18px; */
   position: absolute;
   cursor: pointer;
   font-size: 12px;
