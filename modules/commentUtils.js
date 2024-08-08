@@ -492,7 +492,12 @@ function setCategoryList() {
     colorSelectCell.appendChild(colorSelectElement)
 
     const showCell = document.createElement('td')
-    showCell.textContent = '表示'
+    const showOrHideCategoryCommentsButton = document.createElement('button')
+    showOrHideCategoryCommentsButton.textContent = '表示切り替え'
+    showOrHideCategoryCommentsButton.onclick = () => {
+      alert('ご要望がありましたらカテゴリ「' + category.categoryName + '」に含まれるコメント付箋の表示/非表示を切り替える機能を実装します。')
+    }
+    showCell.appendChild(showOrHideCategoryCommentsButton)
 
     const selectCell = document.createElement('td')
     // selectCell.textContent = '選択'
@@ -500,11 +505,17 @@ function setCategoryList() {
     selectCategoryButton.textContent = '選択'
     selectCategoryButton.onclick = () => {
       selectCategoryComments(category)
+      alert('カテゴリ「' + category.categoryName + '」に含まれるコメント付箋を全て選択状態にする機能を実装予定です。')
     }
     selectCell.appendChild(selectCategoryButton)
 
     const deleteCell = document.createElement('td')
-    deleteCell.textContent = '削除'
+    const deleteCategoryButton = document.createElement('button')
+    deleteCategoryButton.textContent = '削除'
+    deleteCategoryButton.onclick = () => {
+      alert('カテゴリ「' + category.categoryName + '」を削除する機能を実装予定です。')
+    }
+    deleteCell.appendChild(deleteCategoryButton)
 
     tableRow.appendChild(categoryNameCell)
     tableRow.appendChild(colorSelectCell)
