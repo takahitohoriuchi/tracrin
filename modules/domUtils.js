@@ -2,7 +2,7 @@
 HTML要素を直接に生成・更新・削除したりするのモジュールはここ
 */
 
-import { getLastElement, num2Px } from './otherUtils.js'
+import { num2Px } from './otherUtils.js'
 import { isIncompleteKakko, isIncompleteKukuri, isSuffixFirst, kukuriMarkObjs } from './transcriptUtils.js'
 
 export function updateTranscriptAreaSize(_transcriptArea, _windowSize) {
@@ -52,7 +52,7 @@ export function genHatsuwaTags(_hatsuwaGroup, _groupIndex) {
 export function genSpan(_document, _element, _tagText, _id, _fontSize, _tagX = 0) {
 	var dummy = _document.createElement('span')
 	dummy.className = 'tag'
-	dummy.innerHTML = _tagText	
+	dummy.innerText = _tagText	
 	// dummy.classList.add(_id) //NOTE: グループID-発話ID-パーツID	
 	dummy.setAttribute('globalTagID', _id)
 	dummy.style.fontSize = num2Px(_fontSize)
@@ -125,7 +125,7 @@ export function drawLabel(_document, _element, _x, _y, _label, _rowID, _fontSize
 	var dummy = _document.createElement('span')
 	dummy.setAttribute('rowID', _rowID)
 	dummy.className = 'label'	
-	dummy.innerHTML = _label
+	dummy.innerText = _label
 	dummy.style.fontSize = num2Px(_fontSize)
 	dummy.style.left = num2Px(_x)
 	dummy.style.top = num2Px(_y)	
@@ -136,7 +136,7 @@ export function drawLabel(_document, _element, _x, _y, _label, _rowID, _fontSize
 export function drawHeaderLabel(_document, _headerArea, _x, _y, _label, _fontSize){
 	var label = _document.createElement('span')	
 	label.className = 'label'	
-	label.innerHTML = _label
+	label.innerText = _label
 	label.style.fontSize = num2Px(_fontSize)
 	label.style.left = num2Px(_x)
 	label.style.top = num2Px(_y)	
@@ -155,7 +155,7 @@ export function drawHeaderLabel(_document, _headerArea, _x, _y, _label, _fontSiz
 export function addArrow(_document, _element, _fontSize, _x, _y){
 	var dummy = _document.createElement('span')
 	dummy.className = 'arrow'
-	dummy.innerHTML = '→'
+	dummy.innerText = '→'
 	dummy.style.fontSize = num2Px(_fontSize)
 	dummy.style.left = num2Px(_x)
 	dummy.style.top = num2Px(_y)
@@ -185,7 +185,7 @@ export function deleteArrow(_parentElem, _arrows){
  */
 export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow, _tag) {
 	// NOTE:このタグtextに対して、発話特殊記号のまとまり扱いを適用する
-	const text = _span.innerHTML
+	const text = _span.innerText
 	console.log('spanタグtext: ', text)
 	console.log('_charNumFirstRow: ', _charNumFirstRow)
 	console.log('_maxCharNumPerRow: ', _maxCharNumPerRow)	
@@ -194,7 +194,7 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 	let result
 	// この行におさまらない場合
 	if (text.length > _charNumFirstRow) {		
-		/*
+		/*NOTE:
 		textのなかに
 		・"<"と">"が順番にある・・・isゆっくり = true
 		・">"と"<"が順番にある・・・is急いで = true
@@ -211,19 +211,17 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 			var remainingText = text
 			// (0) firstRowを仮生成
 			let firstRowString = remainingText.slice(0, charNumFstRow)
-
+			console.log('ククリ記号中途半端判定します: ', firstRowString)
 			// (1) 仮生成したfirstRowに、発話記号が中途半端にふくまれてないか？チェック
 			// (1-1) 開きっぱなし閉じていないカッコがないか？をチェックし、
 			if (isIncompleteKakko(firstRowString)) {
+				console.log('開きっぱなしのククリ記号アリ')
 				const index = firstRowString.indexOf('(')
 				firstRowString = remainingText.slice(0, index)
 				finalSplit.push(firstRowString)
 				remainingText = remainingText.slice(index)
-			}
-			// 	const bool = isIncompleteKukuri(firstRowString, _tag)
-			// }
-			
-			// (1-3)行頭チェック・・・'?'や'-'など、行頭禁止記号がないかたしかめ、あったら、その行頭禁止記号を前行行末に差し戻す
+			}				
+			// (1-3)行頭チェック・・・行頭に'?'や'-'があったら、前行の行末に差し戻す
 			else if (isSuffixFirst(firstRowString)) {
 				console.log(`サフィックスが行頭にきてるよ`)
 				const suffix = isSuffixFirst(firstRowString)
@@ -231,15 +229,13 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 				finalSplit[finalSplit.length - 1] = finalSplit[finalSplit.length - 1] + suffix
 				finalSplit.push(firstRowString.slice(1))
 				remainingText = remainingText.slice(charNumFstRow - 1)
-			}
-			// else if(){
-
-			// }
-
+			}	
 			// (1-4)中途半端になってなければ、
 			else {
+				// DEBUG:20240718
 				// (1-2) '()','<>','°'などのククリ系記号が、あるタグ内で開いたら閉じてるか？をチェックし、開きっぱだったら調整。
-				const kukuriMarkName = isIncompleteKukuri(firstRowString, _tag)
+				console.log('_tag: ', _tag)
+				const kukuriMarkName = isIncompleteKukuri(firstRowString)
 				console.log('kukuriMarkName: ', kukuriMarkName)
 				// console.log('ククリ記号がとじてない（"<"や">"や"°"が、ペアをもたない）')
 				if(kukuriMarkName){
@@ -249,13 +245,12 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 					firstRowString = remainingText.slice(0, charNumFstRow - sliceStringLength)
 					finalSplit.push(firstRowString)
 					// TODO:
-					remainingText = remainingText.slice(charNumFstRow - 5)
+					remainingText = remainingText.slice(charNumFstRow - 1)
 					// firstRowString = remainingText.slice(0, charNumFstRow - 1)
 					// finalSplit.push(firstRowString)
 					// remainingText = remainingText.slice(charNumFstRow - 1)
 				}else{
 					// const suffix = isSuffixFirst(firstRowString)
-
 					// console.log('suffix: ', suffix)
 					// console.log('発話記号チュートハンパなし')
 					// // 行末にククリ記号がきてないかチェック
@@ -286,13 +281,12 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 					remainingText = remainingText.slice(index)
 				}
 				// 行末判定
-				else if (isIncompleteKukuri(rowString, _tag)) {
+				else if (isIncompleteKukuri(rowString)) {
 					rowString = remainingText.slice(0, maxCharNumPerR - 1)
 					finalSplit.push(rowString)
 					remainingText = remainingText.slice(maxCharNumPerR - 1)
 				}
-				// 行頭判定				
-				
+				// 行頭判定								
 				else {					
 					const suffix = isSuffixFirst(rowString)					
 					if (suffix) {
@@ -327,6 +321,7 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 			}
 			return finalSplit
 		}
+		result = splitText(text, _charNumFirstRow, _maxCharNumPerRow)
 			
 			/*
 			あらかじめ発話objに、発話記号がふくまれる場合、
@@ -338,9 +333,6 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 
 			
 			
-
-
-
 			中途半端になってたら、
 			・次行に申し送るか、
 			・この行のハバを増やすか
@@ -352,47 +344,25 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 			・まとめてある？
 			・先頭文字が
 
-
-			*/
-
-			/*
-	10文字幅winだとすると、
-	すでにaiueoがある行に対して、
-	タグ
-	kak(ikukekosa)si(sus)esotatitu(tetonaninuneno)
-	を追加するならば、
+			Q1.()をふくむタグspanが、firstRowにあって、それがfirstRowの文字数におさまる？
+				YES->
+					そのまんま
+				NO->
+					1行目には、「"タグ先頭文字"〜"("」まで切り取り、
+					2行目には、「残りの"("〜_maxCharNumPerRow文字」を描くが、
+					このとき2行目にも"("の２個目以降がマギコレんでいたら、
+					行内に２個目")"がおさまるかをチェック。
+						YES -> そのまま
+						NO -> 2個目"("を3行目からに改行
+			Q2.()をふくむタグspanが、iこ目のrowからはじまって、それがmaxCharNumPerRowにおさまる？
+				YES->
+					そのまんま
+				NO->
+					i行目には"("の直前文字まで書いといて、
+					i+1行目冒頭から、残りの"("からはじまるタグspanを描く
+			
+	*/					
 		
-
-	aiueo kak
-	(ikukekosa
-	)si(sus)es
-	otatitu
-	(tetonanin
-	uneno)
-
-	になる。
-
-	Q1.()をふくむタグspanが、firstRowにあって、それがfirstRowの文字数におさまる？
-		YES->
-			そのまんま
-		NO->
-			1行目には、「"タグ先頭文字"〜"("」まで切り取り、
-			2行目には、「残りの"("〜_maxCharNumPerRow文字」を描くが、
-			このとき2行目にも"("の２個目以降がマギコレんでいたら、
-			行内に２個目")"がおさまるかをチェック。
-				YES -> そのまま
-				NO -> 2個目"("を3行目からに改行
-	Q2.()をふくむタグspanが、iこ目のrowからはじまって、それがmaxCharNumPerRowにおさまる？
-		YES->
-			そのまんま
-		NO->
-			i行目には"("の直前文字まで書いといて、
-			i+1行目冒頭から、残りの"("からはじまるタグspanを描く
-			
-	*/
-			
-		// テスト
-		result = splitText(text, _charNumFirstRow, _maxCharNumPerRow)
 	}
 	// この行におさまる場合は、そのまんまとくになんもしない
 	else {
@@ -435,7 +405,7 @@ export function getHatsuwaObjFromSpan(_span, _hatsuwaGroups){
 export function getTextWidth(_document, _text, _fontSize) {
 	var dummy = _document.createElement('span')
 	dummy.className = 'tag'
-	dummy.innerHTML = _text
+	dummy.innerText = _text
 	dummy.style.fontSize = _fontSize
 	// DOMに追加して、
 	_document.body.appendChild(dummy)
