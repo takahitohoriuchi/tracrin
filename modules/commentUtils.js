@@ -592,33 +592,16 @@ function editCategorySelectOptions(currentCategoryName, newCategoryName) {
 }
 
 function confirmDeleteComments(targetCommentObjs) {
-  const deleteConfirmationDialog = document.getElementById('deleteConfirmationDialog')
-  deleteConfirmationDialog.textContent = 'コメントを削除しますか？'
-  deleteConfirmationDialog.className = 'categoryList'
-  const display = deleteConfirmationDialog.style.display
-  if (display == 'none') {
-    deleteConfirmationDialog.style.display = 'block'
-  } else {
-    deleteConfirmationDialog.style.display = 'none'
-  }
+  const isConfirmed = confirm('コメントを削除しますか？')
 
-  const confirmDeleteButton = document.createElement('button')
-  confirmDeleteButton.textContent = '削除'
-  confirmDeleteButton.onclick = () => {
+  if (isConfirmed) {
     targetCommentObjs.forEach(function(targetCommentObj) {
       deleteComment(targetCommentObj)
     })
-    deleteConfirmationDialog.style.display = 'none'
   }
-
-  const backButton = document.createElement('button')
-  backButton.textContent = '戻る'
-  backButton.onclick = () => {
-    deleteConfirmationDialog.style.display = 'none'
-  }
-
-  deleteConfirmationDialog.appendChild(backButton)
-  deleteConfirmationDialog.appendChild(confirmDeleteButton)
+  spans.forEach(function(span) {
+    span.style.backgroundColor = 'transparent'
+  })
 }
 
 let categorySelectDisplay = true
