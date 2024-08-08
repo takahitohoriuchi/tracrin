@@ -46,6 +46,10 @@ let isEditingGlobal = false // コメントに対応するspanタグ要素を編
 
 export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
+  getSpans()
+}
+
+function getSpans() {
   spans = document.querySelectorAll('[globalTagID]')
 }
 
@@ -467,13 +471,10 @@ function readCommentFile(tsvText) {
       }
     })
     setCategoryList()
+    getSpans()
     console.log(categories)
     return obj
   })
-}
-
-function readCategories() {
-
 }
 
 function addCommentStickersFromCommentFile(commentObjsFromFile) {
