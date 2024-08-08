@@ -9,27 +9,33 @@ let categories = [
 const colorOptions = [
   {
     colorName: 'ブルー',
-    colorValue: 'blue'
+    colorValue: 'blue',
+    colorCodeLight: '#adf4ff'
   },
   {
     colorName: 'イエロー',
-    colorValue: 'yellow'
+    colorValue: 'yellow',
+    colorCodeLight: '#FEF49C'
   },
   {
     colorName: 'グリーン',
-    colorValue: 'green'
+    colorValue: 'green',
+    colorCodeLight: '#B2FFA0'
   },
   {
     colorName: 'ピンク',
-    colorValue: 'pink'
+    colorValue: 'pink',
+    colorCodeLight: '#FFC7C7'
   },
   {
     colorName: 'パープル',
-    colorValue: 'purple'
+    colorValue: 'purple',
+    colorCodeLight: '#B6CAFF'
   },
   {
     colorName: 'グレー',
-    colorValue: 'gray'
+    colorValue: 'gray',
+    colorCodeLight: '#EEEEEE'
   }
 ]
 
@@ -70,6 +76,11 @@ function addCommentSticker(commentObj) {
   const index = categories.find(_category => _category.categoryName === category)
   if (index) {
     var color = index.color
+  }
+
+  const colorIndex = colorOptions.find(colorOption => colorOption.colorValue === color)
+  if (colorIndex) {
+    var colorCode = colorIndex.colorCodeLight
   }
 
   const commentStickerElement = document.createElement('div')
@@ -204,7 +215,7 @@ function addCommentSticker(commentObj) {
 
   commentStickerElement.addEventListener('mouseover', () => {
     linkedSpans.forEach(function(linkedSpan) {
-      linkedSpan.style.backgroundColor = '#adf4ff'
+      linkedSpan.style.backgroundColor = colorCode
     })
   })
 
@@ -278,7 +289,31 @@ function changeCommentStickerColor(commentObj) {
     var color = index.color
   }
 
+  const colorIndex = colorOptions.find(colorOption => colorOption.colorValue === color)
+  if (colorIndex) {
+    var colorCode = colorIndex.colorCodeLight
+  }
+
   commentStickerElement.className = 'comment ' + color
+
+  const linkedGlobalTagIDs = commentObj.linkedGlobalTagIDs
+  let linkedSpans = []
+  linkedGlobalTagIDs.forEach(function(linkedGlobalTagID) {
+    const linkedSpan = document.querySelector(`[globaltagid="${linkedGlobalTagID}"`)
+    linkedSpans.push(linkedSpan)
+  })
+
+  commentStickerElement.addEventListener('mouseover', () => {
+    linkedSpans.forEach(function(linkedSpan) {
+      linkedSpan.style.backgroundColor = colorCode
+    })
+  })
+
+  commentStickerElement.addEventListener('mouseout', () => {
+    linkedSpans.forEach(function(linkedSpan) {
+      linkedSpan.style.backgroundColor = 'transparent'
+    })
+  })
 }
 
 function changeCategory(newCategory, commentObj) {
