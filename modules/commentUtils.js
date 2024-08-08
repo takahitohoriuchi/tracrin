@@ -128,6 +128,11 @@ function addCommentSticker(commentObj) {
   categories.forEach(function(category) {
     addCategorySelectOption(categorySelect, category)
   })
+  categorySelect.value = commentObj.category
+  categorySelect.text = commentObj.category
+  console.log(commentObj.category)
+  console.log(categorySelect.value)
+  console.log(categorySelect.text)
   categorySelect.className = 'select'
   categorySelect.addEventListener('change', function() {
     changeCategory(this.value, commentObj)
@@ -220,6 +225,7 @@ function addCommentSticker(commentObj) {
     linkedSpans.push(linkedSpan)
   })
 
+  console.log(linkedGlobalTagIDs)
   const targetY = parseInt(linkedSpans[0].style.top, 10)
   commentStickerElement.style.top = targetY + 11 + 'px'
   commentStickerElement.style.left = '400px'
@@ -246,33 +252,65 @@ function addCommentSticker(commentObj) {
   container.appendChild(commentStickerElement)
 }
 
-/**
- * 
- * @param {Object} commentObjs 
- */
-function outputCommentFile(commentObjs) {
-  const headers = Object.keys(commentObjs[0])
-  const csvRows = [headers.join(',')]
+// /**
+//  * 
+//  * @param {Object} commentObjs 
+//  */
+// function outputCommentFile(commentObjs) {
+//   const headers = Object.keys(commentObjs[0])
+//   const csvRows = [headers.join(',')]
 
+//   for (const row of commentObjs) {
+//     if (row.isDeleted === false){
+//       const values = headers.map(header => {
+//         const escaped = (''+row[header]).replace(/"/g, '\\"')
+//         return `"${escaped}"`
+//       })
+//     csvRows.push(values.join(','))
+//     }
+//   }
+
+//   const csvString = csvRows.join('\n')
+//   const blob = new Blob([csvString], { type: 'text/csv' })
+//   const url = URL.createObjectURL(blob)
+//   const link = document.createElement('a')
+//   link.href = url
+//   link.download = 'export.csv'
+//   link.click()
+
+//   URL.revokeObjectURL(url)
+// }
+
+function outputCommentFile(commentObjs) {
+  // オブジェクトのキーからヘッダーを生成
+  const headers = Object.keys(commentObjs[0])
+  // ヘッダー行をタブで結合
+  const tsvRows = [headers.join('\t')]
+
+  // 各オブジェクトを行に変換
   for (const row of commentObjs) {
     if (row.isDeleted === false){
+      // 各値をタブで結合し、必要に応じてエスケープ
       const values = headers.map(header => {
-        const escaped = (''+row[header]).replace(/"/g, '\\"')
-        return `"${escaped}"`
+        const value = '' + row[header]; // 数値などを文字列に変換
+        const escaped = value.replace(/[\t\n\r]/g, ' '); // TSVの制御文字を空白に置換
+        return escaped;
       })
-    csvRows.push(values.join(','))
+      tsvRows.push(values.join('\t'));
     }
   }
 
-  const csvString = csvRows.join('\n')
-  const blob = new Blob([csvString], { type: 'text/csv' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'export.csv'
-  link.click()
+  // TSV文字列を生成し、Blobとして保存
+  const tsvString = tsvRows.join('\n');
+  const blob = new Blob([tsvString], { type: 'text/tab-separated-values' })
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'export.tsv'; // 拡張子を.tsvに変更
+  link.click();
 
-  URL.revokeObjectURL(url)
+  // 生成したURLを解放
+  URL.revokeObjectURL(url);
 }
 
 function deleteComment(commentObj) {
@@ -393,47 +431,49 @@ document.getElementById('commentFileInput').addEventListener('change', function(
       const text = e.target.result
       const data = readCommentFile(text)
       commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
+      console.log(commentObjs)
       addCommentStickersFromCommentFile(data)
     }
     reader.readAsText(file)
   }
 })
 
-function readCommentFile(csvText) {
-  const lines = csvText.split('\n')
-  const headers = lines[0].split(',').map(header => header.trim().replace(/^"|"$/g, ''))
+function readCommentFile(tsvText) {
+  const lines = tsvText.split('\n');
+  const headers = lines[0].split('\t').map(header => header.trim());
+  categories = []
+  let existingCategories = []
 
   return lines.slice(1).map(line => {
-    const data = line.split(',').map(cell => cell.trim())
+    const data = line.split('\t').map((cell, index) => {
+      cell = cell.trim()
+      if (index === 0) {
+        return cell.includes(',') ? cell.split(',').map(item => item.trim()) : [cell]
+      } else {
+        return cell
+      }
+    })
     let obj = {}
     headers.forEach((header, index) => {
-      obj[header] = parseValue(data[index])
+      obj[header] = data[index];
+      if (header === 'category' & !existingCategories.includes(data[index])) {
+        categories.push({
+          categoryName: data[index],
+          categoryID: 'category' + categories.length,
+          color: 'blue'
+        })
+        existingCategories.push(data[index])
+        console.log(existingCategories)
+      }
     })
+    setCategoryList()
+    console.log(categories)
     return obj
   })
 }
 
-function parseValue(value) {
-  // 値が配列の形式をしている場合 (例: "[item1,item2,item3]")
-  if (value.includes('-')) {
-    return value.substring(1, value.length - 1).split(',').map(item => item.trim().replace(/^"|"$/g, ''))
-  }
+function readCategories() {
 
-  // 値がブール値の形式をしている場合 (例: "true" または "false")
-  if (value === '"true"') {
-    return true
-  }
-  if (value === '"false"') {
-    return false
-  }
-
-  // 値が数値の形式をしている場合
-  if (/^"\d+"$/.test(value)) {
-    return parseFloat(value.replace(/^"|"$/g, ''))
-  }
-
-  // それ以外の場合は、クォーテーションを取り除いた文字列を返す
-  return value.replace(/^"|"$/g, '')
 }
 
 function addCommentStickersFromCommentFile(commentObjsFromFile) {
