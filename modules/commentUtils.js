@@ -135,14 +135,14 @@ function addCommentSticker(commentObj) {
 
   // コメントに対応する要素選択機能【ここから】
   const editLinkedSpansButton = document.createElement('button')
-  editLinkedSpansButton.textContent = '対応する要素を編集'
+  editLinkedSpansButton.textContent = '対応要素を編集'
   let isEditing = false
 
   const spanHandlers = new Map()
 
   editLinkedSpansButton.onclick = () => {
     if (isEditingGlobal & !isEditing) {
-      alert('他のコメントの対応する要素を編集中です。')
+      alert('他のコメントの対応要素を編集中です。')
     } else {
       spans.forEach((span) => {
         const globalTagID = span.getAttribute('globalTagID')
@@ -182,9 +182,9 @@ function addCommentSticker(commentObj) {
         }
       })
       if (isEditing) {
-        editLinkedSpansButton.textContent = '対応する要素を編集'
+        editLinkedSpansButton.textContent = '対応要素を編集'
       } else {
-        editLinkedSpansButton.textContent = '対応する要素を確定'
+        editLinkedSpansButton.textContent = '対応要素を確定'
       }
   
       isEditing = !isEditing
@@ -192,7 +192,6 @@ function addCommentSticker(commentObj) {
     }
   }
 
-  fieldElement.appendChild(editLinkedSpansButton)
   // コメントに対応する要素選択機能【ここまで】
 
   headerElement.ondblclick = function() {
@@ -200,7 +199,14 @@ function addCommentSticker(commentObj) {
   }
 
   fieldElement.appendChild(commentInput)
-  fieldElement.appendChild(categorySelect)
+  
+  const optionElement = document.createElement('div')
+  optionElement.id = 'commentOption' + commentObj.commentID
+
+  optionElement.appendChild(categorySelect)
+  optionElement.appendChild(editLinkedSpansButton)
+
+  fieldElement.appendChild(optionElement)
 
   commentStickerElement.appendChild(fieldElement)
   $(commentStickerElement).draggable({
@@ -625,22 +631,22 @@ function confirmDeleteComments(targetCommentObjs) {
   })
 }
 
-let categorySelectDisplay = true
+let commentOptionDisplay = true
 
-document.getElementById('showOrHideCategorySelectButton').addEventListener('click', function() {
-  categorySelectDisplay = !categorySelectDisplay
-  showOrHideCategorySelect()
+document.getElementById('showOrHideCommentOptionButton').addEventListener('click', function() {
+  commentOptionDisplay = !commentOptionDisplay
+  showOrHideCommentOption()
 })
 
-function showOrHideCategorySelect() {
-  const categorySelectElements = document.querySelectorAll('[id^="commentCategorySelect"]')
-  if (categorySelectDisplay) {
-    categorySelectElements.forEach(function(categorySelectElement) {
-      categorySelectElement.style.display = 'block'
+function showOrHideCommentOption() {
+  const commentOptionElements = document.querySelectorAll('[id^="commentOption"]')
+  if (commentOptionDisplay) {
+    commentOptionElements.forEach(function(commentOptionElement) {
+      commentOptionElement.style.display = 'block'
     })
   } else {
-    categorySelectElements.forEach(function(categorySelectElement) {
-      categorySelectElement.style.display = 'none'
+    commentOptionElements.forEach(function(commentOptionElement) {
+      commentOptionElement.style.display = 'none'
     })
   }
 }
