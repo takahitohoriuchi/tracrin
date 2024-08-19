@@ -194,17 +194,7 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 	let result
 	// この行におさまらない場合
 	if (text.length > _charNumFirstRow) {		
-		/*NOTE:
-		textのなかに
-		・"<"と">"が順番にある・・・isゆっくり = true
-		・">"と"<"が順番にある・・・is急いで = true
-		・"°"がある・・・is小さい = true
-		・".h"がある(正規表現だと、/\.h+/)・・・is吸気音 = true
-		・"(hhh)"がある（正規表現だと、\((h+)\)）・・・is笑い = true
-		・"(0.4)"的なのがある（正規表現だと、\((\d+(\.\d+)?)\)）・・・短い沈黙
-		これらそれぞれについて、
-		これらをなす記号の「開始インデックス」と「終了インデックス」を取得しておき、						
-		*/
+
 		function splitText(text, charNumFstRow, maxCharNumPerR) {
 			// まずcharNumFirstRowのぶんだけとりだす
 			var finalSplit = []

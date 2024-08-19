@@ -1,10 +1,10 @@
 // SECTION:【import】
-import { drawComment, outputCommentFile } from './modules/commentUtils.js'
+// import { drawComment, outputCommentFile } from './modules/commentUtils.js'
 import { addArrow, deleteArrow, drawHeaderLabel, drawLabel, genHatsuwaTags, genLabelBox, genRowDiv, genSpan, getHatsuwaObjFromSpan, splitSpan } from './modules/domUtils.js'
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
-import { /* reconvertKukuriMarksInHatsuwa */ tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
-import { video, videoAspectRatio } from './modules/video.js'
+import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
+import { loadVideo, video, videoAspectRatio } from './modules/video.js'
 import { addCommentObj, getCommentObjs } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
@@ -142,6 +142,18 @@ async function genHatsuwaObjs(_textContent) {
 			end: Number(cells[3]), // 発話終了時間
 			text: cells[4], // 発話内容
 		}
+		// DEBUG:
+		/*
+		
+		jsの関数を作ってくれ。
+		引数はオブジェクト（obj）で、オブジェクトの'text'というフィールドの値を変換する関数。
+
+		たとえば、obj.textが'おは(0.124)ようございま(0.486)ああす'であれば、
+		`おは(0.12)ようございま(0.49)ああす`に変換してほしい。
+		このように、.text内に、()のなかに数値が入っている文字があれば、それをすべて小数第三位で四捨五入して、小数第二位までの値に変換するというもの。
+		*/		
+		
+		// DEBUG:
 		// 沈黙だった場合の微調整
 		if(o.speaker==''){
 			// 沈黙時間を小数第二位で四捨五入
@@ -150,6 +162,9 @@ async function genHatsuwaObjs(_textContent) {
 			silentDuration = silentDuration.toFixed(1);
 			o.text = silentDuration
 			o.text = '(' + o.text + ')'			
+		}else{
+			roundTextValues(o)
+
 		}
 		return o
 	})
@@ -183,18 +198,6 @@ async function tempConvertKukuriMarks(_hatsuwaObjs){
 	})
 	console.groupEnd()
 }
-
-// // ククリ記号を元に戻す
-// async function reconvertKukuriMarks(_hatsuwaObjs, _spansOfHatsuwa){
-// 	console.groupCollapsed('ククリ記号をもとに戻す')
-// 	// _hatsuwaObjsを元に戻す
-// 	_hatsuwaObjs.forEach(async hatsuwaObj=>{		
-// 		await reconvertKukuriMarksInHatsuwa(hatsuwaObj)			
-// 	})
-// 	console.groupEnd()
-
-// 	// TODO:_spansOfHatsuwaをもとに戻す
-// }
 
 // 2: 発話オブジェクト群[]をグルーピングする
 async function groupingHatsuwaObjs(_hatsuwaObjs) {
@@ -342,9 +345,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			return result
 		}, [])
 		console.log('bracketsGroup: ', bracketsGroup)
-		
-
-		// DEBUG:
+				
 		// (6) 各ブラケットグループの開始X位置を決定してゆく
 		let startX = 0
 		bracketsGroup.forEach((tagsInThisBracketGroup, i) => {						
@@ -411,8 +412,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			console.groupEnd()
 		})			
 		console.log('dataAreaStyle: ', dataAreaStyle)
-		console.groupEnd()
-		// DEBUG:
+		console.groupEnd()		
 		// console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	})
 
@@ -871,51 +871,61 @@ async function reload() {
 
 // イベントの定義
 window.addEventListener('DOMContentLoaded', () => {	    
-	const ddarea = document.getElementById('ddarea')	
-	// ドラッグされたデータが有効かどうかチェック
-	const isValid = (e) => e.dataTransfer.types.indexOf('Files') >= 0
-	const ddEvent = {
-		dragover: (e) => {
-			e.preventDefault() // 既定の処理をさせない
-			if (!e.currentTarget.isEqualNode(ddarea)) {
-				// ドロップエリア外ならドロップを無効にする
-				e.dataTransfer.dropEffect = 'none'
-				return
-			}
-			e.stopPropagation() // イベント伝播を止める
+	// const ddarea = document.getElementById('ddarea')	
+	const ddareas = document.getElementsByClassName('ddarea')
+	console.log('ddareas: ', ddareas)
+	Array.from(ddareas).forEach(ddarea=>{
+		// ドラッグされたデータが有効かどうかチェック
+		const isValid = (e) => e.dataTransfer.types.indexOf('Files') >= 0
+		const ddEvent = {
+			dragover: (e) => {
+				e.preventDefault() // 既定の処理をさせない
+				if (!e.currentTarget.isEqualNode(ddarea)) {
+					// ドロップエリア外ならドロップを無効にする
+					e.dataTransfer.dropEffect = 'none'
+					return
+				}
+				e.stopPropagation() // イベント伝播を止める
 
-			if (!isValid(e)) {
-				// 無効なデータがドラッグされたらドロップを無効にする
-				e.dataTransfer.dropEffect = 'none'
-				return
-			}
-			// ドロップのタイプを変更
-			e.dataTransfer.dropEffect = 'copy'
-			ddarea.classList.add('ddefect')
-		},
-		dragleave: (e) => {
-			if (!e.currentTarget.isEqualNode(ddarea)) {
-				return
-			}
-			e.stopPropagation() // イベント伝播を止める
-			ddarea.classList.remove('ddefect')
-		},
-		drop: (e) => {
-			e.preventDefault() // 既定の処理をさせない
-			e.stopPropagation() // イベント伝播を止める
-			const files = e.dataTransfer.files			
-			const fileType = files[0].type
-			if (fileType == 'text/plain') {
-				// console.log('.txtファイルだよ')
-				main(files[0])				
-			}
-			ddarea.classList.remove('ddefect')
-		},
-	}
-	Object.keys(ddEvent).forEach((e) => {
-		ddarea.addEventListener(e, ddEvent[e])
-		document.body.addEventListener(e, ddEvent[e])
-	})	
+				if (!isValid(e)) {
+					// 無効なデータがドラッグされたらドロップを無効にする
+					e.dataTransfer.dropEffect = 'none'
+					return
+				}
+				// ドロップのタイプを変更
+				e.dataTransfer.dropEffect = 'copy'
+				ddarea.classList.add('ddefect')
+			},
+			dragleave: (e) => {
+				if (!e.currentTarget.isEqualNode(ddarea)) {
+					return
+				}
+				e.stopPropagation() // イベント伝播を止める
+				ddarea.classList.remove('ddefect')
+			},
+			drop: (e) => {
+				e.preventDefault() // 既定の処理をさせない
+				e.stopPropagation() // イベント伝播を止める
+				const files = e.dataTransfer.files			
+				const fileType = files[0].type				
+				if (fileType == 'text/plain') {
+					// console.log('.txtファイルだよ')
+					main(files[0])				
+				}
+				else if (fileType.startsWith('video/')) {
+					loadVideo(files[0])
+					
+				}
+				ddarea.classList.remove('ddefect')
+			},
+		}
+		Object.keys(ddEvent).forEach((e) => {
+			ddarea.addEventListener(e, ddEvent[e])
+			document.body.addEventListener(e, ddEvent[e])
+		})	
+
+	})
+	
 
 	// 設定メニュー開く
 	const settingsIcon = document.getElementById('settings-icon');
@@ -979,7 +989,9 @@ window.addEventListener('resize', () => {
 	clearTimeout(resizeTimer)
 	resizeTimer = setTimeout(function () {
 		console.log('ウィンドウがリサイズされました')		
+		// DEBUG:20240819：fixモードだと、リサイズに従わない
 		main()
+		// DEBUG:20240819
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
 })
