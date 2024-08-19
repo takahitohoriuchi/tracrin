@@ -134,9 +134,6 @@ function addCommentSticker(commentObj) {
   })
   categorySelect.value = commentObj.category
   categorySelect.text = commentObj.category
-  console.log(commentObj.category)
-  console.log(categorySelect.value)
-  console.log(categorySelect.text)
   categorySelect.className = 'select'
   categorySelect.addEventListener('change', function() {
     changeCategory(this.value, commentObj)
@@ -229,7 +226,6 @@ function addCommentSticker(commentObj) {
     linkedSpans.push(linkedSpan)
   })
 
-  console.log(linkedGlobalTagIDs)
   const targetY = parseInt(linkedSpans[0].style.top, 10)
   commentStickerElement.style.top = targetY + 11 + 'px'
   commentStickerElement.style.left = '400px'
@@ -393,7 +389,6 @@ document.getElementById('editCategoryButton').addEventListener('click', function
 document.getElementById('deleteSelectedCommentsButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    console.log(selectedCommentObjs)
     confirmDeleteComments(selectedCommentObjs)
   }
 })
@@ -429,13 +424,12 @@ document.getElementById('inputCommentFileButton').addEventListener('click', func
 document.getElementById('commentFileInput').addEventListener('change', function(event) {
   const file = event.target.files[0]
   if (file) {
-    console.log("ファイルが選択されました:", file.name)
+    console.log("コメントファイルの入力を受け付けました:", file.name)
     const reader = new FileReader()
     reader.onload = function(e) {
       const text = e.target.result
       const data = readCommentFile(text)
       commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
-      console.log(commentObjs)
       addCommentStickersFromCommentFile(data)
     }
     reader.readAsText(file)
@@ -467,12 +461,10 @@ function readCommentFile(tsvText) {
           color: 'blue'
         })
         existingCategories.push(data[index])
-        console.log(existingCategories)
       }
     })
     setCategoryList()
     getSpans()
-    console.log(categories)
     return obj
   })
 }
