@@ -51,8 +51,29 @@
 			<h6>設定</h6>
 			<label>
 				<button id = "releaseSelectionButton" class="favorite styled" type="button">
-					部分選択を解除
-				</button>				
+					発話の部分選択を解除
+				</button>
+        <button id="editCategoryButton">
+          カテゴリを編集
+        </button>
+        <button id="showOrHideCommentOptionButton">
+          コメントオプション欄の表示/非表示を切り替え
+        </button>
+        <button id="deleteSelectedCommentsButton">
+          選択したコメントを削除
+        </button>
+        <button id="showOrHideSelectedCommentsButton">
+          選択したコメントの表示/非表示を切り替え
+        </button>
+        <button id="outputSelectedCommentsAsFileButton">
+          選択したコメントのファイルを出力
+        </button>
+        <button id="outputCommentFileButton">コメントファイルを出力</button>
+        <button id="inputCommentFileButton">
+          コメントファイルを入力
+        </button>
+        <input type="file" id="commentFileInput" style="display:none;" accept=".tsv">
+        <div id="categoryList" style="display: none;"></div>
 			</label>
 		</div>
 
@@ -64,13 +85,11 @@
 			<div id="scrollable-div">				
 				<div id="dataArea">
 					<!-- データ列エリア -->
-				</div>				
+				</div>
+        <!-- コメント描画エリア -->
+        <div id="commentArea" class="layerComment"></div>	
 			</div>
 		</div>
-
-    <!-- コメント描画エリア -->
-    <div id="commentArea" class="layerComment">
-    </div>
 
 	<!-- :::JS読み込み -->
 		<!-- CDN -->
