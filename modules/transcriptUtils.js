@@ -84,6 +84,22 @@ function findStartIndexOfSubstring(str, substring) {
     return index !== -1 ? index : null;
 }
 
+/**
+ * 発話オブジェクト内の.textに、(0.784)みたいな沈黙数値を、二桁に丸める
+ * @param {Object} obj 
+ */
+export function roundTextValues(obj) {    
+    // 正規表現で () 内の数値を探し出し、処理する        
+    if(obj.text){
+        obj.text = obj.text.replace(/\((\d+\.\d+)\)/g, (match, p1) => {
+            // 数値を四捨五入して小数第二位に変換
+            let roundedValue = Math.round(parseFloat(p1) * 100) / 100;
+            // () の中に再度入れる
+            return `(${roundedValue.toFixed(2)})`;
+        });
+    }
+}
+
 export async function tempConvertKukuriMarksInHatsuwa(_hatsuwaObj){
     console.log('この発話objを変換します', _hatsuwaObj)        
     console.log('_hatsuwaObj.text: ', _hatsuwaObj.text)
@@ -169,6 +185,8 @@ export async function reconvertKukuriMarksInHatsuwa(_hatsuwaObj){
     }
 
 }
+
+
 
 // export async function reconvertHkukuriMarksInHatsuwa(_hatsuwaObj, _hatsuwaTagSpans)
 

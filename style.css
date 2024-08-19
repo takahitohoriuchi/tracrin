@@ -74,7 +74,7 @@ video {
 	height: 100px;	
 }
 
-#ddarea {
+.ddarea {
 	width: 100%;
 	height: 150px;
 	border: 1px dotted #888;
@@ -83,7 +83,7 @@ video {
 	/* display: table-cell; */
 	/* vertical-align: middle; */
 }
-#ddarea.ddefect {
+.ddarea.ddefect {
 	border: 1px solid #000;
 }
 
@@ -164,26 +164,110 @@ video {
   z-index: 2;
 }
 
-.draggable {
+.comment {
   width: 200px;
-  height: 18px;
+  /* height: 18px; */
   position: absolute;
   cursor: pointer;
   font-size: 12px;
+  box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.3);
 }
-.header {
+.comment .header {
   width: 100%;
   height: 14px;
   margin: 0;
-  background-color: #89f0ff;
+  display: flex;
+  /* box-shadow: 0px -3px 10px rgba(0, 0, 0, 0.2); */
 }
-.commentInput {
+.comment .header .p {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.comment .header .deleteButton {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  text-align: center;
+}
+.comment .field {
   width: 100%;
   min-height: 18px;
-  height: 36px;
+  /* height: 36px; */
   box-sizing: border-box;
-  background-color: #adf4ff;
   border: none;
   font-size: 12px;
   resize: vertical;
+  /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); */
+}
+.comment .field .input {
+  width: 100%;
+  min-height: 18px;
+  box-sizing: border-box;
+  border: none;
+  font-size: 12px;
+  resize: vertical;
+  background-color: transparent;
+}
+.comment .field .select {
+  background-color: transparent;
+  border: none;
+  width: 90px;
+}
+
+/* コメント付箋のカラーパレット */
+.comment.blue .header {
+  background-color: #89f0ff;
+}
+.comment.blue .field {
+  background-color: #adf4ff;
+}
+
+.comment.yellow .header {
+  background-color: #FEEA3D;
+}
+.comment.yellow .field {
+  background-color: #FEF49C;
+}
+
+.comment.green .header {
+  background-color: #83FE83;
+}
+.comment.green .field {
+  background-color: #B2FFA0;
+}
+
+.comment.pink .header {
+  background-color: #FFB2B2;
+}
+.comment.pink .field {
+  background-color: #FFC7C7;
+}
+
+.comment.purple .header {
+  background-color: #9BB6FE;
+}
+.comment.purple .field {
+  background-color: #B6CAFF;
+}
+
+.comment.gray .header {
+  background-color: #DADADA;
+}
+.comment.gray .field {
+  background-color: #EEEEEE;
+}
+
+.categoryList {
+  position: fixed;
+	top: 50px;
+	right: 20px;
+	background: white;
+	border: 1px solid #ccc;
+	padding: 10px;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
