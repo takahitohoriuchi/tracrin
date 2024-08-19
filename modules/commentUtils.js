@@ -141,14 +141,14 @@ function addCommentSticker(commentObj) {
 
   // コメントに対応する要素選択機能【ここから】
   const editLinkedSpansButton = document.createElement('button')
-  editLinkedSpansButton.textContent = '対応要素を編集'
+  editLinkedSpansButton.textContent = '参照先を変更'
   let isEditing = false
 
   const spanHandlers = new Map()
 
   editLinkedSpansButton.onclick = () => {
     if (isEditingGlobal & !isEditing) {
-      alert('他のコメントの対応要素を編集中です。')
+      alert('他のコメントの参照先を変更中です。')
     } else {
       spans.forEach((span) => {
         const globalTagID = span.getAttribute('globalTagID')
@@ -188,9 +188,9 @@ function addCommentSticker(commentObj) {
         }
       })
       if (isEditing) {
-        editLinkedSpansButton.textContent = '対応要素を編集'
+        editLinkedSpansButton.textContent = '参照先を変更'
       } else {
-        editLinkedSpansButton.textContent = '対応要素を確定'
+        editLinkedSpansButton.textContent = '参照先を確定'
       }
   
       isEditing = !isEditing
