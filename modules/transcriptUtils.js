@@ -20,12 +20,12 @@ export const kukuriMarkObjs = {
         // 開始キー
         begin: {
             key: '<',            
-            modifiedKey: '$s_b$'
+            modifiedKey: 'ｱ'
         },
         // 終了キー
         end: {
             key: '>',
-            modifiedKey: '$s_e$'
+            modifiedKey: 'ｲ'
         }   
     },
     // 遅い発話
@@ -33,11 +33,11 @@ export const kukuriMarkObjs = {
         // 開始キー            
         begin: {
             key: '>',
-            modifiedKey: '$s_b$'
+            modifiedKey: 'ｳ'
         },
         end: {
             key: '<',
-            modifiedKey: '$s_e$'
+            modifiedKey: 'ｴ'
         }
     },
     // しずか発話
@@ -45,17 +45,17 @@ export const kukuriMarkObjs = {
         // 開始キー
         begin: {
             key: '°',
-            modifiedKey: '$q_b$'
+            modifiedKey: 'ｵ'
         },
         // 終了キー
         end: {
             key: '°',
-            modifiedKey: '$q_e$'
+            modifiedKey: 'ｶ'
         }        
     }
 }
 const kukuriMarks = ['<', '>', '°']
-const kukuriMarksModified = ['$s_b$', '$s_e$', '$q_b$', '$q_e$']
+const kukuriMarksModified = ['ｱ', 'ｲ', 'ｳ', 'ｴ', 'ｵ', 'ｶ']
 
 function isIncludeAnyKukuriMark(_text){    
     let result = false    
@@ -82,6 +82,22 @@ function isIncludeAnyKukuriMarkModified(_text){
 function findStartIndexOfSubstring(str, substring) {
     const index = str.indexOf(substring);
     return index !== -1 ? index : null;
+}
+
+/**
+ * 発話オブジェクト内の.textに、(0.784)みたいな沈黙数値を、二桁に丸める
+ * @param {Object} obj 
+ */
+export function roundTextValues(obj) {    
+    // 正規表現で () 内の数値を探し出し、処理する        
+    if(obj.text){
+        obj.text = obj.text.replace(/\((\d+\.\d+)\)/g, (match, p1) => {
+            // 数値を四捨五入して小数第二位に変換
+            let roundedValue = Math.round(parseFloat(p1) * 100) / 100;
+            // () の中に再度入れる
+            return `(${roundedValue.toFixed(2)})`;
+        });
+    }
 }
 
 export async function tempConvertKukuriMarksInHatsuwa(_hatsuwaObj){
@@ -122,10 +138,20 @@ export async function tempConvertKukuriMarksInHatsuwa(_hatsuwaObj){
     
 }
 
+/*
+    TODO:
+    ・発話オブジェクトので該当があれば、
+    ・_hatsuwaTagSpansのなかから、その発話に該当するものを探して、
+    ・hatsuwaGroupsに変えて、
+    ・
+
+    */
 export async function reconvertKukuriMarksInHatsuwa(_hatsuwaObj){
     console.log('この発話objを変換します', _hatsuwaObj)    
     console.log('\n\n\n\n\n\n\n\n\n\n\n\n')
     console.log('isIncludeAnyKukuriMark(_hatsuwaObj.text): ', isIncludeAnyKukuriMark(_hatsuwaObj.text))    
+
+    
     while(isIncludeAnyKukuriMarkModified(_hatsuwaObj.text)){
         const sortedMarkObjs = Object.values(kukuriMarkObjs).map(v=>{               
             let beginIndex = findStartIndexOfSubstring(_hatsuwaObj.text, v.begin.modifiedKey)
@@ -159,6 +185,9 @@ export async function reconvertKukuriMarksInHatsuwa(_hatsuwaObj){
     }
 
 }
+
+
+
 // export async function reconvertHkukuriMarksInHatsuwa(_hatsuwaObj, _hatsuwaTagSpans)
 
 // くくり記号（行末にこれらがきちゃいけない）
@@ -217,24 +246,32 @@ export async function reconvertKukuriMarksInHatsuwa(_hatsuwaObj){
 // 後ろ添え字記号（行頭にこれらがきちゃいけない）
 const suffixes = ['?', '-']
 
-export function isIncompleteKakko(_rowString){
-    let bool = false
-    if(_rowString.includes('(') && !_rowString.includes(')')){
-        bool = true
+
+export function isIncompleteKakko(inputString) {
+    let leftParenCount = 0;
+    let rightParenCount = 0;
+
+    for (let char of inputString) {
+        if (char === '(') {
+            leftParenCount++;
+        } else if (char === ')') {
+            rightParenCount++;
+        }
     }
-    return bool
+
+    return leftParenCount !== rightParenCount;
 }
 
-export function isIncompleteKukuri(_rowString, _tag){
+export function isIncompleteKukuri(_rowString){
     /*    
     ・行末にククリ開始記号がきているならば、次の行に送る            
     */
     // 行末に開始記号が来てるか？？
     let kukuriMarkName = null
-   Object.entries(kukuriMarkObjs).forEach(([k,v])=>{
-    if(_rowString.endsWith(v.begin.modifiedKey)){
+   Object.entries(kukuriMarkObjs).forEach(([k,v])=>{    
+    if(_rowString.endsWith(v.begin.key)){
         kukuriMarkName = k
-    }    
+    }        
    })				
    return kukuriMarkName
 }

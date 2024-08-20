@@ -11,11 +11,12 @@
 		<!-- 設定メニュー -->
 		<nav>
 			<div>tracrin2.0.0</div>
+      		<!-- <button id="buttonOutputComment">コメントファイルを出力</button> -->
+			<button style="display: none" id="buttonOutputComment">コメントファイルを出力</button>
 			<!-- 設定アイコン -->
-			<div id="settings-icon">⚙️</div>
-			
+			<!-- <div id="settings-icon">⚙️</div>			 -->
 			<!-- 設定メニュー（デフォルトでは非表示） -->
-			<div id="settings-menu" style="display: none;">
+			<!-- <div id="settings-menu" style="display: none;">
 				<ul style="list-style: none">
 					<li>
 						<label>
@@ -31,13 +32,22 @@
 					</li>
 				</ul>				
 				
-			</div>
+			</div> -->
 
 		</nav>
-		<div id="ddarea"><p>Drag & Drop your file(.txt) on me!</p></div>		
+		<div class="ddarea">
+			<p>Drag & Drop your video on me!</p>
+		</div>
+		<div class="ddarea">
+			<p>Drag & Drop your file(.txt) on me!</p>
+		</div>		
 		<!-- 動画エリア -->
-		<div id="videoContainer">			
+		<!-- <div style="display: none" id="videoContainer">			
 			<video id="myVideo" controls>								
+			</video>
+		</div> -->
+		<div id="videoContainer">
+			<video id="myVideo" controls>
 			</video>
 		</div>
 
@@ -46,7 +56,7 @@
 			<h6>設定</h6>
 			<label>
 				<button id = "releaseSelectionButton" class="favorite styled" type="button">
-					発話要素の選択を解除
+					発話の部分選択を解除
 				</button>
         <button id="editCategoryButton">
           カテゴリを編集
