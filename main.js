@@ -1,9 +1,10 @@
 // SECTION:【import】
+// import { drawComment, outputCommentFile } from './modules/commentUtils.js'
 import { addArrow, deleteArrow, drawHeaderLabel, drawLabel, genHatsuwaTags, genLabelBox, genRowDiv, genSpan, getHatsuwaObjFromSpan, splitSpan } from './modules/domUtils.js'
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
-import { reconvertKukuriMarksInHatsuwa, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
-import { video, videoAspectRatio } from './modules/video.js'
+import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
+import { loadVideo, video, videoAspectRatio } from './modules/video.js'
 import { addCommentObj, getCommentObjs } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
@@ -74,12 +75,13 @@ async function main(_file = null) {
 		if (_file) {
 			const textContent = fileReader.result
 			await genHatsuwaObjs(textContent)				
-			tempConvertKukuriMarks(hatsuwaObjs)						
-			reconvertKukuriMarks(hatsuwaObjs)		// ククリ系記号を元に戻す関数
+			// tempConvertKukuriMarks(hatsuwaObjs)									
 			await groupingHatsuwaObjs(hatsuwaObjs)			
 		}
 
 		await drawHatsuwa(hatsuwaGroups, fontSize)
+
+		// reconvertKukuriMarks(hatsuwaObjs)		// ククリ系記号を元に戻す関数
 
 		// 左の発話者&行数ラベルを表示
 		drawIDandSpeaker(hatsuwaGroups, fontSize)
@@ -140,13 +142,29 @@ async function genHatsuwaObjs(_textContent) {
 			end: Number(cells[3]), // 発話終了時間
 			text: cells[4], // 発話内容
 		}
+		// DEBUG:
+		/*
+		
+		jsの関数を作ってくれ。
+		引数はオブジェクト（obj）で、オブジェクトの'text'というフィールドの値を変換する関数。
+
+		たとえば、obj.textが'おは(0.124)ようございま(0.486)ああす'であれば、
+		`おは(0.12)ようございま(0.49)ああす`に変換してほしい。
+		このように、.text内に、()のなかに数値が入っている文字があれば、それをすべて小数第三位で四捨五入して、小数第二位までの値に変換するというもの。
+		*/		
+		
+		// DEBUG:
 		// 沈黙だった場合の微調整
 		if(o.speaker==''){
 			// 沈黙時間を小数第二位で四捨五入
 			let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
 			silentDuration = Math.round(silentDuration * 10) / 10
+			silentDuration = silentDuration.toFixed(1);
 			o.text = silentDuration
 			o.text = '(' + o.text + ')'			
+		}else{
+			roundTextValues(o)
+
 		}
 		return o
 	})
@@ -179,18 +197,6 @@ async function tempConvertKukuriMarks(_hatsuwaObjs){
 		await tempConvertKukuriMarksInHatsuwa(hatsuwaObj)		
 	})
 	console.groupEnd()
-}
-
-// ククリ記号を元に戻す
-async function reconvertKukuriMarks(_hatsuwaObjs, _spansOfHatsuwa){
-	console.groupCollapsed('ククリ記号をもとに戻す')
-	// _hatsuwaObjsを元に戻す
-	_hatsuwaObjs.forEach(async hatsuwaObj=>{		
-		await reconvertKukuriMarksInHatsuwa(hatsuwaObj)			
-	})
-	console.groupEnd()
-
-	// TODO:_spansOfHatsuwaをもとに戻す
 }
 
 // 2: 発話オブジェクト群[]をグルーピングする
@@ -339,8 +345,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			return result
 		}, [])
 		console.log('bracketsGroup: ', bracketsGroup)
-		
-
+				
 		// (6) 各ブラケットグループの開始X位置を決定してゆく
 		let startX = 0
 		bracketsGroup.forEach((tagsInThisBracketGroup, i) => {						
@@ -371,7 +376,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 
 				// spanをnコのテキストへと分割(DOM操作。発話特殊記号にかんする境界処理はsplitSpanにて。)
 				const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsInThisBracketGroup[j])
-				console.log(`${span.innerHTML}は以下${splittedSpanTexts.length}つに分割される↓`)
+				console.log(`${span.innerText}は以下${splittedSpanTexts.length}つに分割される↓`)
 				console.log('splittedSpanTexts: ', splittedSpanTexts)								
 				// const id = span.className.split(' ')[1] //id。例：(10-4-1)みたいな。おおもとのspanは削除しちゃうから、先にidだけとっとく
 				const id = span.getAttribute("globalTagID")
@@ -379,11 +384,11 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 				const hatsuwaID = id.split('-')[1]				
 				
 				splittedSpanTexts.forEach((splittedTag, k) => {
-					const tagX = k == 0 ? startX : 0//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
-					// テキストからspanタグを描画
-					// NOTE:ここでは一時的に、spanの親をdataAreaにしてある（rowと、その子かつspanの親である「dataBox」がまだ未生成のため）
-					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX+labelBoxW)	
+					//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
+					const tagX = k == 0 ? startX + labelBoxW : labelBoxW
+					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX)	
 					e.setAttribute('fragmentID', k)
+					// テキストからspanタグを描画					
 					// 全体の発話span配列に追加する
 					hatsuwaTagSpans[groupIndex][hatsuwaID].push(e)
 					// 分割してできた最終タグが、maxケツXの候補になる！					
@@ -399,16 +404,15 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 				})
 			})
 			// (3)「次bracketグループの描画開始X位置」を更新する(現bracketグループの末尾に合わせる)！
-			startX = maxTagXInThisBracketGroup
+			startX = maxTagXInThisBracketGroup - labelBoxW
 			// console.log('startX: ', startX)
 
 			// (4)spansOfThisBracketGroup[]は削除
 			spansOfThisBracketGroup.forEach((span) => span.remove())
 			console.groupEnd()
-		})
-			
+		})			
 		console.log('dataAreaStyle: ', dataAreaStyle)
-		console.groupEnd()
+		console.groupEnd()		
 		// console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	})
 
@@ -424,7 +428,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			spansOfHatsuwa.forEach((span, k) => {				
 				// TODO:ククリ記号を変換する
 				// console.log('span.textContent: ', span.textContent)				
-				// span.innerHTML = 
+				// span.innerText = 
 				// (パタンA)： いっっちばんさいしょタグspanの場合
 				if (i == 0 && j == 0 && k == 0) {
 					console.log('データの最初です')
@@ -506,8 +510,7 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 		horizontalLine.className = 'group-line'
 		dataArea.appendChild(horizontalLine)
 		console.groupEnd()
-	})
-	// TODO:こいつのタグをそれぞれハックして、記号を元に戻す
+	})	
 	console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	console.groupEnd()
 	// 更新
@@ -648,9 +651,7 @@ async function addMouseEvents() {
 					// let sGlobalTagID = selectionStartTag.getAttribute("globalTagID")				
 					// let eGlobalTagID = selectionEndTag.getAttribute("globalTagID")
 					
-					// 部分再生の時間をセット↓
-					// 動画の部分再生begin = そのbeginタグが属する発話obj
-					// 動画の部分再生end = そのendタグが属する発話obj					
+					// 部分再生の時間をセット↓									
 					let sObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)					
 					let eObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)					
 					video.startTime = sObj.start
@@ -870,51 +871,61 @@ async function reload() {
 
 // イベントの定義
 window.addEventListener('DOMContentLoaded', () => {	    
-	const ddarea = document.getElementById('ddarea')	
-	// ドラッグされたデータが有効かどうかチェック
-	const isValid = (e) => e.dataTransfer.types.indexOf('Files') >= 0
-	const ddEvent = {
-		dragover: (e) => {
-			e.preventDefault() // 既定の処理をさせない
-			if (!e.currentTarget.isEqualNode(ddarea)) {
-				// ドロップエリア外ならドロップを無効にする
-				e.dataTransfer.dropEffect = 'none'
-				return
-			}
-			e.stopPropagation() // イベント伝播を止める
+	// const ddarea = document.getElementById('ddarea')	
+	const ddareas = document.getElementsByClassName('ddarea')
+	console.log('ddareas: ', ddareas)
+	Array.from(ddareas).forEach(ddarea=>{
+		// ドラッグされたデータが有効かどうかチェック
+		const isValid = (e) => e.dataTransfer.types.indexOf('Files') >= 0
+		const ddEvent = {
+			dragover: (e) => {
+				e.preventDefault() // 既定の処理をさせない
+				if (!e.currentTarget.isEqualNode(ddarea)) {
+					// ドロップエリア外ならドロップを無効にする
+					e.dataTransfer.dropEffect = 'none'
+					return
+				}
+				e.stopPropagation() // イベント伝播を止める
 
-			if (!isValid(e)) {
-				// 無効なデータがドラッグされたらドロップを無効にする
-				e.dataTransfer.dropEffect = 'none'
-				return
-			}
-			// ドロップのタイプを変更
-			e.dataTransfer.dropEffect = 'copy'
-			ddarea.classList.add('ddefect')
-		},
-		dragleave: (e) => {
-			if (!e.currentTarget.isEqualNode(ddarea)) {
-				return
-			}
-			e.stopPropagation() // イベント伝播を止める
-			ddarea.classList.remove('ddefect')
-		},
-		drop: (e) => {
-			e.preventDefault() // 既定の処理をさせない
-			e.stopPropagation() // イベント伝播を止める
-			const files = e.dataTransfer.files			
-			const fileType = files[0].type
-			if (fileType == 'text/plain') {
-				// console.log('.txtファイルだよ')
-				main(files[0])				
-			}
-			ddarea.classList.remove('ddefect')
-		},
-	}
-	Object.keys(ddEvent).forEach((e) => {
-		ddarea.addEventListener(e, ddEvent[e])
-		document.body.addEventListener(e, ddEvent[e])
-	})	
+				if (!isValid(e)) {
+					// 無効なデータがドラッグされたらドロップを無効にする
+					e.dataTransfer.dropEffect = 'none'
+					return
+				}
+				// ドロップのタイプを変更
+				e.dataTransfer.dropEffect = 'copy'
+				ddarea.classList.add('ddefect')
+			},
+			dragleave: (e) => {
+				if (!e.currentTarget.isEqualNode(ddarea)) {
+					return
+				}
+				e.stopPropagation() // イベント伝播を止める
+				ddarea.classList.remove('ddefect')
+			},
+			drop: (e) => {
+				e.preventDefault() // 既定の処理をさせない
+				e.stopPropagation() // イベント伝播を止める
+				const files = e.dataTransfer.files			
+				const fileType = files[0].type				
+				if (fileType == 'text/plain') {
+					// console.log('.txtファイルだよ')
+					main(files[0])				
+				}
+				else if (fileType.startsWith('video/')) {
+					loadVideo(files[0])
+					
+				}
+				ddarea.classList.remove('ddefect')
+			},
+		}
+		Object.keys(ddEvent).forEach((e) => {
+			ddarea.addEventListener(e, ddEvent[e])
+			document.body.addEventListener(e, ddEvent[e])
+		})	
+
+	})
+	
 
 	// 設定メニュー開く
 	const settingsIcon = document.getElementById('settings-icon');
@@ -934,12 +945,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 	
 	// 発話グループ水平線をトグル@設定メニュー
-	const toggleLineCheckbox = document.getElementById('toggle-line');	
-	toggleLineCheckbox.addEventListener('change', toggleLine) 
+	// const toggleLineCheckbox = document.getElementById('toggle-line');	
+	// toggleLineCheckbox.addEventListener('change', toggleLine) 
 
 	// 開発用表示＠設定メニュー
-	const toggleDevCheckbox = document.getElementById('toggle-dev');	
-	toggleDevCheckbox.addEventListener('change', toggleDev)
+	// const toggleDevCheckbox = document.getElementById('toggle-dev');	
+	// toggleDevCheckbox.addEventListener('change', toggleDev)
 
 	// プチ設定エリア
 	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
@@ -978,7 +989,9 @@ window.addEventListener('resize', () => {
 	clearTimeout(resizeTimer)
 	resizeTimer = setTimeout(function () {
 		console.log('ウィンドウがリサイズされました')		
+		// DEBUG:20240819：fixモードだと、リサイズに従わない
 		main()
+		// DEBUG:20240819
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
 })
