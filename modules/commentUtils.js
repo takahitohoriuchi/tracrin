@@ -458,7 +458,7 @@ function readCommentFile(tsvText) {
         categories.push({
           categoryName: data[index],
           categoryID: 'category' + categories.length,
-          color: colorOptions[categories.length].colorValue
+          color: colorOptions[categories.length % 6].colorValue
         })
         existingCategories.push(data[index])
       }
