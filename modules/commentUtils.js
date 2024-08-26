@@ -43,6 +43,7 @@ let commentObjs
 let spans
 let zIndexCounter = 2
 let isEditingGlobal = false // コメントに対応するspanタグ要素を編集状態を制御、わかりやすい変数名に変更予定
+let currentCategory = categories[0].categoryName
 
 export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
@@ -58,7 +59,8 @@ export function addCommentObj(globalTagID){
   let commentObj = {
     linkedGlobalTagIDs: [ globalTagID ],
     comment: "",
-    category: categories[0].categoryName,
+    // category: categories[0].categoryName,
+    category: currentCategory,
     isSelected: false,
     isShown: true,
     isDeleted: false,
@@ -373,6 +375,7 @@ function changeCommentStickerColor(commentObj) {
 
 function changeCategory(newCategory, commentObj) {
   commentObj.category = newCategory
+  currentCategory = newCategory
   changeCommentStickerColor(commentObj)
 }
 
@@ -439,7 +442,7 @@ document.getElementById('commentFileInput').addEventListener('change', function(
 function readCommentFile(tsvText) {
   const lines = tsvText.split('\n');
   const headers = lines[0].split('\t').map(header => header.trim());
-  categories = []
+  // categories = []
   let existingCategories = []
 
   return lines.slice(1).map(line => {
@@ -614,6 +617,8 @@ function addCategory(newCategoryName) {
   }
   categories.push(newCategory)
   setCategoryList()
+
+  currentCategory = newCategoryName
 
   const categorySelectElements = document.querySelectorAll('[id^="commentCategorySelect"]')
   categorySelectElements.forEach(element => {
