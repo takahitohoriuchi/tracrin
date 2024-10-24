@@ -254,67 +254,6 @@ function addCommentSticker(commentObj) {
   container.appendChild(commentStickerElement)
 }
 
-// /**
-//  * 
-//  * @param {Object} commentObjs 
-//  */
-// function outputCommentFile(commentObjs) {
-//   const headers = Object.keys(commentObjs[0])
-//   const csvRows = [headers.join(',')]
-
-//   for (const row of commentObjs) {
-//     if (row.isDeleted === false){
-//       const values = headers.map(header => {
-//         const escaped = (''+row[header]).replace(/"/g, '\\"')
-//         return `"${escaped}"`
-//       })
-//     csvRows.push(values.join(','))
-//     }
-//   }
-
-//   const csvString = csvRows.join('\n')
-//   const blob = new Blob([csvString], { type: 'text/csv' })
-//   const url = URL.createObjectURL(blob)
-//   const link = document.createElement('a')
-//   link.href = url
-//   link.download = 'export.csv'
-//   link.click()
-
-//   URL.revokeObjectURL(url)
-// }
-
-function outputCommentFile(commentObjs) {
-  // オブジェクトのキーからヘッダーを生成
-  const headers = Object.keys(commentObjs[0])
-  // ヘッダー行をタブで結合
-  const tsvRows = [headers.join('\t')]
-
-  // 各オブジェクトを行に変換
-  for (const row of commentObjs) {
-    if (row.isDeleted === false){
-      // 各値をタブで結合し、必要に応じてエスケープ
-      const values = headers.map(header => {
-        const value = '' + row[header]; // 数値などを文字列に変換
-        const escaped = value.replace(/[\t\n\r]/g, ' '); // TSVの制御文字を空白に置換
-        return escaped;
-      })
-      tsvRows.push(values.join('\t'));
-    }
-  }
-
-  // TSV文字列を生成し、Blobとして保存
-  const tsvString = tsvRows.join('\n');
-  const blob = new Blob([tsvString], { type: 'text/tab-separated-values' })
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'export.tsv'; // 拡張子を.tsvに変更
-  link.click();
-
-  // 生成したURLを解放
-  URL.revokeObjectURL(url);
-}
-
 function deleteComment(commentObj) {
   commentObj.isDeleted = true
   const target = document.getElementById('commentSticker' + commentObj.commentID)
@@ -423,62 +362,6 @@ document.getElementById("outputCommentFileButton").addEventListener('click', fun
 document.getElementById('inputCommentFileButton').addEventListener('click', function() {
   document.getElementById('commentFileInput').click()
 })
-
-document.getElementById('commentFileInput').addEventListener('change', function(event) {
-  const file = event.target.files[0]
-  if (file) {
-    console.log("コメントファイルの入力を受け付けました:", file.name)
-    const reader = new FileReader()
-    reader.onload = function(e) {
-      const text = e.target.result
-      const data = readCommentFile(text)
-      commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
-      addCommentStickersFromCommentFile(data)
-    }
-    reader.readAsText(file)
-  }
-})
-
-function readCommentFile(tsvText) {
-  const lines = tsvText.split('\n');
-  const headers = lines[0].split('\t').map(header => header.trim());
-  // categories = []
-  let existingCategories = []
-
-  return lines.slice(1).map(line => {
-    const data = line.split('\t').map((cell, index) => {
-      cell = cell.trim()
-      if (index === 0) {
-        return cell.includes(',') ? cell.split(',').map(item => item.trim()) : [cell]
-      } else {
-        return cell
-      }
-    })
-    let obj = {}
-    headers.forEach((header, index) => {
-      obj[header] = data[index];
-      if (header === 'category' & !existingCategories.includes(data[index])) {
-        categories.push({
-          categoryName: data[index],
-          categoryID: 'category' + categories.length,
-          color: colorOptions[categories.length % 6].colorValue
-        })
-        existingCategories.push(data[index])
-      }
-    })
-    setCategoryList()
-    getSpans()
-    return obj
-  })
-}
-
-function addCommentStickersFromCommentFile(commentObjsFromFile) {
-  commentObjsFromFile.forEach(commentObjFromFile => {
-    // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
-    // addCommentObj(globalTagID)
-    addCommentSticker(commentObjFromFile)
-  })
-}
 
 setCategoryList()
 
@@ -697,4 +580,92 @@ function selectCategoryComments(category) {
       targetComment.isSelected = true
     })
   }
+}
+
+function outputCommentFile(commentObjs) {
+  // オブジェクトのキーからヘッダーを生成
+  const headers = Object.keys(commentObjs[0])
+  // ヘッダー行をタブで結合
+  const tsvRows = [headers.join('\t')]
+
+  // 各オブジェクトを行に変換
+  for (const row of commentObjs) {
+    if (row.isDeleted === false){
+      // 各値をタブで結合し、必要に応じてエスケープ
+      const values = headers.map(header => {
+        const value = '' + row[header]; // 数値などを文字列に変換
+        const escaped = value.replace(/[\t\n\r]/g, ' '); // TSVの制御文字を空白に置換
+        return escaped;
+      })
+      tsvRows.push(values.join('\t'));
+    }
+  }
+
+  // TSV文字列を生成し、Blobとして保存
+  const tsvString = tsvRows.join('\n');
+  const blob = new Blob([tsvString], { type: 'text/tab-separated-values' })
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'export.tsv'; // 拡張子を.tsvに変更
+  link.click();
+
+  // 生成したURLを解放
+  URL.revokeObjectURL(url);
+}
+
+function readCommentFile(tsvText) {
+  const lines = tsvText.split('\n');
+  const headers = lines[0].split('\t').map(header => header.trim());
+  // categories = []
+  let existingCategories = []
+
+  return lines.slice(1).map(line => {
+    const data = line.split('\t').map((cell, index) => {
+      cell = cell.trim()
+      if (index === 0) {
+        return cell.includes(',') ? cell.split(',').map(item => item.trim()) : [cell]
+      } else {
+        return cell
+      }
+    })
+    let obj = {}
+    headers.forEach((header, index) => {
+      obj[header] = data[index];
+      if (header === 'category' & !existingCategories.includes(data[index])) {
+        categories.push({
+          categoryName: data[index],
+          categoryID: 'category' + categories.length,
+          color: colorOptions[categories.length % 6].colorValue
+        })
+        existingCategories.push(data[index])
+      }
+    })
+    setCategoryList()
+    getSpans()
+    return obj
+  })
+}
+
+document.getElementById('commentFileInput').addEventListener('change', function(event) {
+  const file = event.target.files[0]
+  if (file) {
+    console.log("コメントファイルの入力を受け付けました:", file.name)
+    const reader = new FileReader()
+    reader.onload = function(e) {
+      const text = e.target.result
+      const data = readCommentFile(text)
+      commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
+      addCommentStickersFromCommentFile(data)
+    }
+    reader.readAsText(file)
+  }
+})
+
+function addCommentStickersFromCommentFile(commentObjsFromFile) {
+  commentObjsFromFile.forEach(commentObjFromFile => {
+    // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
+    // addCommentObj(globalTagID)
+    addCommentSticker(commentObjFromFile)
+  })
 }
