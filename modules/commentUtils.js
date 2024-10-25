@@ -39,7 +39,7 @@ const colorOptions = [
   }
 ]
 
-let commentObjs
+let commentObjs = []
 let hatsuwaGroups
 let spans
 let zIndexCounter = 2
@@ -65,7 +65,6 @@ export function addCommentObj(globalTagID){
   let commentObj = {
     linkedGlobalTagIDs: [ globalTagID ],
     comment: "",
-    // category: categories[0].categoryName,
     category: currentCategory,
     isSelected: false,
     isShown: true,
@@ -83,7 +82,7 @@ export function addCommentObj(globalTagID){
  * @param {Object} commentObj 
  * @returns {HTMLElement}
  */
-function addCommentSticker(commentObj) {
+function addCommentSticker(commentObj, xPosition, yPosition) {
   const category = commentObj.category
 
   const index = categories.find(_category => _category.categoryName === category)
@@ -234,9 +233,14 @@ function addCommentSticker(commentObj) {
     linkedSpans.push(linkedSpan)
   })
 
-  const targetY = parseInt(linkedSpans[0].style.top, 10)
-  commentStickerElement.style.top = targetY + 11 + 'px'
-  commentStickerElement.style.left = '400px'
+  if (xPosition === undefined) {
+    const targetY = parseInt(linkedSpans[0].style.top, 10)
+    commentStickerElement.style.left = '400px'
+    commentStickerElement.style.top = targetY + 11 + 'px'
+  } else {
+    commentStickerElement.style.left = xPosition + 'px'
+    commentStickerElement.style.top = yPosition + 'px'
+  }
   commentStickerElement.style.position = 'absolute'
   commentStickerElement.style.zIndex = zIndexCounter++
 
@@ -662,6 +666,9 @@ function readCommentFile(tsvText) {
     let obj = {}
     headers.forEach((header, index) => {
       obj[header] = data[index];
+      obj['isSelected'] = false
+      obj['isDeleted'] = false
+      obj['commentID'] = commentObjs.length
       if (header === 'category' & !existingCategories.includes(data[index])) {
         categories.push({
           categoryName: data[index],
@@ -673,7 +680,8 @@ function readCommentFile(tsvText) {
     })
     setCategoryList()
     getSpans()
-    return obj
+    commentObjs.push(obj)
+    addCommentSticker(obj, obj['xPosition'], obj['yPosition'])
   })
 }
 
@@ -684,21 +692,22 @@ document.getElementById('commentFileInput').addEventListener('change', function(
     const reader = new FileReader()
     reader.onload = function(e) {
       const text = e.target.result
-      const data = readCommentFile(text)
-      commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
-      addCommentStickersFromCommentFile(data)
+      readCommentFile(text)
+      // const data = readCommentFile(text)
+      // commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
+      // addCommentStickersFromCommentFile(data)
     }
     reader.readAsText(file)
   }
 })
 
-function addCommentStickersFromCommentFile(commentObjsFromFile) {
-  commentObjsFromFile.forEach(commentObjFromFile => {
-    // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
-    // addCommentObj(globalTagID)
-    addCommentSticker(commentObjFromFile)
-  })
-}
+// function addCommentStickersFromCommentFile(commentObjsFromFile) {
+//   commentObjsFromFile.forEach(commentObjFromFile => {
+//     // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
+//     // addCommentObj(globalTagID)
+//     addCommentSticker(commentObjFromFile)
+//   })
+// }
 
 function getHatsuwaTime(globalTagID){
   const [ i, j, k ] = globalTagID.split('-')
