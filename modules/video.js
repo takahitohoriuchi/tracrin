@@ -33,6 +33,8 @@ export function loadVideo(_file){
 	// 再生が開始されたとき
     video.addEventListener('play', function() {
         console.log('再生が開始されました。');
+        // if (video.currentTime) video.currentTime = video.startTime
+        video.currentTime = video.currentTime >= video.endTime ? video.startTime : video.currentTime
     });
 
     // 一時停止されたとき
@@ -60,7 +62,7 @@ export function loadVideo(_file){
 		// TODO:手動スライダで動画を動かしたときに、video.startTimeとvideo.endTimeをどうする？
         if (video.currentTime >= video.endTime) {
             video.pause(); // 終了時間に達したら一時停止
-            video.currentTime = video.startTime; // TODO:必要に応じて再度開始時間に戻す？それともそのまま？
+            // video.currentTime = video.startTime; // TODO:必要に応じて再度開始時間に戻す？それともそのまま？
             // console.log('指定された区間の再生が完了しました。');
         }
     });

@@ -133,6 +133,20 @@ export function drawLabel(_document, _element, _x, _y, _label, _rowID, _fontSize
 	return dummy
 }
 
+
+export function drawSpeakerLabel(_document, _element, _x, _y, _label, _rowID, _hatsuwaID, _fontSize) {
+	var dummy = _document.createElement('span')
+	dummy.setAttribute('rowID', _rowID)
+	dummy.setAttribute('hatsuwaID', _hatsuwaID)
+	dummy.className = 'label'
+	dummy.innerText = _label
+	dummy.style.fontSize = num2Px(_fontSize)
+	dummy.style.left = num2Px(_x)
+	dummy.style.top = num2Px(_y)
+	_element.appendChild(dummy)
+	return dummy
+}
+
 export function drawHeaderLabel(_document, _headerArea, _x, _y, _label, _fontSize){
 	var label = _document.createElement('span')	
 	label.className = 'label'	
