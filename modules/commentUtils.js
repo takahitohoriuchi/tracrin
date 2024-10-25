@@ -260,7 +260,7 @@ function addCommentSticker(commentObj, xPosition, yPosition) {
     })
   })
 
-  let container = document.getElementById("commentArea")
+  const container = document.getElementById("commentArea")
   container.appendChild(commentStickerElement)
 }
 
@@ -723,9 +723,10 @@ function getHatsuwaTime(globalTagID){
 function getCommentStickerPosition(commentID){
   const commentStickerElementID = 'commentSticker' + commentID
   const commentStickerElement = document.getElementById(commentStickerElementID)
+  const parent = commentStickerElement.offsetParent
 
-  const xPosition = commentStickerElement.offsetLeft
-  const yPosition = commentStickerElement.offsetTop
+  const xPosition = commentStickerElement.offsetLeft + parent.scrollLeft
+  const yPosition = commentStickerElement.offsetTop + parent.scrollTop
 
   return [ xPosition, yPosition ]
 }
