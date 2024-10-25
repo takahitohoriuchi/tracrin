@@ -5,7 +5,7 @@ import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { toggleDev, toggleLine } from './modules/settings.js'
 import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
-import { addCommentObj, getCommentObjs } from './modules/commentUtils.js'
+import { addCommentObj, getCommentObjs, pushHatsuwaGroups } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -247,6 +247,7 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 		}
 	}
 	console.groupEnd()
+  pushHatsuwaGroups(hatsuwaGroups)
 }
 
 // 3: 発話たちを描画する。
