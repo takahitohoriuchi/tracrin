@@ -40,6 +40,7 @@ const colorOptions = [
 ]
 
 let commentObjs
+let hatsuwaGroups
 let spans
 let zIndexCounter = 2
 let isEditingGlobal = false // コメントに対応するspanタグ要素を編集状態を制御、わかりやすい変数名に変更予定
@@ -48,6 +49,11 @@ let currentCategory = categories[0].categoryName
 export function getCommentObjs(_commentObjs){
   commentObjs = _commentObjs
   getSpans()
+}
+
+export function pushHatsuwaGroups(_hatsuwaGroups){
+  hatsuwaGroups = _hatsuwaGroups
+  console.log(hatsuwaGroups[5][0]['end'])
 }
 
 function getSpans() {
@@ -584,19 +590,44 @@ function selectCategoryComments(category) {
 
 function outputCommentFile(commentObjs) {
   // オブジェクトのキーからヘッダーを生成
-  const headers = Object.keys(commentObjs[0])
+  // const headers = Object.keys(commentObjs[0])
+  const headers = [
+    'linkedGlobalTagIDs',
+    'comment',
+    'category',
+    'startTime',
+    'endTime',
+    'xPosition',
+    'yPosition',
+    'isShown'
+  ]
   // ヘッダー行をタブで結合
   const tsvRows = [headers.join('\t')]
 
   // 各オブジェクトを行に変換
   for (const row of commentObjs) {
     if (row.isDeleted === false){
-      // 各値をタブで結合し、必要に応じてエスケープ
-      const values = headers.map(header => {
-        const value = '' + row[header]; // 数値などを文字列に変換
-        const escaped = value.replace(/[\t\n\r]/g, ' '); // TSVの制御文字を空白に置換
-        return escaped;
-      })
+      const linkedGlobalTagIDs = row.linkedGlobalTagIDs
+      const comment = row.comment
+      const category = row.category
+      const [ startTime, endTime ] = getHatsuwaTime(linkedGlobalTagIDs[0])
+      const commentID = row.commentID
+      const [ xPosition, yPosition ] = getCommentStickerPosition(commentID)
+      const isShown = row.isShown
+
+      const values = [
+        linkedGlobalTagIDs.join(','), // 配列の場合カンマ区切り
+        comment,
+        category,
+        startTime,
+        endTime,
+        xPosition,
+        yPosition,
+        isShown
+      ].map(value => {
+        const strValue = '' + value; // 数値などを文字列に変換
+        return strValue.replace(/[\t\n\r]/g, ' '); // TSVの制御文字を空白に置換
+      });
       tsvRows.push(values.join('\t'));
     }
   }
@@ -617,7 +648,6 @@ function outputCommentFile(commentObjs) {
 function readCommentFile(tsvText) {
   const lines = tsvText.split('\n');
   const headers = lines[0].split('\t').map(header => header.trim());
-  // categories = []
   let existingCategories = []
 
   return lines.slice(1).map(line => {
@@ -668,4 +698,25 @@ function addCommentStickersFromCommentFile(commentObjsFromFile) {
     // addCommentObj(globalTagID)
     addCommentSticker(commentObjFromFile)
   })
+}
+
+function getHatsuwaTime(globalTagID){
+  const [ i, j, k ] = globalTagID.split('-')
+
+  console.log(i, j, k)
+
+  const startTime = hatsuwaGroups[i][j]['start']
+  const endTime = hatsuwaGroups[i][j]['end']
+
+  return [ startTime, endTime ]
+}
+
+function getCommentStickerPosition(commentID){
+  const commentStickerElementID = 'commentSticker' + commentID
+  const commentStickerElement = document.getElementById(commentStickerElementID)
+
+  const xPosition = commentStickerElement.offsetLeft
+  const yPosition = commentStickerElement.offsetTop
+
+  return [ xPosition, yPosition ]
 }
