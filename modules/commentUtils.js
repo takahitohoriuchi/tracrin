@@ -693,21 +693,10 @@ document.getElementById('commentFileInput').addEventListener('change', function(
     reader.onload = function(e) {
       const text = e.target.result
       readCommentFile(text)
-      // const data = readCommentFile(text)
-      // commentObjs = data // コメントファイルを複数読み込む場合を考慮するとcommentObjの全書き換えはしない方が良いので後で修正
-      // addCommentStickersFromCommentFile(data)
     }
     reader.readAsText(file)
   }
 })
-
-// function addCommentStickersFromCommentFile(commentObjsFromFile) {
-//   commentObjsFromFile.forEach(commentObjFromFile => {
-//     // const globalTagID = commentObjFromFile.linkedGlobalTagIDs[0]
-//     // addCommentObj(globalTagID)
-//     addCommentSticker(commentObjFromFile)
-//   })
-// }
 
 function getHatsuwaTime(globalTagID){
   const [ i, j, k ] = globalTagID.split('-')
