@@ -1,8 +1,20 @@
 // SECTION:【import】
 // import { drawComment, outputCommentFile } from './modules/commentUtils.js'
-import { addArrow, deleteArrow, drawHeaderLabel, drawLabel, genHatsuwaTags, genLabelBox, genRowDiv, genSpan, getHatsuwaObjFromSpan, splitSpan } from './modules/domUtils.js'
+import { addCommentObj, getCommentObjs } from './modules/commentUtils.js'
+import {
+	addArrow,
+	deleteArrow,
+	drawHeaderLabel,
+	drawLabel,
+	drawSpeakerLabel,
+	genHatsuwaTags,
+	genLabelBox,
+	genRowDiv,
+	genSpan,
+	getHatsuwaObjFromSpan,
+	splitSpan,
+} from './modules/domUtils.js'
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
-import { toggleDev, toggleLine } from './modules/settings.js'
 import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
 import { addCommentObj, getCommentObjs, pushHatsuwaGroups } from './modules/commentUtils.js'
@@ -29,7 +41,7 @@ let dataArea = document.getElementById('dataArea')
 let dataAreaMargin = 10
 let dataAreaStyle
 let labelBoxW = 90
-let dataBoxX;
+let dataBoxX
 let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
@@ -43,7 +55,6 @@ let windowSize = {
 	margin: 20,
 }
 
-
 // 色
 let mouseon4Label = '#c1dff7'
 let selected4Label = 'red'
@@ -55,10 +66,9 @@ let selected4Hatsuwatag = '#ff0062'
 let selectionStartTag
 let selectionEndTag
 
-
 // SECTION::【関数】
 // メイン関数
-async function main(_file = null) {
+async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 	if (_file) {
 		file = _file
 	}
@@ -69,31 +79,30 @@ async function main(_file = null) {
 		// TODO:hatsuwaObjsとかの生成は、リロード時はやりなおさなくてよし！！！！
 		await reload()
 		await resize()
-		
 
 		// 最初の読み込み時だけ（winリサイズ時はいちいちやらない）
 		if (_file) {
 			const textContent = fileReader.result
-			await genHatsuwaObjs(textContent)				
-			// tempConvertKukuriMarks(hatsuwaObjs)									
-			await groupingHatsuwaObjs(hatsuwaObjs)			
+			await genHatsuwaObjs(textContent)
+			// tempConvertKukuriMarks(hatsuwaObjs)
+			await groupingHatsuwaObjs(hatsuwaObjs)
 		}
 
-		await drawHatsuwa(hatsuwaGroups, fontSize)
+		await drawHatsuwa(hatsuwaGroups, fontSize, _charNumPerRow)
 
 		// reconvertKukuriMarks(hatsuwaObjs)		// ククリ系記号を元に戻す関数
 
 		// 左の発話者&行数ラベルを表示
 		drawIDandSpeaker(hatsuwaGroups, fontSize)
 		// spanやラベルにイベントを追加
-		await addMouseEvents()			
+		await addMouseEvents()
 
 		// TODO:heightを更新
 		// 1:hatsuwaTagSpans[][][]の最終要素のbottomを取得して
 		const lastDataBottom = accumRowCount * fontSize * lineHeightRatio
-		transcriptArea.style.height = num2Px(lastDataBottom - headerAreaHeight)		
+		transcriptArea.style.height = num2Px(lastDataBottom - headerAreaHeight)
 		headerArea.style.height = num2Px(headerAreaHeight)
-		dataArea.style.height = num2Px(lastDataBottom)				
+		dataArea.style.height = num2Px(lastDataBottom)
 		scrollableDivArea.style.top = num2Px(headerAreaHeight)
 		console.groupCollapsed('最終的な全体情報')
 		console.log('hatsuwaObjs: ', hatsuwaObjs)
@@ -123,8 +132,9 @@ async function genHatsuwaObjs(_textContent) {
 	const rowNum = rows.length
 	console.log('データ行の数: ', rowNum)
 	// 発話オブジェクト群を生成
-	hatsuwaObjs = rows.map((row, i) => {
-		/*
+	hatsuwaObjs = rows
+		.map((row, i) => {
+			/*
 			[.txtのrowの中身]
 			1列目:CM_Utter??
 			2列目:CM??
@@ -132,55 +142,42 @@ async function genHatsuwaObjs(_textContent) {
 			4列目:発話終了時間（秒）
 			5列目:発話内容（発話記号含む）			
 			*/
-		const cells = row.split('\t')
-		// console.log('cells: ', cells)
-		let o = {
-			// ID: i + 1, //発話インデックス
-			label: cells[0], // 発話ラベル
-			speaker: cells[1], // 発話者
-			start: Number(cells[2]), // 発話開始時間
-			end: Number(cells[3]), // 発話終了時間
-			text: cells[4], // 発話内容
-		}
-		// DEBUG:
-		/*
-		
-		jsの関数を作ってくれ。
-		引数はオブジェクト（obj）で、オブジェクトの'text'というフィールドの値を変換する関数。
+			const cells = row.split('\t')
+			// console.log('cells: ', cells)
+			let o = {
+				// ID: i + 1, //発話インデックス
+				label: cells[0], // 発話ラベル
+				speaker: cells[1], // 発話者
+				start: Number(cells[2]), // 発話開始時間
+				end: Number(cells[3]), // 発話終了時間
+				text: cells[4], // 発話内容
+			}
 
-		たとえば、obj.textが'おは(0.124)ようございま(0.486)ああす'であれば、
-		`おは(0.12)ようございま(0.49)ああす`に変換してほしい。
-		このように、.text内に、()のなかに数値が入っている文字があれば、それをすべて小数第三位で四捨五入して、小数第二位までの値に変換するというもの。
-		*/		
-		
-		// DEBUG:
-		// 沈黙だった場合の微調整
-		if(o.speaker==''){
-			// 沈黙時間を小数第二位で四捨五入
-			let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
-			silentDuration = Math.round(silentDuration * 10) / 10
-			silentDuration = silentDuration.toFixed(1);
-			o.text = silentDuration
-			o.text = '(' + o.text + ')'			
-		}else{
-			roundTextValues(o)
-
-		}
-		return o
-	})
-	.filter(o=>o.text)
+			// 沈黙だった場合の微調整
+			if (o.speaker == '') {
+				// 沈黙時間を小数第二位で四捨五入
+				let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
+				silentDuration = Math.round(silentDuration * 10) / 10
+				silentDuration = silentDuration.toFixed(2)
+				o.text = silentDuration
+				o.text = '(' + o.text + ')'
+			} else {
+				roundTextValues(o)
+			}
+			return o
+		})
+		.filter((o) => o.text)
 	// 発話オブジェクト群から、「0.15秒未満の沈黙」を削除
-	hatsuwaObjs = hatsuwaObjs.filter(o=>{
-		if(o.speaker == ''){
+	hatsuwaObjs = hatsuwaObjs.filter((o) => {
+		if (o.speaker == '') {
 			let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
 			console.log('silentDuration: ', silentDuration)
-			return silentDuration>=0.15			
-		}else{
+			return silentDuration >= 0.15
+		} else {
 			return true
-		}		
+		}
 	})
 	// TODO:発話オブジェクト群から、silentオンリーの発話は先頭末尾に'(',')'がなければつける。
-
 
 	// 発話オブジェクトを「発話開始時間」でソート
 	hatsuwaObjs.sort((a, b) => a.start - b.start)
@@ -190,11 +187,11 @@ async function genHatsuwaObjs(_textContent) {
 }
 
 // ククリ記号を一時的に別の文字に置き換える
-async function tempConvertKukuriMarks(_hatsuwaObjs){
+async function tempConvertKukuriMarks(_hatsuwaObjs) {
 	console.groupCollapsed('ククリ記号を一時的に別文字に置換')
-	_hatsuwaObjs.forEach(async hatsuwaObj=>{		
+	_hatsuwaObjs.forEach(async (hatsuwaObj) => {
 		console.log('hatsuwaObj: ', hatsuwaObj)
-		await tempConvertKukuriMarksInHatsuwa(hatsuwaObj)		
+		await tempConvertKukuriMarksInHatsuwa(hatsuwaObj)
 	})
 	console.groupEnd()
 }
@@ -207,13 +204,13 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 	doGrouping: for (let i = 0; i < hatsuwaObjs.length; i++) {
 		console.log('groupStartIndex: ', groupStartIndex)
 		console.log('i: ', i)
-		if (i >= groupStartIndex) {						
+		if (i >= groupStartIndex) {
 			// 発話グループ生成して、ひとつの発話オブジェクトいれとく
-			let hatsuwaGroup = [hatsuwaObjs[i]]	
+			let hatsuwaGroup = [hatsuwaObjs[i]]
 			// この発話グループの発話オブジェクトのうち、Endがもっとも遅い値
-			let maxEndInThisGroup = hatsuwaObjs[i].end			
+			let maxEndInThisGroup = hatsuwaObjs[i].end
 			// 次の発話objから
-			for (let j = i + 1; j < hatsuwaObjs.length; j++) {				
+			for (let j = i + 1; j < hatsuwaObjs.length; j++) {
 				// かぶりがあったら
 				if (hatsuwaObjs[j].start < maxEndInThisGroup) {
 					// グループにいれる
@@ -240,8 +237,7 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 						break
 					}
 				}
-			}			
-			
+			}
 		} else {
 			// console.log('グループインデックスより小さいのでスルー')
 		}
@@ -251,13 +247,17 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 }
 
 // 3: 発話たちを描画する。
-async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
-	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)			
-	let dataBoxW = dataAreaStyle.width - labelBoxW	
+async function drawHatsuwa(_hatsuwaGroups, _fontSize, _maxCharNumPerRow = null) {
+	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)
+	let dataBoxW = dataAreaStyle.width - labelBoxW
 	// console.log('dataBoxW: ', dataBoxW)
 	// dataBoxX = document.getElementsByClassName('dataBox')[0]
-	let maxCharNumPerRow = Math.floor(dataBoxW / fontSize)
+	let maxCharNumPerRow = _maxCharNumPerRow ? _maxCharNumPerRow : Math.floor(dataBoxW / fontSize)
 	console.log('maxCharNumPerRow: ', maxCharNumPerRow)
+	// DEBUG:ひとまず、maxCharNumPerRowまではOK。だけど、文字数表示はウィンドウサイズとの関係性っぽいから変わらない
+	// NOTE:remainedHabaは、maxCharNumPerRowを参照していない
+	// let charNumPerRow = document.getElementById('charNumPerRow')
+
 	// 発話グループそれぞれにおいて
 	_hatsuwaGroups.forEach((hatsuwaGroup, groupIndex) => {
 		console.groupCollapsed(`発話グループ${groupIndex}`)
@@ -269,11 +269,10 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			//グループ内の発話の数だけ、空配列セット
 			hatsuwaTagSpans[groupIndex].push([])
 		})
-						
+
 		// (2) 発話から子発話に生成・分割（二重配列）
 		let tagArrays = genHatsuwaTags(hatsuwaGroup, groupIndex)
 		console.log('tagArrays: ', tagArrays)
-		
 
 		// (3) 各発話の「先頭タグ」に'bracketID'フィールドを割り振る
 		let bracketID = 1
@@ -281,17 +280,16 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			// 発話iの先頭（=tagArrays[0].text[0]）には[がある？
 			console.log('tagArrays.length: ', tagArrays.length)
 			if (tagArrays[i][0].text[0] == '[') {
-				if (i < tagArrays.length - 1) {										
+				if (i < tagArrays.length - 1) {
 					// まだbracketIDプロパティをもたないものだけ
 					if (!('bracketID' in tagArrays[i][0])) {
 						console.log('この発話の先頭タグは、bracketIDをもってません')
 						// あれば、
 						for (let j = 1; j < tagArrays.length; j++) {
-							// 続く発話たち(tagArrays[i+j].text[0]の発話開始時間と同じかチェック							
-							if(!hatsuwaGroup[i+j]){
+							// 続く発話たち(tagArrays[i+j].text[0]の発話開始時間と同じかチェック
+							if (!hatsuwaGroup[i + j]) {
 								break
-							}
-							else if (hatsuwaGroup[i + j].start - hatsuwaGroup[i].start < hatsuwaTimeResolution) {
+							} else if (hatsuwaGroup[i + j].start - hatsuwaGroup[i].start < hatsuwaTimeResolution) {
 								tagArrays[i][0].bracketID = bracketID
 								tagArrays[i + j][0].bracketID = bracketID
 							} else {
@@ -334,8 +332,8 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 		})
 
 		// (5) ブラケットグループ化する（同じbracketIDのtagどうしをまとめた配列）
-		const tempTagArray = tagArrays.flatMap((row) => row)// tagArraysを、二次元配列から一次元配列に変えて、
-		// console.log('tempTagArray: ', tempTagArray)		
+		const tempTagArray = tagArrays.flatMap((row) => row) // tagArraysを、二次元配列から一次元配列に変えて、
+		// console.log('tempTagArray: ', tempTagArray)
 		const bracketsGroup = tempTagArray.reduce((result, obj) => {
 			const group = result.find((group) => group[0].bracketID === obj.bracketID)
 			if (group) {
@@ -346,14 +344,14 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			return result
 		}, [])
 		console.log('bracketsGroup: ', bracketsGroup)
-				
+
 		// (6) 各ブラケットグループの開始X位置を決定してゆく
 		let startX = 0
-		bracketsGroup.forEach((tagsInThisBracketGroup, i) => {						
+		bracketsGroup.forEach((tagsInThisBracketGroup, i) => {
 			console.groupCollapsed(`ブラケットグループ${i}の開始X位置決定`)
 			console.log('bracketID: ', i, ' (グループ内での[のインデックス)')
 			console.log('tagsInThisBracketGroup: ', tagsInThisBracketGroup)
-			const spansOfThisBracketGroup = []//一時生成であり、最終的には消す
+			const spansOfThisBracketGroup = [] //一時生成であり、最終的には消す
 
 			// (1) このブラケットグループのspanタグを一時的に描画する
 			tagsInThisBracketGroup.forEach((tag) => {
@@ -362,11 +360,11 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			})
 			console.log('spansOfThisBracketGroup: ', spansOfThisBracketGroup)
 
-			// (2) spanタグの行分割処理（画面右端オーバーしないよう。）			
-			let maxTagXInThisBracketGroup = 0// このbracketのグループの<span>タグ群の末尾の最右位置
+			// (2) spanタグの行分割処理（画面右端オーバーしないよう。）
+			let maxTagXInThisBracketGroup = 0 // このbracketのグループの<span>タグ群の末尾の最右位置
 			spansOfThisBracketGroup.forEach((span, j) => {
-				// spanの幅								
-				const spanW = span.getBoundingClientRect().width// NOTE:下のやりかただと、12pxぶん違いがでる。。。？				
+				// spanの幅
+				const spanW = span.getBoundingClientRect().width // NOTE:下のやりかただと、12pxぶん違いがでる。。。？
 				// console.log('spanW: ', spanW)
 				// 残りの画面幅
 				const remainedHaba = dataBoxW - startX
@@ -378,28 +376,28 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 				// spanをnコのテキストへと分割(DOM操作。発話特殊記号にかんする境界処理はsplitSpanにて。)
 				const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsInThisBracketGroup[j])
 				console.log(`${span.innerText}は以下${splittedSpanTexts.length}つに分割される↓`)
-				console.log('splittedSpanTexts: ', splittedSpanTexts)								
+				console.log('splittedSpanTexts: ', splittedSpanTexts)
 				// const id = span.className.split(' ')[1] //id。例：(10-4-1)みたいな。おおもとのspanは削除しちゃうから、先にidだけとっとく
-				const id = span.getAttribute("globalTagID")
+				const id = span.getAttribute('globalTagID')
 				console.log('id: ', id)
-				const hatsuwaID = id.split('-')[1]				
-				
+				const hatsuwaID = id.split('-')[1]
+
 				splittedSpanTexts.forEach((splittedTag, k) => {
 					//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
 					const tagX = k == 0 ? startX + labelBoxW : labelBoxW
-					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX)	
+					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX)
 					e.setAttribute('fragmentID', k)
-					// テキストからspanタグを描画					
+					// テキストからspanタグを描画
 					// 全体の発話span配列に追加する
 					hatsuwaTagSpans[groupIndex][hatsuwaID].push(e)
-					// 分割してできた最終タグが、maxケツXの候補になる！					
+					// 分割してできた最終タグが、maxケツXの候補になる！
 					// 分割された各断片テキストのうち、末尾が最右にあるものの末尾pxを。
-					const tagID = id.split('-')[2]																									
-					if(Number(tagID) < tagArrays[hatsuwaID].length-1){
+					const tagID = id.split('-')[2]
+					if (Number(tagID) < tagArrays[hatsuwaID].length - 1) {
 						if (k == splittedSpanTexts.length - 1) {
 							const xx = e.getBoundingClientRect().right - dataAreaStyle.x
 							console.log(`splitTag${k}のright`, xx)
-							maxTagXInThisBracketGroup = Math.max(maxTagXInThisBracketGroup, xx)														
+							maxTagXInThisBracketGroup = Math.max(maxTagXInThisBracketGroup, xx)
 						}
 					}
 				})
@@ -411,41 +409,40 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			// (4)spansOfThisBracketGroup[]は削除
 			spansOfThisBracketGroup.forEach((span) => span.remove())
 			console.groupEnd()
-		})			
+		})
 		console.log('dataAreaStyle: ', dataAreaStyle)
-		console.groupEnd()		
+		console.groupEnd()
 		// console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	})
 
-	// (7) spanのY位置を決定（spanにクラス属性'rowID'をここで追加=spanが属する行番号）、ククリ記号を元に戻す処理	
-	console.groupCollapsed('spanのY位置決定処理（rowの子要素にするのもここ）')	
+	// (7) spanのY位置を決定（spanにクラス属性'rowID'をここで追加=spanが属する行番号）、ククリ記号を元に戻す処理
+	console.groupCollapsed('spanのY位置決定処理（rowの子要素にするのもここ）')
 	accumRowCount = 0 //累積行数
 	hatsuwaTagSpans.forEach((spansOfGroup, i) => {
 		console.groupCollapsed(`発話グループ${i}のspan処理`)
 		spansOfGroup.forEach((spansOfHatsuwa, j) => {
 			console.groupCollapsed(`発話${j}: ${hatsuwaGroups[i][j].text}`)
 			let rowNum = 0
-			hatsuwaGroups[i][j].startRow = accumRowCount			
-			spansOfHatsuwa.forEach((span, k) => {				
+			hatsuwaGroups[i][j].startRow = accumRowCount
+			spansOfHatsuwa.forEach((span, k) => {
 				// TODO:ククリ記号を変換する
-				// console.log('span.textContent: ', span.textContent)				
-				// span.innerText = 
+				// console.log('span.textContent: ', span.textContent)
+				// span.innerText =
 				// (パタンA)： いっっちばんさいしょタグspanの場合
 				if (i == 0 && j == 0 && k == 0) {
 					console.log('データの最初です')
-					span.setAttribute('rowID', accumRowCount)																				
-					const y = 0					
+					span.setAttribute('rowID', accumRowCount)
+					const y = 0
 					let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
 					let dataBox = row.querySelector('.dataBox')
 					console.log('dataBox: ', dataBox)
 					dataBox.appendChild(span)
 					// row.appendChild(span)
-					rowElems.push(row)										
-					rowNum += 1					
+					rowElems.push(row)
+					rowNum += 1
 				}
 				// (パタンB): グループ内最初発話かつ最初タグの場合・・・直前グループ最終発話かつ最終タグspanのbottomにあわせる
 				else if (j == 0 && k == 0) {
-					
 					accumRowCount += 1
 					console.log('グループ内の最初発話の最初タグ')
 					const hatsuwaNum = hatsuwaTagSpans[i - 1].length
@@ -457,12 +454,11 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 					let dataBox = row.querySelector('.dataBox')
 					console.log('dataBox: ', dataBox)
 					dataBox.appendChild(span)
-					rowElems.push(row)			
+					rowElems.push(row)
 					rowNum += 1
 				}
 				// (パタンC): 発話内最初のタグの場合・・・直前発話の最終タグspanのbottomにあわせる
 				else if (k == 0) {
-					
 					accumRowCount += 1
 					console.log('発話内最初タグ')
 					const spanNum = spansOfGroup[j - 1].length
@@ -473,11 +469,11 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 					let dataBox = row.querySelector('.dataBox')
 					console.log('dataBox: ', dataBox)
 					dataBox.appendChild(span)
-					rowElems.push(row)			
+					rowElems.push(row)
 					rowNum += 1
-				}								
+				}
 				// (パタンD): spanXが0にきてる場合・・・直前タグのbottomにあわせる
-				else if (px2Num(span.style.left) == labelBoxW) {									
+				else if (px2Num(span.style.left) == labelBoxW) {
 					accumRowCount += 1
 					const y = accumRowCount * fontSize * lineHeightRatio
 					span.style.top = num2Px(y)
@@ -486,17 +482,17 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 					let dataBox = row.querySelector('.dataBox')
 					console.log('dataBox: ', dataBox)
 					dataBox.appendChild(span)
-					rowElems.push(row)			
+					rowElems.push(row)
 					rowNum += 1
 				}
 				// (パタンE): それ以外の場合・・・直前タグのtopにあわせる（列車的連結）
 				else {
 					const y = accumRowCount * fontSize * lineHeightRatio
 					span.style.top = num2Px(y)
-					span.setAttribute('rowID', accumRowCount)					
-					let dataBox = rowElems[rowElems.length-1].querySelector('.dataBox')
+					span.setAttribute('rowID', accumRowCount)
+					let dataBox = rowElems[rowElems.length - 1].querySelector('.dataBox')
 					dataBox.appendChild(span)
-					// rowElems[rowElems.length-1].appendChild(span)					
+					// rowElems[rowElems.length-1].appendChild(span)
 				}
 			})
 			console.log('この発話の行数: ', rowNum)
@@ -504,14 +500,14 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 			// hatsuwaGroups[i][j].endRow = accumRowCount
 			console.groupEnd()
 		})
-		const lineY = spansOfGroup[0][0].getBoundingClientRect().top - dataAreaStyle.top		
+		const lineY = spansOfGroup[0][0].getBoundingClientRect().top - dataAreaStyle.top
 		var horizontalLine = document.createElement('div')
 		// console.log('水平線のlineY: ', lineY)
 		horizontalLine.style.top = num2Px(lineY)
 		horizontalLine.className = 'group-line'
 		dataArea.appendChild(horizontalLine)
 		console.groupEnd()
-	})	
+	})
 	console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	console.groupEnd()
 	// 更新
@@ -519,54 +515,52 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize) {
 }
 
 // 4: IDとSpeakerのラベルを左にDOM描画する関数
-async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {	
+async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 	// drawLabel()を、グローバル位置Xを引数にとるようにして、各ラベルの位置を指定する
 	// 行ラベル表示
-	// DEBUG:これ、drawHeaderLabelにする	
+	// DEBUG:これ、drawHeaderLabelにする
 	drawHeaderLabel(document, headerArea, 0, 0, 'ID', _fontSize) //ID
-			
+
 	// (1) ヘッダを描く
 	// 話者
-	const speakerLabelX = _fontSize * 3	
-	drawHeaderLabel(document, headerArea, speakerLabelX, 0, 'Speaker', _fontSize) // speaker	
+	const speakerLabelX = _fontSize * 3
+	drawHeaderLabel(document, headerArea, speakerLabelX, 0, 'Speaker', _fontSize) // speaker
 	// 矢印
-	// const arrowLabelX = _fontSize * 6	
+	// const arrowLabelX = _fontSize * 6
 	const textLabelX = _fontSize * 8
-	drawHeaderLabel(document, headerArea, textLabelX, 0, 'Text', _fontSize) // text	
-	
+	drawHeaderLabel(document, headerArea, textLabelX, 0, 'Text', _fontSize) // text
+
 	// console.log('dataAreaStyle: ', dataAreaStyle)
-	
+
 	// (2) 列ラベルを発話ごとに処理
 	accumRowCount = 0
 	_hatsuwaGroups.forEach((hatsuwaGroup, i) => {
 		hatsuwaGroup.forEach((hatsuwaObj, j) => {
 			for (let k = 0; k < hatsuwaObj.rowNum; k++) {
-				
 				// 行連番を表示
 				const idColX = 0
 				const idColY = _fontSize * lineHeightRatio * (accumRowCount + k)
-				
-				const id = formatNumber(accumRowCount + k + 1)//NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。
-				const rowID = id-1
-				// const id = accumRowCount + k + 1				
+
+				const id = formatNumber(accumRowCount + k + 1) //NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。
+				const rowID = id - 1
+				// const id = accumRowCount + k + 1
 				// TODO:親となるdiv
-				// let labelBox = document.createElement('div')				
-				// console.log('rowElems[rowID]: ', rowElems[rowID])				
+				// let labelBox = document.createElement('div')
+				// console.log('rowElems[rowID]: ', rowElems[rowID])
 				let labelBox = genLabelBox(document, rowElems[rowID])
 				// labelBoxをrowにapppendせねば
 				const label = drawLabel(document, labelBox, idColX, idColY, id, rowID, _fontSize)
 
 				// 矢印用のボックスを用意
 				// let arrowLabel = drawLabel(document, labelBox, )
-	
-				
+
 				idLabels.push(label)
 				// 「話者ラベル」を表示（発話の最初行だけ）
 				if (k == 0) {
 					const speakerColX = speakerLabelX
 					const speakerColY = _fontSize * lineHeightRatio * accumRowCount
-					const speaker = hatsuwaObj.speaker					
-					const label = drawLabel(document, labelBox, speakerColX, speakerColY, speaker, rowID, _fontSize)
+					const speaker = hatsuwaObj.speaker
+					const label = drawSpeakerLabel(document, labelBox, speakerColX, speakerColY, speaker, rowID, hatsuwaObj.ID, _fontSize)
 					speakerLabels.push(label)
 				}
 				// rowElems[rowID].appendChild(labelBox)
@@ -576,7 +570,6 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 		})
 	})
 	// console.log('最終的に描画される行数: ', accumRowCount)
-	
 }
 
 // 5: マウスイベントを追加
@@ -586,161 +579,226 @@ async function addMouseEvents() {
 		for (let hatsuwa of group) {
 			for (let span of hatsuwa) {
 				// マウスオン
-				span.addEventListener('mouseover', () => {					
-					span.style.backgroundColor = mouseon4Label															
+				span.addEventListener('mouseover', () => {
+					span.style.backgroundColor = mouseon4Label
 					let rowID = span.getAttribute('rowID')
 					let row = rowElems[rowID]
 					row.style.backgroundColor = mouseon4HatsuwarowColor
 				})
 				// マウスリーブ
-				span.addEventListener('mouseout', () => {					
-					span.style.backgroundColor = 'transparent'																									
+				span.addEventListener('mouseout', () => {
+					span.style.backgroundColor = 'transparent'
 					let rowID = span.getAttribute('rowID')
 					let row = rowElems[rowID]
 					let isSelectedRow = row.getAttribute('selected')
-					if(isSelectedRow){
+					if (isSelectedRow) {
 						row.style.backgroundColor = selectedHatsuwarowColor
-					}else{
+					} else {
 						row.style.backgroundColor = 'transparent'
-					}														
-				})				
+					}
+				})
 				// マウスダウン
-				span.addEventListener('mousedown', () => {
-					console.groupCollapsed('spanのマウスダウン処理')					
-					console.log('mousedownされたspan: ', span)
-					selectionStartTag = span// ダウンとアップを記録するだけで良い。そのあいだのspanタグ全部取得するから。										
-					console.groupEnd()
+				span.addEventListener('mousedown', (e) => {
+					// console.groupCollapsed('spanのマウスダウン処理')
+					
 				})
 				// マウスムーブ
 				span.addEventListener('mousemove', () => {
-					// console.log('mousemoveされたspan: ', span)					
+					// shift + マウスダウン中だったら、行の色を変える。
 				})
-				// マウスアップ
-				span.addEventListener('mouseup', () => {
-					console.groupCollapsed('spanのマウスアップ処理')
+				// // マウスアップ
+				// span.addEventListener('mouseup', (e) => {					
+				// })
+				// クリック（NOTE:マウスアップのあとに起こる）
+				span.addEventListener('click', (e) => {
+					console.groupCollapsed('spanのクリック処理')
 					console.log(span)
-					selectionEndTag = span
-					// console.log('selectionEndTag: ', selectionEndTag)															
-					let sRowID = selectionStartTag.getAttribute('rowID')
-					let eRowID = selectionEndTag.getAttribute('rowID')
-					// 下行からドラッグしてた場合、スワップ
-					if(sRowID > eRowID){
-						let tempSRowID = sRowID
-						sRowID = eRowID
-						eRowID = tempSRowID
-					}
-					console.log('sRowID: ', sRowID)
-					console.log('eRowID: ', eRowID)
-					
-					// ドラッグしたってことだから
-					// if(sRowID != eRowID){
-						rowElems.forEach((row,i)=>{
+					console.log('selectionStartTag: ', selectionStartTag)
+					console.log('selectionEndTag: ', selectionEndTag)
+					/*
+					【単一タグの該当再生時間の計算方法】
+					選択タグの`globalTagID = i-j-k`と`発話objのID`取得しておき（`hatsuwaObjs[l]`とする）
+					- 再生開始時間：、`hatsuwObjs[l+k].start`
+					- 再生終了時間：`globalTagID = i-j-(k+1)`なるタグがあるかどうかを判定し、
+						- あれば、`hatsuwaObjs[l+k].start`
+						- なければ、`hatsuwaObjs[l].end`					
+					*/
+
+					/*
+					【複数タグ選択の再生時間の計算方法】
+					shiftなしでタグクリックしたら、自動的に、selectionStartTagとする
+					shiftありでタグクリックしたら、
+					- selectionStartTagがすでにあれば
+						それをselectionEndTagとし、
+						処理のあとに、selectionStartTagとselectionEndTagを両方とも破棄
+					- selectionStartTagなければ、なにもしない										
+					*/
+					// 非Shiftキーのとき
+					if (!e.shiftKey) {
+						// not Shiftキーのときは、これを「スタートタグ」に設定
+						selectionEndTag = null
+						selectionStartTag = span // ダウンとアップを記録するだけで良い。そのあいだのspanタグ全部取得するから。
+
+						let globalTagID = span.getAttribute('globalTagID')
+						console.log('globalTagID: ', globalTagID)
+						let rowID = span.getAttribute('rowID')
+						console.log('rowID: ', rowID)
+						let groupID = globalTagID.split('-')[0]
+						let hatsuwaIDInGroup = globalTagID.split('-')[1]
+						let hatsuwaObjOwningThisTag = hatsuwaGroups[groupID][hatsuwaIDInGroup]
+						console.log('↓↓↓この発話objの傘下です↓↓↓')
+						console.table(hatsuwaObjOwningThisTag)
+
+						let hatsuwaIDOwningThisTagZeroStart = hatsuwaObjOwningThisTag.ID - 1
+						// console.log('hatsuwaIDOwningThisTagZeroStart: ', hatsuwaIDOwningThisTagZeroStart)
+						let tagIDinThisHatsuwa = parseInt(globalTagID.split('-')[2])
+						// console.log('tagIDinThisHatsuwa: ', tagIDinThisHatsuwa)
+
+						video.startTime = hatsuwaObjs[hatsuwaIDOwningThisTagZeroStart + tagIDinThisHatsuwa].start
+						console.log('video.startTime: ', video.startTime)
+						video.currentTime = video.startTime
+						// 同発話内で、このタグの後続のタグはあるか？
+						let nextTagInThisHatsuwa = document.querySelector(`[globalTagID="${groupID}-${hatsuwaIDInGroup}-${tagIDinThisHatsuwa + 1}"]`)
+						// console.log('nextTagInThisHatsuwa: ', nextTagInThisHatsuwa)
+						video.endTime = nextTagInThisHatsuwa
+							? hatsuwaObjs[hatsuwaIDOwningThisTagZeroStart + 1 + tagIDinThisHatsuwa].start
+							: hatsuwaObjOwningThisTag.end
+						console.log('video.endTime: ', video.endTime)
+
+						// spanタグの選択状態（selected属性）を反転
+						let classList = span.classList
+						let selectedSpans = document.getElementsByClassName('selected')
+						if (!classList.contains('selected')) {
+							Array.from(selectedSpans).forEach((spn) => {
+								spn.classList.remove('selected')
+								spn.style.color = ''
+							})
+							console.log('非選択状態から選択状態へ')
+							classList.add('selected')
+							span.style.color = selected4Hatsuwatag
+						} else {
+							Array.from(selectedSpans).forEach((spn) => {
+								spn.classList.remove('selected')
+								spn.style.color = ''
+							})
+						}
+						// このspanタグを含む行の選択状態を変更
+						rowElems.forEach((row, i) => {
 							// ドラッグ範囲内の行なら選択状態に
-							if(i>=sRowID && i<=eRowID){
+							if (i == rowID) {
 								row.setAttribute('selected', true)
 								row.style.backgroundColor = selectedHatsuwarowColor
 							}
 							// 範囲外なので非選択状態にする
-							else{
+							else {
 								row.removeAttribute('selected')
 								row.style.backgroundColor = 'transparent'
 							}
-						})																								
-					// }
+						})
+						// var style = window.getComputedStyle(span)
 
+						// TODO:選択spanの数が1個以上なら、ボタン表示にする
+					}
+					// Shiftキー押してて、かつstartTagがあるときだけ
+					else if(e.shiftKey && selectionStartTag){
+						/*
+						いま選択したタグ（span）の時間が、
+						- sタグよりも早い・・・sタグをeタグにいれ、いまタグをsタグにいれてから、処理
+						- (sタグそのもの・・・なんもしない)
+						- sタグからeタグのあいだ・・・eタグをいまタグにしてから、処理
+						- (eタグそのもの・・・なんもしない)
+						- （eタグあり ∩）eタグよりも遅い・・・eタグをsタグにいれ、いまタグをeタグにしてから、処理
+						*/
+						// const hatsuwaObj = getHatsuwaObjFromSpan(span, hatsuwaGroups)
+						// let tempSObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)
+						// if (hatsuwaObj.start < tempSObj.start) {
+						// 	selectionEndTag = selectionStartTag
+						// 	selectionStartTag = span
+						// } else if (selectionEndTag) {
+						// 	let tempEObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)
+						// 	if (hatsuwaObj.start > tempEObj.start) {
+						// 		selectionStartTag = selectionEndTag
+						// 		selectionEndTag = span
+						// 	}
+						// } else {
+						// 	selectionEndTag = span
+						// }
 
-					// let sGlobalTagID = selectionStartTag.getAttribute("globalTagID")				
-					// let eGlobalTagID = selectionEndTag.getAttribute("globalTagID")
-					
-					// 部分再生の時間をセット↓									
-					let sObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)					
-					let eObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)					
-					video.startTime = sObj.start
-					console.log('video.startTime: ', video.startTime)
-					video.currentTime = video.startTime
-					video.endTime = eObj.end
-					console.log('video.endTime: ', video.endTime)
+						selectionEndTag = span
+
+						// console.log('selectionEndTag: ', selectionEndTag)
+						let sRowID = selectionStartTag.getAttribute('rowID')
+						let eRowID = selectionEndTag.getAttribute('rowID')
+						// 下から上にドラッグしてた場合、上下範囲逆転
+						if (sRowID > eRowID) {
+							let tempSRowID = sRowID
+							sRowID = eRowID
+							eRowID = tempSRowID
+						}
+						console.log('sRowID: ', sRowID)
+						console.log('eRowID: ', eRowID)
+
+						// let sGlobalTagID = selectionStartTag.getAttribute("globalTagID")
+						// let eGlobalTagID = selectionEndTag.getAttribute("globalTagID")
+						// 部分再生の時間をセット↓
+						let sObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)
+						let eObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)
+
+						video.startTime = sObj.start
+						console.log('video.startTime: ', video.startTime)
+						video.currentTime = video.startTime
+						video.endTime = eObj.end
+						console.log('video.endTime: ', video.endTime)
+						// ;(selectionStartTag = null), (selectionEndTag = null)
+
+						// 行選択状態の変更
+						rowElems.forEach((row, i) => {
+							// ドラッグ範囲内の行なら選択状態に
+							if (i >= sRowID && i <= eRowID) {
+								row.setAttribute('selected', true)
+								row.style.backgroundColor = selectedHatsuwarowColor
+							}
+							// 範囲外なので非選択状態にする
+							else {
+								row.removeAttribute('selected')
+								row.style.backgroundColor = 'transparent'
+							}
+						})
+						console.groupEnd()
+					}
+
 					console.groupEnd()
 				})
-				// クリック（NOTE:マウスアップのあとに起こる）
-				span.addEventListener('click', () => {
-					console.groupCollapsed('spanのクリック処理')
-					console.log(span)					
-					let globalTagID = span.getAttribute('globalTagID')					
-					console.log('globalTagID: ', globalTagID)
-					let rowID = span.getAttribute('rowID')
-					console.log('rowID: ', rowID)					
-					let groupID = globalTagID.split('-')[0]
-					let hatsuwaIDInGroup = globalTagID.split('-')[1]
-					let hatsuwaObjOwningThisTag = hatsuwaGroups[groupID][hatsuwaIDInGroup]
-					console.log('↓↓↓この発話objの傘下です↓↓↓')
-					console.table(hatsuwaObjOwningThisTag)
-					// 再生時間処理
-					video.startTime = hatsuwaObjOwningThisTag.start
-					video.currentTime = video.startTime
-					video.endTime = hatsuwaObjOwningThisTag.end
-					console.log('video.endTime: ', video.endTime)
-					video.currentTime = video.endTime				
-					
-										
-					// このspanが元々非selectedなら、「selected」に
-					let classList = span.classList					
-					let selectedSpans = document.getElementsByClassName('selected')						
-					if(!classList.contains('selected')){																								
-						Array.from(selectedSpans).forEach(spn => {
-							spn.classList.remove('selected');
-							spn.style.color = ''
-						});
-						console.log('非選択状態から選択状態へ')
-						classList.add('selected')
-						span.style.color = selected4Hatsuwatag
-					}
-					// このspanが元々selectedなら、
-					else{
-						Array.from(selectedSpans).forEach(spn => {
-							spn.classList.remove('selected');
-							spn.style.color = ''
-						});
-					}
-					var style = window.getComputedStyle(span);		
-					
-					// TODO:選択spanの数が1個以上なら、ボタン表示にする
 
-
-					console.groupEnd()
-	
+				// ダブルクリックでコメントを追加
+				span.addEventListener('contextmenu', () => {
+					event.preventDefault()
+					let globalTagID = span.getAttribute('globalTagID')
+					getCommentObjs(commentObjs)
+					addCommentObj(globalTagID)
+					console.log(commentObjs)
 				})
-
-        // ダブルクリックでコメントを追加
-        span.addEventListener("contextmenu", () => {
-          event.preventDefault()
-          let globalTagID = span.getAttribute('globalTagID')
-          getCommentObjs(commentObjs)
-          addCommentObj(globalTagID)
-          console.log(commentObjs)
-        })
-
 			}
 		}
 	}
 	// IDラベルの選択
 	for (let [i, label] of idLabels.entries()) {
 		// マウスオン
-		label.addEventListener('mouseover', () => {			
-			label.style.backgroundColor = mouseon4Label															
+		label.addEventListener('mouseover', () => {
+			label.style.backgroundColor = mouseon4Label
 			let rowID = label.getAttribute('rowID')
 			let row = rowElems[rowID]
 			row.style.backgroundColor = mouseon4HatsuwarowColor
 		})
 		// マウスリーブ
 		label.addEventListener('mouseout', () => {
-			label.style.backgroundColor = 'transparent'																									
+			label.style.backgroundColor = 'transparent'
 			let rowID = label.getAttribute('rowID')
-			let row = rowElems[rowID]									
+			let row = rowElems[rowID]
 			let isSelectedRow = row.getAttribute('selected')
-			if(isSelectedRow){
+			if (isSelectedRow) {
 				row.style.backgroundColor = selectedHatsuwarowColor
-			}else{
+			} else {
 				row.style.backgroundColor = 'transparent'
 			}
 		})
@@ -749,52 +807,57 @@ async function addMouseEvents() {
 			console.log('clickされたIDラベル: ', label)
 			// let rowID = label.getAttribute('rowID')
 			// console.log('rowID: ', rowID)
-			// const labelBox = 			
+			// const labelBox =
 			// このrowIDのlabelBoxに矢印を追加する
-			// const x = speakerLabels[i].getBoundingClientRect().left						
+			// const x = speakerLabels[i].getBoundingClientRect().left
 			// console.log('xxx: ', xxx)
 			console.log('IDラベルのindex: ', i)
-			// const y = i * fontSize * lineHeightRatio					
-			const y = 0//NOTE:yは、この行（label）のローカルで良い。addArrow参照。			
-			const arrows = label.querySelectorAll(`.arrow`);
+			// const y = i * fontSize * lineHeightRatio
+			const y = 0 //NOTE:yは、この行（label）のローカルで良い。addArrow参照。
+			const arrows = label.querySelectorAll(`.arrow`)
 			console.log('arrows: ', arrows)
-			if(arrows.length > 0){				
-				deleteArrow(label, arrows)				
-			}else{
-				addArrow(document, label, fontSize * 1.5, 15, y)				
-			}								
+			if (arrows.length > 0) {
+				deleteArrow(label, arrows)
+			} else {
+				addArrow(document, label, fontSize * 1.5, 15, y)
+			}
 		})
 	}
 	// speakerラベルの選択
 	for (let label of speakerLabels) {
 		// マウスオン
 		label.addEventListener('mouseover', () => {
-			label.style.backgroundColor = mouseon4Label															
+			label.style.backgroundColor = mouseon4Label
 			let rowID = label.getAttribute('rowID')
 			let row = rowElems[rowID]
 			row.style.backgroundColor = mouseon4HatsuwarowColor
 		})
 		// マウスリーブ
 		label.addEventListener('mouseout', () => {
-			label.style.backgroundColor = 'transparent'																									
+			label.style.backgroundColor = 'transparent'
 			let rowID = label.getAttribute('rowID')
 			let row = rowElems[rowID]
 			let isSelectedRow = row.getAttribute('selected')
-			if(isSelectedRow){
+			if (isSelectedRow) {
 				row.style.backgroundColor = selectedHatsuwarowColor
-			}else{
+			} else {
 				row.style.backgroundColor = 'transparent'
 			}
 		})
-		// クリック
+		// クリック（発話選択して、再生時間セット）
 		label.addEventListener('click', () => {
 			console.log('clickされたspakerラベル: ', label)
-			let classList = label.className
-			let globalTagID = label.getAttribute('globalTagID')
-			// TODO:
-			// からのsplitなどで使う。何度もやるならそれまわりのutil関数つくってもよいのかも。
-			// getGroupOfThisSpan()とか
-			console.log('classList: ', classList)			
+			// labelの「hatsuwaID」属性値を取得し、
+			const hatsuwaID = label.getAttribute('hatsuwaID')
+			const hatsuwaID_zeroIndex = hatsuwaID - 1
+			// console.log('hatsuwaID_zeroIndex: ', hatsuwaID_zeroIndex)
+			// hatsuwaObjsからそれの.startと.endをそれぞれ取得し、セット（idに-1してる）
+			// console.log('選択した発話obj: ', hatsuwaObjs[hatsuwaID_zeroIndex])
+			video.startTime = hatsuwaObjs[hatsuwaID_zeroIndex].start
+			// console.log('video.startTime: ', video.startTime)
+			video.currentTime = video.startTime
+			video.endTime = hatsuwaObjs[hatsuwaID_zeroIndex].end
+			// console.log('video.endTime: ', video.endTime)
 		})
 	}
 }
@@ -802,49 +865,44 @@ async function addMouseEvents() {
 // エリアのサイズ調整
 async function resize() {
 	console.groupCollapsed('リサイズ関数()')
-	console.log('window.innerWidth: ', window.innerWidth)	
+	console.log('window.innerWidth: ', window.innerWidth)
 
 	// NOTE:外側の要素からサイズ決定していく（データによらないサイズ情報。）
-	
+
 	// (0) ウィンドウサイズ変更
 	windowSize.w = window.innerWidth
 	windowSize.h = window.innerHeight
 	console.log('windowSize: ', windowSize)
 
-	
-
-	
 	// (1) transcriptAreaとその子scrollableDivAreaのサイズ（ウィンドウサイズに応じて）
 	transcriptArea.style.display = 'block'
 	transcriptArea.style.width = num2Px(window.innerWidth)
 	transcriptAreaStyle = transcriptArea.getBoundingClientRect()
 	scrollableDivArea.style.margin = num2Px(scrollableDivAreaMargin)
-	scrollableDivArea.style.width = num2Px(window.innerWidth - 2*scrollableDivAreaMargin) //-20はtranscriptAreaのm
-	scrollableDivAreaStyle = scrollableDivArea.getBoundingClientRect()	
-
+	scrollableDivArea.style.width = num2Px(window.innerWidth - 2 * scrollableDivAreaMargin) //-20はtranscriptAreaのm
+	scrollableDivAreaStyle = scrollableDivArea.getBoundingClientRect()
 
 	// (2) dataAreaサイズを
-	dataArea.style.margin = num2Px(dataAreaMargin)	
-	dataArea.style.width = num2Px(scrollableDivAreaStyle.width - 2*dataAreaMargin)
+	dataArea.style.margin = num2Px(dataAreaMargin)
+	dataArea.style.width = num2Px(scrollableDivAreaStyle.width - 2 * dataAreaMargin)
 	dataAreaStyle = dataArea.getBoundingClientRect()
 	// console.log('dataAreaStyle: ', dataAreaStyle)
-	// console.log('dataAreastyle.width: ', dataArea.style.width)		
+	// console.log('dataAreastyle.width: ', dataArea.style.width)
 	// console.log('dataBoxX: ', dataBoxX)
-		
-	// (3) headerAreaサイズ	
+
+	// (3) headerAreaサイズ
 	headerArea.style.margin = num2Px(dataAreaMargin)
 	headerArea.style.width = num2Px(dataAreaStyle.width)
 	headerAreaStyle = headerArea.getBoundingClientRect()
-	// console.log('scrollableDivAreaStyle.margin: ', scrollableDivArea.style.padding)					
+	// console.log('scrollableDivAreaStyle.margin: ', scrollableDivArea.style.padding)
 
 	// ビデオをリサイズ（scrollableDivAreaにハバをあわせる）
 	const videoContainer = document.getElementById('videoContainer')
 	// videoContainer.style.width = num2Px(window.innerWidth)
 	// videoContainer.style.height = num2Px(window.innerWidth / videoAspectRatio)
-	
+
 	videoContainer.style.width = num2Px(scrollableDivAreaStyle.width)
 	videoContainer.style.height = num2Px(scrollableDivAreaStyle.width / videoAspectRatio)
-
 
 	console.groupEnd()
 }
@@ -855,28 +913,26 @@ async function reload() {
 	// // dataAreaのすべてのDOM削除
 	// while (dataArea.firstChild) {
 	// 	dataArea.removeChild(dataArea.firstChild)
-	// }	
+	// }
 	// 非同期ver
 	while (dataArea.firstChild) {
 		dataArea.firstChild.remove()
 		await new Promise((resolve) => setTimeout(resolve, 0)) // 非同期処理の待機
 	}
-	
-	// 初期化		
+
+	// 初期化
 	hatsuwaTagSpans = []
 	idLabels = []
 	speakerLabels = []
 	rowElems = []
 }
 
-
 // イベントの定義
-window.addEventListener('DOMContentLoaded', () => {	    
-	// const ddarea = document.getElementById('ddarea')	
+window.addEventListener('DOMContentLoaded', () => {
+	// ファイルのドラッグ&ドロップ
 	const ddareas = document.getElementsByClassName('ddarea')
 	console.log('ddareas: ', ddareas)
-	Array.from(ddareas).forEach(ddarea=>{
-		// ドラッグされたデータが有効かどうかチェック
+	Array.from(ddareas).forEach((ddarea) => {
 		const isValid = (e) => e.dataTransfer.types.indexOf('Files') >= 0
 		const ddEvent = {
 			dragover: (e) => {
@@ -907,15 +963,13 @@ window.addEventListener('DOMContentLoaded', () => {
 			drop: (e) => {
 				e.preventDefault() // 既定の処理をさせない
 				e.stopPropagation() // イベント伝播を止める
-				const files = e.dataTransfer.files			
-				const fileType = files[0].type				
+				const files = e.dataTransfer.files
+				const fileType = files[0].type
 				if (fileType == 'text/plain') {
 					// console.log('.txtファイルだよ')
-					main(files[0])				
-				}
-				else if (fileType.startsWith('video/')) {
+					main(files[0])
+				} else if (fileType.startsWith('video/')) {
 					loadVideo(files[0])
-					
 				}
 				ddarea.classList.remove('ddefect')
 			},
@@ -923,75 +977,114 @@ window.addEventListener('DOMContentLoaded', () => {
 		Object.keys(ddEvent).forEach((e) => {
 			ddarea.addEventListener(e, ddEvent[e])
 			document.body.addEventListener(e, ddEvent[e])
-		})	
-
+		})
 	})
-	
 
-	// 設定メニュー開く
-	const settingsIcon = document.getElementById('settings-icon');
-    if (settingsIcon) {
-        settingsIcon.addEventListener('click', function(){
-			const menu = document.getElementById('settings-menu');
-        	menu.style.display = 'block'
-		});
-    }
-	// 設定メニュー閉じる
-	const settingsMenu = document.getElementById('settings-menu');
-	document.addEventListener('click', function(e) {
-        // クリックがメニュー内またはアイコン上でなければメニューを閉じる
-        if (!settingsMenu.contains(e.target) && e.target !== settingsIcon) {
-            settingsMenu.style.display = 'none';
+	// DEBUG:
+	// 一行あたり文字数の設定
+	const charNumPerRowInputField = document.getElementById('charNumPerRow')
+	const charNumChangeConfirmButton = document.getElementById('charNumChange')
+	charNumChangeConfirmButton.addEventListener('click', handleCharNumInput)
+	function handleCharNumInput(event) {
+		const inputValue = charNumPerRowInputField.value
+
+		// Check if the input is a valid number
+		if (!isNaN(inputValue) && inputValue.trim() !== '') {
+			console.log(`The entered number is: ${inputValue}`)
+			// Call your custom function here
+			// drawHatsuwa(hatsuwaGroups, fontSize, inputValue)
+			main(null, null, inputValue)
+		} else {
+			console.log('Please enter a valid number')
+			alert('Please enter a valid number')
+		}
+	}
+	// DEBUG:
+
+	// フォントサイズの設定
+	const fontSizeSelector = document.getElementById('fontSizeSelector')
+	fontSizeSelector.addEventListener('change', () => {
+		console.log('フォントサイズの変更')
+		fontSize = fontSizeSelector.value
+		main(null, fontSize, null)
+	})
+
+	// フォントの設定
+	const fontSelector = document.getElementById('fontSelector')
+	fontSelector.addEventListener('change', () => {
+		const selectedFont = fontSelector.value
+		if (selectedFont === 'gothic') {
+			transcriptArea.style.fontFamily = 'Arial, sans-serif'
+		} else if (selectedFont === 'mincho') {
+			transcriptArea.style.fontFamily = '"Times New Roman", serif'
+		}else if (selectedFont === 'monospace') {
+            transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace';
         }
-    });
-	
+	})
+
+	// // 設定メニュー開く
+	// const settingsIcon = document.getElementById('settings-icon')
+	// if (settingsIcon) {
+	// 	settingsIcon.addEventListener('click', function () {
+	// 		const menu = document.getElementById('settings-menu')
+	// 		menu.style.display = 'block'
+	// 	})
+	// }
+	// // 設定メニュー閉じる
+	// const settingsMenu = document.getElementById('settings-menu')
+	// document.addEventListener('click', function (e) {
+	// 	// クリックがメニュー内またはアイコン上でなければメニューを閉じる
+	// 	if (!settingsMenu.contains(e.target) && e.target !== settingsIcon) {
+	// 		settingsMenu.style.display = 'none'
+	// 	}
+	// })
+
 	// 発話グループ水平線をトグル@設定メニュー
-	// const toggleLineCheckbox = document.getElementById('toggle-line');	
-	// toggleLineCheckbox.addEventListener('change', toggleLine) 
+	// const toggleLineCheckbox = document.getElementById('toggle-line');
+	// toggleLineCheckbox.addEventListener('change', toggleLine)
 
 	// 開発用表示＠設定メニュー
-	// const toggleDevCheckbox = document.getElementById('toggle-dev');	
+	// const toggleDevCheckbox = document.getElementById('toggle-dev');
 	// toggleDevCheckbox.addEventListener('change', toggleDev)
 
 	// プチ設定エリア
 	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
-	releaseSelectionButton.addEventListener('click', ()=>{		
+	releaseSelectionButton.addEventListener('click', () => {
 		// ボタン非表示
 		// releaseSelectionButton.style.display = 'none'
 
 		// spanの選択解除
-		let selectedSpans = document.getElementsByClassName('selected')								
-		// このspanが元々selectedなら、		
-		Array.from(selectedSpans).forEach(spn => {
-			spn.classList.remove('selected');
+		let selectedSpans = document.getElementsByClassName('selected')
+		// このspanが元々selectedなら、
+		Array.from(selectedSpans).forEach((spn) => {
+			spn.classList.remove('selected')
 			spn.style.color = ''
-		});
+		})
+		// 選択開始タグと終了タグを解除
+		;(selectionStartTag = null), (selectionEndTag = null)
 
 		// rowの選択解除
-		rowElems.forEach((row,i)=>{			
+		rowElems.forEach((row, i) => {
 			row.removeAttribute('selected')
-			row.style.backgroundColor = 'transparent'			
-		})			
+			row.style.backgroundColor = 'transparent'
+		})
 
-		// ビデオをもどす
+		// ビデオ再生範囲を初期状態へ
 		video.startTime = 0
-		video.currentTime = video.startTime
-		video.endTime = video.duration		
+		video.endTime = video.duration
 		
 		// .classList.contains('selected')
-		// rele.classList.remove('selected');			
-		
+		// rele.classList.remove('selected');
 	})
-	
 })
 
 // ウィンドウサイズ変更イベント
 window.addEventListener('resize', () => {
 	clearTimeout(resizeTimer)
 	resizeTimer = setTimeout(function () {
-		console.log('ウィンドウがリサイズされました')		
+		console.log('ウィンドウがリサイズされました')
 		// DEBUG:20240819：fixモードだと、リサイズに従わない
-		main()
+		// main()
 		// DEBUG:20240819
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
