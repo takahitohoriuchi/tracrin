@@ -1,6 +1,4 @@
 // SECTION:【import】
-// import { drawComment, outputCommentFile } from './modules/commentUtils.js'
-import { addCommentObj, getCommentObjs } from './modules/commentUtils.js'
 import {
 	addArrow,
 	deleteArrow,
