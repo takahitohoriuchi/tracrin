@@ -551,6 +551,7 @@ function setCategoryList() {
         categoryNameCell.textContent = newCategoryName
         category.categoryName = newCategoryName
         editCategorySelectOptions(currentCategoryName, newCategoryName)
+        currentCategory = newCategoryName
       })
 
       input.addEventListener('keydown', function(e) {
