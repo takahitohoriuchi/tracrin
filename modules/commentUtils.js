@@ -46,9 +46,13 @@ let zIndexCounter = 2
 let isEditingGlobal = false // コメントに対応するspanタグ要素を編集状態を制御、わかりやすい変数名に変更予定
 let currentCategory = categories[0].categoryName
 
-export function getCommentObjs(_commentObjs){
-  commentObjs = _commentObjs
-  getSpans()
+// export function getCommentObjs(_commentObjs){
+//   commentObjs = _commentObjs
+//   getSpans()
+// }
+
+export function pushSpans(){
+  spans = document.querySelectorAll('[globalTagID]')
 }
 
 export function pushHatsuwaGroups(_hatsuwaGroups){
@@ -56,13 +60,18 @@ export function pushHatsuwaGroups(_hatsuwaGroups){
   console.log(hatsuwaGroups[5][0]['end'])
 }
 
-function getSpans() {
-  spans = document.querySelectorAll('[globalTagID]')
+// function getSpans() {
+//   spans = document.querySelectorAll('[globalTagID]')
+// }
+
+export function addComment(globalTagID){
+  const commentObj = addCommentObj(globalTagID)
+  addCommentSticker(commentObj)
 }
 
-export function addCommentObj(globalTagID){
-  let commentID = commentObjs.length
-  let commentObj = {
+function addCommentObj(globalTagID){
+  const commentID = commentObjs.length
+  const commentObj = {
     linkedGlobalTagIDs: [ globalTagID ],
     comment: "",
     category: currentCategory,
@@ -72,9 +81,9 @@ export function addCommentObj(globalTagID){
     commentID: commentID
   }
 
-  addCommentSticker(commentObj)
-
   commentObjs.push(commentObj)
+
+  return commentObj
 }
 
 /**

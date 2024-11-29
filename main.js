@@ -15,7 +15,7 @@ import {
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
-import { addCommentObj, getCommentObjs, pushHatsuwaGroups } from './modules/commentUtils.js'
+import { addComment, pushSpans, pushHatsuwaGroups } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -45,7 +45,7 @@ let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
 
-let commentObjs = []
+// let commentObjs = []
 
 let windowSize = {
 	w: 0,
@@ -772,9 +772,10 @@ async function addMouseEvents() {
 				span.addEventListener('contextmenu', () => {
 					event.preventDefault()
 					let globalTagID = span.getAttribute('globalTagID')
-					getCommentObjs(commentObjs)
-					addCommentObj(globalTagID)
-					console.log(commentObjs)
+					// getCommentObjs(commentObjs)
+          pushSpans()
+					addComment(globalTagID)
+					// console.log(commentObjs)
 				})
 			}
 		}
