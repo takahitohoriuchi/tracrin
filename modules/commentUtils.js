@@ -134,6 +134,14 @@ function addCommentSticker(commentObj, xPosition, yPosition) {
 
   const fieldElement = document.createElement('div')
   fieldElement.className = 'field'
+  if ( commentObj.isShown === 'false' ) {
+    //TODO: コメントファイル入力時にtrue/falseを文字列型でなくbool型で取得するよう修正、分岐の記述をシンプルにする
+    fieldElement.style.display = 'none'
+    headerComment.textContent = commentObj.comment
+  } else {
+    fieldElement.style.display = 'block'
+    headerComment.textContent = ""
+  }
 
   const commentInput = document.createElement('textarea')
   commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
