@@ -719,7 +719,7 @@ function outputCommentFile(commentObjs, fileName) {
 function readCommentFile(tsvText) {
   const lines = tsvText.split('\n');
   const headers = lines[0].split('\t').map(header => header.trim());
-  let existingCategories = []
+  let existingCategories = categories.map(category => category.categoryName)
 
   return lines.slice(1).map(line => {
     const data = line.split('\t').map((cell, index) => {
@@ -736,17 +736,34 @@ function readCommentFile(tsvText) {
       obj['isSelected'] = false
       obj['isDeleted'] = false
       obj['commentID'] = commentObjs.length
-      if (header === 'category' & !existingCategories.includes(data[index])) {
-        categories.push({
-          categoryName: data[index],
-          categoryID: 'category' + categories.length,
-          color: colorOptions[categories.length % 6].colorValue
-        })
-        existingCategories.push(data[index])
+      if (header === 'category') {
+        if (!existingCategories.includes(data[index])) {
+          const newCategory = {
+            categoryName: data[index],
+            categoryID: 'category' + categories.length,
+            color: colorOptions[categories.length % 6].colorValue
+          }
+          categories.push(newCategory)
+          existingCategories.push(newCategory.categoryName)
+          console.log('categories: ', categories)
+          console.log('existingCategories: ', existingCategories)
+        } else {
+          console.log('categories!: ', categories)
+          console.log('existingCategories!: ', existingCategories)
+          // const newCategory = {
+          //   categoryName: data[index] + '_2',
+          //   categoryID: 'category' + categories.length,
+          //   color: colorOptions[categories.length % 6].colorValue
+          // }
+          // categories.push(newCategory)
+          // existingCategories.push(newCategory.categoryName)
+          // console.log('categories: ', categories)
+          // console.log('existingCategories: ', existingCategories)
+        }
       }
     })
     setCategoryList()
-    getSpans()
+    // getSpans()
     commentObjs.push(obj)
     addCommentSticker(obj, obj['xPosition'], obj['yPosition'])
   })
