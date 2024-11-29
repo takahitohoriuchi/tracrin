@@ -374,13 +374,90 @@ document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('
   }
 })
 
-document.getElementById("outputCommentFileButton").addEventListener('click', function() {
-  outputCommentFile(commentObjs)
-})
+// document.getElementById("outputCommentFileButton").addEventListener('click', function() {
+//   outputCommentFile(commentObjs)
+// })
 
 document.getElementById('inputCommentFileButton').addEventListener('click', function() {
   document.getElementById('commentFileInput').click()
 })
+
+document.addEventListener('DOMContentLoaded', () => {
+  // ボタンを作成して追加
+  const openModalBtn = document.getElementById("outputCommentFileButton");
+  // openModalBtn.id = 'openModal';
+  openModalBtn.textContent = 'ファイルを出力';
+  // document.body.appendChild(openModalBtn);
+
+  // モーダルの要素を作成
+  const modal = document.createElement('div');
+  modal.id = 'fileModal';
+  modal.style.display = 'none'; // 初期は非表示
+  modal.style.position = 'fixed';
+  modal.style.top = '0';
+  modal.style.left = '0';
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  // modal.style.display = 'flex';
+  modal.style.justifyContent = 'center';
+  modal.style.alignItems = 'center';
+
+  // モーダルの中身を定義
+  const modalContent = document.createElement('div');
+  modalContent.style.background = 'white';
+  modalContent.style.padding = '20px';
+  modalContent.style.borderRadius = '5px';
+  modalContent.style.textAlign = 'center';
+
+  modalContent.innerHTML = `
+    <h3>ファイルをダウンロード</h3>
+    <label>
+      ファイル名: <input type="text" id="fileName" placeholder="example" />
+    </label>
+    <br>
+    <label>
+      ファイル形式: 
+      <select id="fileType">
+        <option value="txt">.txt</option>
+        <option value="json">.json</option>
+        <option value="csv">.csv</option>
+      </select>
+    </label>
+    <br>
+    <button id="downloadFile">ダウンロード</button>
+    <button id="closeModal">キャンセル</button>
+  `;
+
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+
+  // モーダルの操作イベントを設定
+  openModalBtn.addEventListener('click', () => {
+    modal.style.display = 'flex'; // モーダルを表示
+  });
+
+  modalContent.querySelector('#closeModal').addEventListener('click', () => {
+    modal.style.display = 'none'; // モーダルを非表示
+  });
+
+  modalContent.querySelector('#downloadFile').addEventListener('click', () => {
+    const fileName = document.getElementById('fileName').value || 'default';
+    const fileType = document.getElementById('fileType').value;
+
+    // ダミーデータを生成
+    const fileContent = 'これはダミーデータです。';
+
+    // Blobを生成してダウンロードをトリガー
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${fileName}.${fileType}`;
+    link.click();
+
+    modal.style.display = 'none'; // モーダルを閉じる
+  });
+});
 
 setCategoryList()
 
