@@ -439,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (fileType === 'tsv') {
             outputCommentFile(commentObjs, fileName)
           } else if (fileType === 'elan') {
-            alert(`ファイル名: ${fileName}, ファイル形式: ${fileType}`);
+            outputCommentFileForElan(commentObjs, fileName)
           } else {
             alert('無効な形式が選択されました。');
           }
@@ -454,6 +454,60 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+function outputCommentFileForElan() {
+  let xmlData = `
+  <?xml version="1.0" encoding="UTF-8"?>
+  <ColTimeList xmlns="http://mpi.nl/tools/coltime"
+    xmlns:NS1="http://www.w3.org/2001/XMLSchema-instance" NS1:schemaLocation="http://mpi.nl/tools/coltime http://www.mpi.nl/tools/coltime/schema.xsd">
+    `.trim()
+  for (const commentObj of commentObjs) {
+    if (commentObj.isDeleted === false) {
+      const linkedGlobalTagIDs = commentObj.linkedGlobalTagIDs
+      const comment = commentObj.comment
+      const category = commentObj.category
+
+      linkedGlobalTagIDs.forEach(linkedGlobalTagID => {
+        const [ startTime, endTime ] = getHatsuwaTime(linkedGlobalTagID)
+        const xmlItem = `
+        <ColTime ColTimeMessageID="cc518108-8583-4bef-8a27-acd4905c3d05" URL="">
+          <Metadata>
+            <Initials/>
+            <ThreadID/>
+            <Sender/>
+            <Recipient/>
+            <CreationDate>2017-05-08T06:04:25.301Z</CreationDate>
+            <ModificationDate>2017-05-08T06:04:25.301Z</ModificationDate>
+            <Category>unknown</Category>
+            <Status>unknown</Status>
+          </Metadata>
+          <AnnotationFile URL="" type="EAF">urn:nl-mpi-tools-elan-eaf:bcb79885-1575-46be-9e36-2c24a5580111#t=${startTime}/${endTime};tier=default</AnnotationFile>
+          <Message>${category}:${comment}
+          </Message>
+        </ColTime>
+        `.trim()
+        xmlData += xmlItem
+      })
+    }
+  }
+
+  // 1. XMLデータの生成
+  xmlData += `
+  </ColTimeList>
+  `.trim();
+
+  // 2. Blobを使用してファイルを生成
+  const blob = new Blob([xmlData], { type: "application/xml" });
+
+  // 3. ダウンロードリンクを生成
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "data.eafcomment"; // ダウンロードされるファイル名
+  link.click();
+
+  // 4. 生成したURLを解放
+  URL.revokeObjectURL(url);
+}
 
 
 setCategoryList()
