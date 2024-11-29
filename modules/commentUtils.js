@@ -266,6 +266,14 @@ function addCommentSticker(commentObj, xPosition, yPosition) {
   })
 
   commentStickerElement.addEventListener('mouseover', () => {
+    const index = categories.find(_category => _category.categoryName === category)
+    if (index) {
+      var color = index.color
+    }
+    const colorIndex = colorOptions.find(colorOption => colorOption.colorValue === color)
+    if (colorIndex) {
+      var colorCode = colorIndex.colorCodeLight
+    }
     linkedSpans.forEach(function(linkedSpan) {
       linkedSpan.style.backgroundColor = colorCode
     })
