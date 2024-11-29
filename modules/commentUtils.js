@@ -370,7 +370,7 @@ document.getElementById('showOrHideSelectedCommentsButton').addEventListener('cl
 document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('click', function() {
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
-    outputCommentFile(selectedCommentObjs)
+    outputCommentFile(selectedCommentObjs, 'no_name')
   }
 })
 
@@ -383,81 +383,62 @@ document.getElementById('inputCommentFileButton').addEventListener('click', func
 })
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ボタンを作成して追加
-  const openModalBtn = document.getElementById("outputCommentFileButton");
-  // openModalBtn.id = 'openModal';
-  openModalBtn.textContent = 'ファイルを出力';
-  // document.body.appendChild(openModalBtn);
+  let popup; // ポップアップのインスタンスを保持
 
-  // モーダルの要素を作成
-  const modal = document.createElement('div');
-  modal.id = 'fileModal';
-  modal.style.display = 'none'; // 初期は非表示
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.width = '100%';
-  modal.style.height = '100%';
-  modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  // modal.style.display = 'flex';
-  modal.style.justifyContent = 'center';
-  modal.style.alignItems = 'center';
+  const openPopupBtn = document.getElementById("outputCommentFileButton");
 
-  // モーダルの中身を定義
-  const modalContent = document.createElement('div');
-  modalContent.style.background = 'white';
-  modalContent.style.padding = '20px';
-  modalContent.style.borderRadius = '5px';
-  modalContent.style.textAlign = 'center';
+  openPopupBtn.addEventListener('click', () => {
+    if (!popup) {
+      // 初回クリック時にポップアップを生成
+      const content = document.createElement('p');
+      content.innerHTML = `
+        <label>
+          ファイル名: <input type="text" id="fileName" value="comment" />
+        </label>
+        <br>
+        <label>
+          ファイル形式: 
+          <select id="fileType">
+            <option value="tsv">tracrin(.tsv)</option>
+            <option value="elan">elan(.eafcomment)</option>
+          </select>
+        </label>
+      `;
 
-  modalContent.innerHTML = `
-    <h3>ファイルをダウンロード</h3>
-    <label>
-      ファイル名: <input type="text" id="fileName" placeholder="example" />
-    </label>
-    <br>
-    <label>
-      ファイル形式: 
-      <select id="fileType">
-        <option value="txt">.txt</option>
-        <option value="json">.json</option>
-        <option value="csv">.csv</option>
-      </select>
-    </label>
-    <br>
-    <button id="downloadFile">ダウンロード</button>
-    <button id="closeModal">キャンセル</button>
-  `;
+      // ポップアップを作成
+      popup = new Popup(
+        'コメントファイルを出力',
+        content,
+        () => {
+          // コールバック内で最新の値を取得
+          const fileNameInput = document.getElementById('fileName');
+          const fileTypeSelect = document.getElementById('fileType');
 
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
+          let fileName = fileNameInput.value;
+          if (!fileName) {
+            fileName = 'comment'
+          }
+          const fileType = fileTypeSelect.value;
 
-  // モーダルの操作イベントを設定
-  openModalBtn.addEventListener('click', () => {
-    modal.style.display = 'flex'; // モーダルを表示
-  });
+          if (fileType === 'tsv') {
+            outputCommentFile(commentObjs, fileName)
+          } else if (fileType === 'elan') {
+            alert(`ファイル名: ${fileName}, ファイル形式: ${fileType}`);
+          } else {
+            alert('無効な形式が選択されました。');
+          }
+        }
+      );
 
-  modalContent.querySelector('#closeModal').addEventListener('click', () => {
-    modal.style.display = 'none'; // モーダルを非表示
-  });
+      // 初期生成後、ポップアップを保持して再利用
+    }
 
-  modalContent.querySelector('#downloadFile').addEventListener('click', () => {
-    const fileName = document.getElementById('fileName').value || 'default';
-    const fileType = document.getElementById('fileType').value;
-
-    // ダミーデータを生成
-    const fileContent = 'これはダミーデータです。';
-
-    // Blobを生成してダウンロードをトリガー
-    const blob = new Blob([fileContent], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${fileName}.${fileType}`;
-    link.click();
-
-    modal.style.display = 'none'; // モーダルを閉じる
+    // ポップアップを表示
+    popup.show();
   });
 });
+
+
 
 setCategoryList()
 
@@ -472,7 +453,7 @@ function setCategoryList() {
   tableHeaderTexts.forEach(function(tableHeaderText) {
     const tableHeaderColumn = document.createElement('th')
     tableHeaderColumn.textContent = tableHeaderText
-    tableHeaderRow.appendChild(tableHeaderColumn) 
+    tableHeaderRow.appendChild(tableHeaderColumn)
   })
   categoryTable.appendChild(tableHeaderRow)
   categories.forEach(function(category) {
@@ -678,7 +659,7 @@ function selectCategoryComments(category) {
   }
 }
 
-function outputCommentFile(commentObjs) {
+function outputCommentFile(commentObjs, fileName) {
   // オブジェクトのキーからヘッダーを生成
   // const headers = Object.keys(commentObjs[0])
   const headers = [
@@ -728,7 +709,7 @@ function outputCommentFile(commentObjs) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'export.tsv'; // 拡張子を.tsvに変更
+  link.download = fileName + '.tsv'; // 拡張子を.tsvに変更
   link.click();
 
   // 生成したURLを解放
@@ -804,4 +785,91 @@ function getCommentStickerPosition(commentID){
   const yPosition = commentStickerElement.offsetTop + parent.scrollTop
 
   return [ xPosition, yPosition ]
+}
+
+class Popup {
+  constructor(headerTitle, contentElement, onConfirm) {
+    // モーダル要素を作成
+    this.modal = document.createElement('div');
+    this.modal.style.display = 'none';
+    this.modal.style.position = 'fixed';
+    this.modal.style.top = '0';
+    this.modal.style.left = '0';
+    this.modal.style.width = '100%';
+    this.modal.style.height = '100%';
+    this.modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    this.modal.style.display = 'flex';
+    this.modal.style.justifyContent = 'center';
+    this.modal.style.alignItems = 'center';
+    this.modal.style.zIndex = zIndexCounter
+
+    // モーダルの中身を作成
+    const modalContent = document.createElement('div');
+    modalContent.style.background = 'white';
+    modalContent.style.padding = '20px';
+    modalContent.style.borderRadius = '5px';
+    modalContent.style.textAlign = 'center';
+    modalContent.style.minWidth = '300px';
+    modalContent.style.zIndex = zIndexCounter + 1
+
+    zIndexCounter += 2
+
+    // ヘッダー部分を作成
+    const header = document.createElement('h3');
+    header.textContent = headerTitle;
+
+    // 内容部分を挿入
+    const content = document.createElement('div');
+    content.appendChild(contentElement);
+
+    // ボタン部分を作成
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.marginTop = '20px';
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'space-around';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'キャンセル';
+    cancelButton.addEventListener('click', () => this.hide());
+
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = '実行';
+    confirmButton.addEventListener('click', () => {
+      if (typeof onConfirm === 'function') {
+        onConfirm();
+      }
+      this.hide();
+    });
+
+    // ボタンを追加
+    buttonContainer.appendChild(cancelButton);
+    buttonContainer.appendChild(confirmButton);
+
+    // モーダルの中身を結合
+    modalContent.appendChild(header);
+    modalContent.appendChild(content);
+    modalContent.appendChild(buttonContainer);
+    this.modal.appendChild(modalContent);
+
+    // モーダル外をクリックしたときに閉じる
+    this.modal.addEventListener('click', (event) => {
+      // クリックした箇所がmodalContentではない場合に閉じる
+      if (event.target === this.modal) {
+        this.hide();
+      }
+    });
+
+    // DOMに追加
+    document.body.appendChild(this.modal);
+  }
+
+  // モーダルを表示
+  show() {
+    this.modal.style.display = 'flex';
+  }
+
+  // モーダルを非表示
+  hide() {
+    this.modal.style.display = 'none';
+  }
 }
