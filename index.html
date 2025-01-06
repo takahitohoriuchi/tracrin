@@ -6,107 +6,64 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="./style.css" />
 		<title>tracrin--2.5.0</title>
+    <style>
+      /* ヘッダーのスタイリング */
+      .header {
+            position: fixed; /* ページの上部に固定 */
+            top: 0; /* 上端から0pxの位置に配置 */
+            left: 0; /* 左端から0pxの位置に配置 */
+            width: 100%; /* 画面の全幅に広がる */
+            height: 60px; /* 高さは60px */
+            background: linear-gradient(to right, #eff699, #75e477, #eff699, #eff699, #7ffaa4); /* 背景色の設定 */
+            color: black; /* 文字色は黒 */
+            line-height: 60px; /* 文字を中央に配置 */
+            text-align: center; /* テキストを中央揃え */
+            z-index: 1000; /* 他の要素より前面に表示 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* 影を追加 */
+            display: flex;
+            justify-content: space-between; /* 左右の要素を端に寄せる */
+            padding: 0 10px;
+            box-sizing: border-box; /* パディングとボーダーを幅に含める */
+        }
+
+      /* ページのコンテンツにパディングを追加して、ヘッダーと重ならないようにする */
+      body {
+          padding-top: 60px; /* ヘッダーの高さと同じ分のパディングを追加 */
+      }
+
+      .left-group {
+            display: flex; /* 左側のグループもフレックスコンテナとして設定 */
+        }
+
+      #content {
+          overflow: auto; /* スクロールバーを適宜表示 */
+          height: auto;  /* 高さを内容に合わせる */
+          min-height: 100vh; /* 最低でもビューポートの高さ */
+      }
+  </style>
 	</head>
 	<body>
-		<!-- 設定メニュー -->
-		<nav>
-			<div>tracrin2.5.0</div>
-			<!-- <button id="buttonOutputComment">コメントファイルを出力</button> -->
-			<button style="display: none" id="buttonOutputComment">コメントファイルを出力</button>
-			<!-- 設定アイコン -->
-			<!-- <div id="settings-icon">⚙️</div>			 -->
-			<!-- 設定メニュー（デフォルトでは非表示） -->
-			<!-- <div id="settings-menu" style="display: none;">
-				<ul style="list-style: none">
-					<li>
-						<label>
-							<input type="checkbox" id="toggle-line">
-							発話グループごとに水平線
-						</label>
-					</li>
-					<li>
-						<label>
-							<input type="checkbox" id="toggle-dev">
-							開発用表示モード
-						</label>
-					</li>
-				</ul>				
-				
-			</div> -->
-		</nav>
-		<div class="ddarea">
-			<p>Drag & Drop your video on me!</p>
-		</div>
-		<div class="ddarea">
-			<p>Drag & Drop your file(.txt) on me!</p>
-		</div>
-		<!-- 動画エリア -->
-		<!-- <div style="display: none" id="videoContainer">			
-			<video id="myVideo" controls>								
-			</video>
-		</div> -->
-		<div id="videoContainer">
-			<video id="myVideo" controls></video>
-		</div>
-
-		<!-- TODO:プチ設定エリア -->
-		<div id="editContainer">
-			<h6>設定</h6>
-			<label>
-				<button id="releaseSelectionButton" class="favorite styled" type="button">発話の部分選択を解除</button>
-				<button id="editCategoryButton">カテゴリを編集</button>
-				<button id="showOrHideCommentOptionButton">コメントオプション欄の表示/非表示を切り替え</button>
-				<button id="deleteSelectedCommentsButton">選択したコメントを削除</button>
-				<button id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</button>
-				<button id="outputSelectedCommentsAsFileButton">選択したコメントのファイルを出力</button>
-				<button id="outputCommentFileButton">コメントファイルを出力</button>
-				<button id="inputCommentFileButton">コメントファイルを入力</button>
-				<input type="file" id="commentFileInput" style="display: none" accept=".tsv" />
-				<div id="categoryList" style="display: none"></div>
-				<!-- 一行あたり文字数 -->
-				<label>一行あたり文字数<input type="text" id="charNumPerRow" /></label>
-				<button id="charNumChange">文字数変更を反映</button>
-				<!-- フォントセレクタ -->
-				<select id="fontSelector">
-					<option value="gothic">Gothic</option>
-					<option value="mincho">Mincho</option>
-					<option value="monospace">Monospace</option>
-				</select>				
-				<!-- フォントサイズセレクタ -->
-				<label for="fontSizeSelector">font size: </label>
-				<select id="fontSizeSelector">
-					<option value="10">10</option>
-					<option value="12" selected>12</option>
-					<option value="14">14</option>
-					<option value="16">16</option>
-					<option value="18">18</option>
-					<option value="20">20</option>
-				</select>
-			</label>
-		</div>
-
-		<!-- 発話描画エリア -->
-		<div id="transcriptArea" class="layerTranscript">
-			<div id="headerArea">
-				<!-- ヘッダ行エリア -->
-			</div>
-			<div id="scrollable-div">
-				<div id="dataArea">
-					<!-- データ列エリア -->
-				</div>
-				<!-- コメント描画エリア -->
-				<div id="commentArea" class="layerComment"></div>
-			</div>
-		</div>
-
-		<!-- :::JS読み込み -->
-		<!-- CDN -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
-		<!-- ファイルの読み込み -->
-		<script src="./main.js" type="module"></script>
-		<!-- コメント表示領域をドラッグ可能にする -->
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <div class="header">
+      <div class="left-group">
+        <div>Element 1</div>
+        <div>Element 2</div>
+      </div>
+        <div>Element 3</div>
+    </div>
+    <div id="content">Top page content will be loaded here</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('top.html')
+                .then(response => response.text())
+                .then(html => {
+                    const contentDiv = document.getElementById('content');
+                    contentDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Failed to load top.html', error);
+                });
+        });
+    </script>
 	</body>
 </html>
 
