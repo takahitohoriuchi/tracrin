@@ -74,17 +74,74 @@ video {
 	height: 100px;	
 }
 
+.top {
+  display: flex;            /* フレックスコンテナとして設定 */
+  flex-direction: column;   /* 子要素を縦並びにする */
+  justify-content: center; /* 水平方向の中央揃え */
+  align-items: center;      /* 垂直方向の中央揃え */
+  text-align: center;       /* テキストも中央揃えにする */
+  height: 100%;             /* コンテナの高さを親要素に合わせる（必要に応じて） */
+  width: 100%;              /* コンテナの幅を親要素に合わせる（必要に応じて） */
+}
+
 .ddarea {
-	width: 100%;
+  width: 357px;
+  height: 240px;
+  border: 2px solid;
+	/* width: 100%;
 	height: 150px;
 	border: 1px dotted #888;
-	margin: 1em auto;
+	margin: 1em auto; */
 	text-align: center;
 	/* display: table-cell; */
 	/* vertical-align: middle; */
+  background-image:
+  linear-gradient(to right, #ccc 1px, transparent 1px),
+  linear-gradient(to bottom, #ccc 1px, transparent 1px);
+  background-size: 12px 12px; /* 方眼紙の一マスのサイズ */
 }
-.ddarea.ddefect {
+
+.ddarea.textfile {
+  border-radius: 20px 0px 0px 20px;
+}
+
+.ddarea.videofile {
+  border-left: none;
+  border-radius: 0px 20px 20px 0px;
+}
+
+/* .ddarea.ddefect {
 	border: 1px solid #000;
+} */
+
+/* ここからボタン */
+
+.button {
+  font-size: 16px;
+  width: 280px;
+  height: 60px;
+  line-height: 60px;
+  
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  color: #666666;
+
+  border-radius: 100vh;
+
+  border: 1px solid;
+  box-shadow: 0 4px 0 #666666;
+  background-image: linear-gradient(to right, #7ffaa4, #eff699, #eff699, #7ffaa4);
+}
+
+.button:hover {
+  margin-top: 3px;
+  box-shadow: 0 2px 0 #666666;
 }
 
 /* トラクリのエリア */
