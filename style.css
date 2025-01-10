@@ -74,6 +74,48 @@ video {
 	height: 100px;	
 }
 
+/* ヘッダーのスタイリング */
+.pageHeader {
+  position: fixed; /* ページの上部に固定 */
+  top: 0; /* 上端から0pxの位置に配置 */
+  left: 0; /* 左端から0pxの位置に配置 */
+  width: 100%; /* 画面の全幅に広がる */
+  height: 60px; /* 高さは60px */
+  background: linear-gradient(to right, #eff699, #75e477, #eff699, #eff699, #7ffaa4); /* 背景色の設定 */
+  color: black; /* 文字色は黒 */
+  line-height: 60px; /* 文字を中央に配置 */
+  text-align: center; /* テキストを中央揃え */
+  z-index: 1000; /* 他の要素より前面に表示 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* 影を追加 */
+  display: flex;
+  justify-content: space-between; /* 左右の要素を端に寄せる */
+  padding: 0 10px;
+  box-sizing: border-box; /* パディングとボーダーを幅に含める */
+  align-items: center; /* 垂直方向の中央揃え */
+  }
+
+/* ページのコンテンツにパディングを追加して、ヘッダーと重ならないようにする */
+body {
+  padding-top: 60px; /* ヘッダーの高さと同じ分のパディングを追加 */
+  height: 100%;
+}
+
+.left-group {
+  display: flex; /* 左側のグループもフレックスコンテナとして設定 */
+}
+
+.pageFooter {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 20px; /* フッターの高さ */
+  background-color: transparent; /* フッターの背景色 */
+  color: #666666;
+  text-align: center;
+  line-height: 20px; /* テキストを垂直中央に配置 */
+}
+
 .top {
   display: flex;            /* フレックスコンテナとして設定 */
   flex-direction: column;   /* 子要素を縦並びにする */

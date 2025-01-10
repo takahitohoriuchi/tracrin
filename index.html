@@ -7,57 +7,16 @@
 		<link rel="stylesheet" href="./style.css" />
 		<title>tracrin--2.5.0</title>
     <style>
-      /* ヘッダーのスタイリング */
-      .header {
-        position: fixed; /* ページの上部に固定 */
-        top: 0; /* 上端から0pxの位置に配置 */
-        left: 0; /* 左端から0pxの位置に配置 */
-        width: 100%; /* 画面の全幅に広がる */
-        height: 60px; /* 高さは60px */
-        background: linear-gradient(to right, #eff699, #75e477, #eff699, #eff699, #7ffaa4); /* 背景色の設定 */
-        color: black; /* 文字色は黒 */
-        line-height: 60px; /* 文字を中央に配置 */
-        text-align: center; /* テキストを中央揃え */
-        z-index: 1000; /* 他の要素より前面に表示 */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* 影を追加 */
-        display: flex;
-        justify-content: space-between; /* 左右の要素を端に寄せる */
-        padding: 0 10px;
-        box-sizing: border-box; /* パディングとボーダーを幅に含める */
-        align-items: center; /* 垂直方向の中央揃え */
-        }
-
-      /* ページのコンテンツにパディングを追加して、ヘッダーと重ならないようにする */
-      body {
-        padding-top: 60px; /* ヘッダーの高さと同じ分のパディングを追加 */
-        height: 100%;
-      }
-
-      .left-group {
-        display: flex; /* 左側のグループもフレックスコンテナとして設定 */
-      }
-
       #content {
         overflow: auto; /* スクロールバーを適宜表示 */
         height: auto;  /* 高さを内容に合わせる */
         min-height: 100vh; /* 最低でもビューポートの高さ */
       }
 
-      .footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 20px; /* フッターの高さ */
-        background-color: transparent; /* フッターの背景色 */
-        color: #666666;
-        text-align: center;
-        line-height: 20px; /* テキストを垂直中央に配置 */
-      }
-  </style>
+    </style>
 	</head>
 	<body>
-    <div class="header">
+    <div class="pageHeader">
       <div class="left-group">
         <img src="./assets/tracrin_logo.png" alt="tracrin-logo" style="width: 30%; height: 30%;">
         <div>ver.2.5.0</div>
@@ -95,12 +54,10 @@
     </div>
 
     <div id="next" class="next">
-    <!-- <div> -->
-      <!-- 設定メニュー -->
       <div id="videoContainer">
         <video id="myVideo" controls></video>
       </div>
-
+  
       <!-- TODO:プチ設定エリア -->
       <div id="editContainer">
         <h6>設定</h6>
@@ -115,9 +72,28 @@
           <button id="inputCommentFileButton">コメントファイルを入力</button>
           <input type="file" id="commentFileInput" style="display: none" accept=".tsv" />
           <div id="categoryList" style="display: none"></div>
+          <!-- 一行あたり文字数 -->
+          <label>一行あたり文字数<input type="text" id="charNumPerRow" /></label>
+          <button id="charNumChange">文字数変更を反映</button>
+          <!-- フォントセレクタ -->
+          <select id="fontSelector">
+            <option value="gothic">Gothic</option>
+            <option value="mincho">Mincho</option>
+            <option value="monospace">Monospace</option>
+          </select>				
+          <!-- フォントサイズセレクタ -->
+          <label for="fontSizeSelector">font size: </label>
+          <select id="fontSizeSelector">
+            <option value="10">10</option>
+            <option value="12" selected>12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+          </select>
         </label>
       </div>
-
+  
       <!-- 発話描画エリア -->
       <div id="transcriptArea" class="layerTranscript">
         <div id="headerArea">
@@ -131,9 +107,8 @@
           <div id="commentArea" class="layerComment"></div>
         </div>
       </div>
-    </div>
-
-    <div class="footer">
+  
+    <div class="pageFooter">
       © 2025 Your Company Name. All rights reserved.
     </div>
 
