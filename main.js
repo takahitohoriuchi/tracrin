@@ -1062,8 +1062,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	roughDrawButton.addEventListener('click', () => {
 		releaseSelection()
 		positionAdjust(false)
-	})
-	// DEBUG:これを、あらびょうがのときも再利用するためには、これに引数を渡さねば。
+	})	
 	async function positionAdjust(_isAdjustedPosition) {
 		await reload()				
 		await drawTranscript(hatsuwaGroups, fontSize, drawnRange, _isAdjustedPosition, null)		
