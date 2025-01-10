@@ -21,6 +21,10 @@ import { addComment, pushSpans, pushHatsuwaGroups } from './modules/commentUtils
 let hatsuwaObjs = []
 let hatsuwaGroups = []
 let hatsuwaTagSpans = [] //三重配列:[グループ][発話][発話タグ]
+const drawnRange = {
+	sGroupID: 0,
+	eGroupID: 0,
+}
 let rowElems = [] //rowエレメント（行えれめんと）を、格納する
 let idLabels = []
 let speakerLabels = []
@@ -76,7 +80,7 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 	const fileReader = new FileReader()
 	fileReader.readAsText(file)
 	fileReader.onload = async () => {
-		// TODO:hatsuwaObjsとかの生成は、リロード時はやりなおさなくてよし！！！！
+		// TODO:hatsuwaObjsとかの生成は、リロード時はやりなおさなくてよし！！！！		
 		await reload()
 		await resize()
 
@@ -85,15 +89,14 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 			const textContent = fileReader.result
 			await genHatsuwaObjs(textContent)
 			// tempConvertKukuriMarks(hatsuwaObjs)
-			await groupingHatsuwaObjs(hatsuwaObjs)
+			await groupingHatsuwaObjs(hatsuwaObjs)			
 		}
-
-		await drawHatsuwa(hatsuwaGroups, fontSize, _charNumPerRow)
-
-		// reconvertKukuriMarks(hatsuwaObjs)		// ククリ系記号を元に戻す関数
-
+		drawnRange.sGroupID = 0
+		drawnRange.eGroupID = hatsuwaGroups.length
+		const isAdjustedPosition = false			
+		await drawTranscript(hatsuwaGroups, fontSize, drawnRange, isAdjustedPosition, _charNumPerRow)
 		// 左の発話者&行数ラベルを表示
-		drawIDandSpeaker(hatsuwaGroups, fontSize)
+		drawIDandSpeaker(hatsuwaGroups, drawnRange, fontSize)
 		// spanやラベルにイベントを追加
 		await addMouseEvents()
 
@@ -105,6 +108,7 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 		dataArea.style.height = num2Px(lastDataBottom)
 		scrollableDivArea.style.top = num2Px(headerAreaHeight)
 		console.groupCollapsed('最終的な全体情報')
+		console.log('drawnRange: ', drawnRange)
 		console.log('hatsuwaObjs: ', hatsuwaObjs)
 		console.log('hatsuwaGroups: ', hatsuwaGroups)
 		console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
@@ -155,10 +159,10 @@ async function genHatsuwaObjs(_textContent) {
 
 			// 沈黙だった場合の微調整
 			if (o.speaker == '') {
-				// 沈黙時間を小数第二位で四捨五入
-				let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
+				// 沈黙時間を小数第二位で四捨五入して、第一位までに
+				let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))																
 				silentDuration = Math.round(silentDuration * 10) / 10
-				silentDuration = silentDuration.toFixed(2)
+				silentDuration = silentDuration.toFixed(1)				
 				o.text = silentDuration
 				o.text = '(' + o.text + ')'
 			} else {
@@ -243,14 +247,26 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 		}
 	}
 	console.groupEnd()
-  pushHatsuwaGroups(hatsuwaGroups)
+	pushHatsuwaGroups(hatsuwaGroups)
 }
 
 // 3: 発話たちを描画する。
-async function drawHatsuwa(_hatsuwaGroups, _fontSize, _maxCharNumPerRow = null) {
+async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjustedPosition, _maxCharNumPerRow = null) {
+	/*TODO:		
+	・globalTagIDはちゃんと「hatsuwaGroupsの何グループ目か」が必要：groupIndexとtempGroupIndexのつかいわけ（tempHatsuwaGroupsの何番目かではなく）
+	・ただし、tempHatsuwaGroupsに削除とかすると、参照ゆえに元のhatsuwaGroupsからも削除されかねない。。
+	*/
+	console.groupCollapsed('drawTranscript()')
+	// _drawnRange.sGroupID = 13
+	// _drawnRange.eGroupID = 17
+	console.log('_drawnRange: ', _drawnRange)	
+	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID+1)
+	console.log('tempHatsuwaGroups: ', tempHatsuwaGroups)
+
+
 	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)
 	let dataBoxW = dataAreaStyle.width - labelBoxW
-	// console.log('dataBoxW: ', dataBoxW)
+	// console.log('dataBoxW: ', dataBoxWreleaseSelectionButton)
 	// dataBoxX = document.getElementsByClassName('dataBox')[0]
 	let maxCharNumPerRow = _maxCharNumPerRow ? _maxCharNumPerRow : Math.floor(dataBoxW / fontSize)
 	console.log('maxCharNumPerRow: ', maxCharNumPerRow)
@@ -259,18 +275,19 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize, _maxCharNumPerRow = null) 
 	// let charNumPerRow = document.getElementById('charNumPerRow')
 
 	// 発話グループそれぞれにおいて
-	_hatsuwaGroups.forEach((hatsuwaGroup, groupIndex) => {
-		console.groupCollapsed(`発話グループ${groupIndex}`)
-		console.log(`【グループ${groupIndex}】`, hatsuwaGroup)
+	tempHatsuwaGroups.forEach((hatsuwaGroup, tempGroupIndex) => {
+		console.groupCollapsed(`発話グループ${tempGroupIndex}`)
+		console.log(`【グループ${tempGroupIndex}】`, hatsuwaGroup)
 		// (1) hatsuwaTagSpansの前準備
 		hatsuwaTagSpans.push([])
 		hatsuwaGroup.forEach((hatsuwa, i) => {
 			console.log(`発話${i}: `, hatsuwa.text)
 			//グループ内の発話の数だけ、空配列セット
-			hatsuwaTagSpans[groupIndex].push([])
+			hatsuwaTagSpans[tempGroupIndex].push([])
 		})
 
 		// (2) 発話から子発話に生成・分割（二重配列）
+		let groupIndex = tempGroupIndex + _drawnRange.sGroupID
 		let tagArrays = genHatsuwaTags(hatsuwaGroup, groupIndex)
 		console.log('tagArrays: ', tagArrays)
 
@@ -345,181 +362,244 @@ async function drawHatsuwa(_hatsuwaGroups, _fontSize, _maxCharNumPerRow = null) 
 		}, [])
 		console.log('bracketsGroup: ', bracketsGroup)
 
-		// (6) 各ブラケットグループの開始X位置を決定してゆく
-		let startX = 0
-		bracketsGroup.forEach((tagsInThisBracketGroup, i) => {
-			console.groupCollapsed(`ブラケットグループ${i}の開始X位置決定`)
-			console.log('bracketID: ', i, ' (グループ内での[のインデックス)')
-			console.log('tagsInThisBracketGroup: ', tagsInThisBracketGroup)
-			const spansOfThisBracketGroup = [] //一時生成であり、最終的には消す
+		// 位置調整アリの場合
+		if(_isAdjustedPosition){
+			// (6) 各ブラケットグループの開始X位置を決定してゆく
+			let startX = 0
+			bracketsGroup.forEach((tagsInThisBracketGroup, i) => {
+				console.groupCollapsed(`ブラケットグループ${i}の開始X位置決定`)
+				console.log('bracketID: ', i, ' (グループ内での[のインデックス)')
+				console.log('tagsInThisBracketGroup: ', tagsInThisBracketGroup)
+				const spansOfThisBracketGroup = [] //一時生成であり、最終的には消す
 
-			// (1) このブラケットグループのspanタグを一時的に描画する
-			tagsInThisBracketGroup.forEach((tag) => {
-				const span = genSpan(document, dataArea, tag.text, tag.id, fontSize, startX)
-				spansOfThisBracketGroup.push(span)
-			})
-			console.log('spansOfThisBracketGroup: ', spansOfThisBracketGroup)
-
-			// (2) spanタグの行分割処理（画面右端オーバーしないよう。）
-			let maxTagXInThisBracketGroup = 0 // このbracketのグループの<span>タグ群の末尾の最右位置
-			spansOfThisBracketGroup.forEach((span, j) => {
-				// spanの幅
-				const spanW = span.getBoundingClientRect().width // NOTE:下のやりかただと、12pxぶん違いがでる。。。？
-				// console.log('spanW: ', spanW)
-				// 残りの画面幅
-				const remainedHaba = dataBoxW - startX
-				// console.log('remainedHaba: ', remainedHaba)
-				// この行にはあと何文字ぶんの余白が残っている？
-				const charNumFirstRow = Math.floor(remainedHaba / fontSize)
-				// console.log('charNumFirstRow: ', charNumFirstRow)
-
-				// spanをnコのテキストへと分割(DOM操作。発話特殊記号にかんする境界処理はsplitSpanにて。)
-				const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsInThisBracketGroup[j])
-				console.log(`${span.innerText}は以下${splittedSpanTexts.length}つに分割される↓`)
-				console.log('splittedSpanTexts: ', splittedSpanTexts)
-				// const id = span.className.split(' ')[1] //id。例：(10-4-1)みたいな。おおもとのspanは削除しちゃうから、先にidだけとっとく
-				const id = span.getAttribute('globalTagID')
-				console.log('id: ', id)
-				const hatsuwaID = id.split('-')[1]
-
-				splittedSpanTexts.forEach((splittedTag, k) => {
-					//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
-					const tagX = k == 0 ? startX + labelBoxW : labelBoxW
-					const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX)
-					e.setAttribute('fragmentID', k)
-					// テキストからspanタグを描画
-					// 全体の発話span配列に追加する
-					hatsuwaTagSpans[groupIndex][hatsuwaID].push(e)
-					// 分割してできた最終タグが、maxケツXの候補になる！
-					// 分割された各断片テキストのうち、末尾が最右にあるものの末尾pxを。
-					const tagID = id.split('-')[2]
-					if (Number(tagID) < tagArrays[hatsuwaID].length - 1) {
-						if (k == splittedSpanTexts.length - 1) {
-							const xx = e.getBoundingClientRect().right - dataAreaStyle.x
-							console.log(`splitTag${k}のright`, xx)
-							maxTagXInThisBracketGroup = Math.max(maxTagXInThisBracketGroup, xx)
-						}
-					}
+				// (6-1) このブラケットグループのspanタグを一時的に描画する
+				tagsInThisBracketGroup.forEach((tag) => {
+					const span = genSpan(document, dataArea, tag.text, tag.id, fontSize, startX)
+					spansOfThisBracketGroup.push(span)
 				})
-			})
-			// (3)「次bracketグループの描画開始X位置」を更新する(現bracketグループの末尾に合わせる)！
-			startX = maxTagXInThisBracketGroup - labelBoxW
-			// console.log('startX: ', startX)
+				console.log('spansOfThisBracketGroup: ', spansOfThisBracketGroup)
 
-			// (4)spansOfThisBracketGroup[]は削除
-			spansOfThisBracketGroup.forEach((span) => span.remove())
-			console.groupEnd()
-		})
+				// (6-2) spanタグの行分割処理（画面右端オーバーしないよう。）
+				let maxTagXInThisBracketGroup = 0 // このbracketのグループの<span>タグ群の末尾の最右位置
+				spansOfThisBracketGroup.forEach((span, j) => {
+					// spanの幅
+					const spanW = span.getBoundingClientRect().width // NOTE:下のやりかただと、12pxぶん違いがでる。。。？
+					// console.log('spanW: ', spanW)
+					// 残りの画面幅
+					const remainedHaba = dataBoxW - startX
+					// console.log('remainedHaba: ', remainedHaba)
+					// この行にはあと何文字ぶんの余白が残っている？
+					const charNumFirstRow = Math.floor(remainedHaba / fontSize)
+					// console.log('charNumFirstRow: ', charNumFirstRow)
+
+					// spanをnコのテキストへと分割(DOM操作。発話特殊記号にかんする境界処理はsplitSpanにて。)
+					const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsInThisBracketGroup[j])
+					console.log(`${span.innerText}は以下${splittedSpanTexts.length}つに分割される↓`)
+					console.log('splittedSpanTexts: ', splittedSpanTexts)
+					// const id = span.className.split(' ')[1] //id。例：(10-4-1)みたいな。おおもとのspanは削除しちゃうから、先にidだけとっとく
+					const id = span.getAttribute('globalTagID')
+					console.log('id: ', id)
+					const hatsuwaID = id.split('-')[1]
+
+					splittedSpanTexts.forEach((splittedTag, k) => {
+						//分割された断片テキストの1番目は直前タグの末尾から書き始め、改行した２番目以降は最左から書き始めるってだけ。
+						const tagX = k == 0 ? startX + labelBoxW : labelBoxW
+						const e = genSpan(document, dataArea, splittedTag, id, fontSize, tagX)
+						e.setAttribute('fragmentID', k)
+						// テキストからspanタグを描画
+						// 全体の発話span配列に追加する
+						hatsuwaTagSpans[tempGroupIndex][hatsuwaID].push(e)
+						// 分割してできた最終タグが、maxケツXの候補になる！
+						// 分割された各断片テキストのうち、末尾が最右にあるものの末尾pxを。
+						const tagID = id.split('-')[2]
+						if (Number(tagID) < tagArrays[hatsuwaID].length - 1) {
+							if (k == splittedSpanTexts.length - 1) {
+								const xx = e.getBoundingClientRect().right - dataAreaStyle.x
+								console.log(`splitTag${k}のright`, xx)
+								maxTagXInThisBracketGroup = Math.max(maxTagXInThisBracketGroup, xx)
+							}
+						}
+					})
+				})
+				// (6-3)「次bracketグループの描画開始X位置」を更新する(現bracketグループの末尾に合わせる)！
+				startX = maxTagXInThisBracketGroup - labelBoxW
+				// console.log('startX: ', startX)
+
+				// (6-4)spansOfThisBracketGroup[]は削除
+				spansOfThisBracketGroup.forEach((span) => span.remove())
+				console.groupEnd()
+			})
+		}
+		// 位置調整ナシの場合
+		else{
+			hatsuwaGroup.forEach((hatsuwaObj, i)=>{								
+				const tagX = labelBoxW
+				const span = genSpan(document, dataArea, hatsuwaObj.text, `${groupIndex}-${i}-0`, fontSize, tagX)
+				hatsuwaTagSpans[tempGroupIndex][i].push(span)				
+			})			
+		}
+
+		
 		console.log('dataAreaStyle: ', dataAreaStyle)
 		console.groupEnd()
 		// console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	})
 
-	// (7) spanのY位置を決定（spanにクラス属性'rowID'をここで追加=spanが属する行番号）、ククリ記号を元に戻す処理
+	// (7) 各spanのY位置を決定
+	// この段階で、各spanに'rowID'属性（spanが属する行番号）を追加
 	console.groupCollapsed('spanのY位置決定処理（rowの子要素にするのもここ）')
 	accumRowCount = 0 //累積行数
-	hatsuwaTagSpans.forEach((spansOfGroup, i) => {
-		console.groupCollapsed(`発話グループ${i}のspan処理`)
-		spansOfGroup.forEach((spansOfHatsuwa, j) => {
-			console.groupCollapsed(`発話${j}: ${hatsuwaGroups[i][j].text}`)
-			let rowNum = 0
-			hatsuwaGroups[i][j].startRow = accumRowCount
-			spansOfHatsuwa.forEach((span, k) => {
-				// TODO:ククリ記号を変換する
-				// console.log('span.textContent: ', span.textContent)
-				// span.innerText =
-				// (パタンA)： いっっちばんさいしょタグspanの場合
-				if (i == 0 && j == 0 && k == 0) {
-					console.log('データの最初です')
-					span.setAttribute('rowID', accumRowCount)
-					const y = 0
-					let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
-					let dataBox = row.querySelector('.dataBox')
-					console.log('dataBox: ', dataBox)
-					dataBox.appendChild(span)
-					// row.appendChild(span)
-					rowElems.push(row)
-					rowNum += 1
-				}
-				// (パタンB): グループ内最初発話かつ最初タグの場合・・・直前グループ最終発話かつ最終タグspanのbottomにあわせる
-				else if (j == 0 && k == 0) {
-					accumRowCount += 1
-					console.log('グループ内の最初発話の最初タグ')
-					const hatsuwaNum = hatsuwaTagSpans[i - 1].length
-					const spanNum = hatsuwaTagSpans[i - 1][hatsuwaNum - 1].length
-					const y = accumRowCount * fontSize * lineHeightRatio
-					span.style.top = num2Px(y)
-					span.setAttribute('rowID', accumRowCount)
-					let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
-					let dataBox = row.querySelector('.dataBox')
-					console.log('dataBox: ', dataBox)
-					dataBox.appendChild(span)
-					rowElems.push(row)
-					rowNum += 1
-				}
-				// (パタンC): 発話内最初のタグの場合・・・直前発話の最終タグspanのbottomにあわせる
-				else if (k == 0) {
-					accumRowCount += 1
-					console.log('発話内最初タグ')
-					const spanNum = spansOfGroup[j - 1].length
-					const y = accumRowCount * fontSize * lineHeightRatio
-					span.style.top = num2Px(y)
-					span.setAttribute('rowID', accumRowCount)
-					let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
-					let dataBox = row.querySelector('.dataBox')
-					console.log('dataBox: ', dataBox)
-					dataBox.appendChild(span)
-					rowElems.push(row)
-					rowNum += 1
-				}
-				// (パタンD): spanXが0にきてる場合・・・直前タグのbottomにあわせる
-				else if (px2Num(span.style.left) == labelBoxW) {
-					accumRowCount += 1
-					const y = accumRowCount * fontSize * lineHeightRatio
-					span.style.top = num2Px(y)
-					span.setAttribute('rowID', accumRowCount)
-					let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
-					let dataBox = row.querySelector('.dataBox')
-					console.log('dataBox: ', dataBox)
-					dataBox.appendChild(span)
-					rowElems.push(row)
-					rowNum += 1
-				}
-				// (パタンE): それ以外の場合・・・直前タグのtopにあわせる（列車的連結）
-				else {
-					const y = accumRowCount * fontSize * lineHeightRatio
-					span.style.top = num2Px(y)
-					span.setAttribute('rowID', accumRowCount)
-					let dataBox = rowElems[rowElems.length - 1].querySelector('.dataBox')
-					dataBox.appendChild(span)
-					// rowElems[rowElems.length-1].appendChild(span)
-				}
+	// 位置調整アリの場合
+	if(_isAdjustedPosition){
+		hatsuwaTagSpans.forEach((spansOfGroup, i) => {
+			console.groupCollapsed(`発話グループ${i}のspan処理`)
+			spansOfGroup.forEach((spansOfHatsuwa, j) => {
+				console.groupCollapsed(`発話${j}: ${tempHatsuwaGroups[i][j].text}`)
+				let rowNum = 0
+				tempHatsuwaGroups[i][j].startRow = accumRowCount
+				spansOfHatsuwa.forEach((span, k) => {
+					// (パタンA)： いっっちばんさいしょタグspanの場合
+					if (i == 0 && j == 0 && k == 0) {
+						console.log('データの最初です')
+						span.setAttribute('rowID', accumRowCount)
+						const y = 0
+						let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
+						let dataBox = row.querySelector('.dataBox')
+						console.log('dataBox: ', dataBox)
+						dataBox.appendChild(span)
+						// row.appendChild(span)
+						rowElems.push(row)
+						rowNum += 1
+					}
+					// (パタンB): グループ内最初発話かつ最初タグの場合・・・直前グループ最終発話かつ最終タグspanのbottomにあわせる
+					else if (j == 0 && k == 0) {
+						accumRowCount += 1
+						console.log('グループ内の最初発話の最初タグ')
+						const hatsuwaNum = hatsuwaTagSpans[i - 1].length
+						const spanNum = hatsuwaTagSpans[i - 1][hatsuwaNum - 1].length
+						const y = accumRowCount * fontSize * lineHeightRatio
+						span.style.top = num2Px(y)
+						span.setAttribute('rowID', accumRowCount)
+						let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
+						let dataBox = row.querySelector('.dataBox')
+						console.log('dataBox: ', dataBox)
+						dataBox.appendChild(span)
+						rowElems.push(row)
+						rowNum += 1
+					}
+					// (パタンC): 発話内最初のタグの場合・・・直前発話の最終タグspanのbottomにあわせる
+					else if (k == 0) {
+						accumRowCount += 1
+						console.log('発話内最初タグ')
+						const spanNum = spansOfGroup[j - 1].length
+						const y = accumRowCount * fontSize * lineHeightRatio
+						span.style.top = num2Px(y)
+						span.setAttribute('rowID', accumRowCount)
+						let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
+						let dataBox = row.querySelector('.dataBox')
+						console.log('dataBox: ', dataBox)
+						dataBox.appendChild(span)
+						rowElems.push(row)
+						rowNum += 1
+					}
+					// (パタンD): spanXが0にきてる場合・・・直前タグのbottomにあわせる
+					else if (px2Num(span.style.left) == labelBoxW) {
+						accumRowCount += 1
+						const y = accumRowCount * fontSize * lineHeightRatio
+						span.style.top = num2Px(y)
+						span.setAttribute('rowID', accumRowCount)
+						let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
+						let dataBox = row.querySelector('.dataBox')
+						console.log('dataBox: ', dataBox)
+						dataBox.appendChild(span)
+						rowElems.push(row)
+						rowNum += 1
+					}
+					// (パタンE): それ以外の場合・・・直前タグのtopにあわせる（列車的連結）
+					else {
+						const y = accumRowCount * fontSize * lineHeightRatio
+						span.style.top = num2Px(y)
+						span.setAttribute('rowID', accumRowCount)
+						let dataBox = rowElems[rowElems.length - 1].querySelector('.dataBox')
+						dataBox.appendChild(span)
+						// rowElems[rowElems.length-1].appendChild(span)
+					}
+				})
+				console.log('この発話の行数: ', rowNum)
+				tempHatsuwaGroups[i][j].rowNum = rowNum
+				// tempHatsuwaGroups[i][j].endRow = accumRowCount
+				console.groupEnd()
 			})
-			console.log('この発話の行数: ', rowNum)
-			hatsuwaGroups[i][j].rowNum = rowNum
-			// hatsuwaGroups[i][j].endRow = accumRowCount
+			const lineY = spansOfGroup[0][0].getBoundingClientRect().top - dataAreaStyle.top
+			var horizontalLine = document.createElement('div')
+			// console.log('水平線のlineY: ', lineY)
+			horizontalLine.style.top = num2Px(lineY)
+			horizontalLine.className = 'group-line'
+			dataArea.appendChild(horizontalLine)
 			console.groupEnd()
 		})
-		const lineY = spansOfGroup[0][0].getBoundingClientRect().top - dataAreaStyle.top
-		var horizontalLine = document.createElement('div')
-		// console.log('水平線のlineY: ', lineY)
-		horizontalLine.style.top = num2Px(lineY)
-		horizontalLine.className = 'group-line'
-		dataArea.appendChild(horizontalLine)
-		console.groupEnd()
-	})
+	}
+	// 位置調整ナシの場合（粗表示）
+	else{
+		// 各グループ
+		hatsuwaTagSpans.forEach((spansOfGroup, i) => {
+			console.groupCollapsed(`発話グループ${i}のspan処理`)
+			let y = 0
+			// 各発話						
+			spansOfGroup.forEach((spansOfHatsuwa, j) => {
+				console.groupCollapsed(`発話${j}: ${tempHatsuwaGroups[i][j].text}`)
+				console.log('accumRowCount: ', accumRowCount)
+				y = accumRowCount * fontSize * lineHeightRatio
+				let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
+				let dataBox = row.querySelector('.dataBox')
+				// let dataBox = rowElems[rowElems.length - 1].querySelector('.dataBox')
+				console.log('dataBox: ', dataBox)				
+				tempHatsuwaGroups[i][j].startRow = accumRowCount								
+				tempHatsuwaGroups[i][j].rowNum = 1
+				// 各span
+				spansOfHatsuwa.forEach((span, k) => {
+					// 発話が変われば、accumRowCount++
+					console.log('spanのテキスト: ', span.textContent)
+					console.log('このspanのrowID: ', accumRowCount)
+					const y = accumRowCount * fontSize * lineHeightRatio
+					span.style.top = num2Px(y)
+					span.setAttribute('rowID', accumRowCount)						
+					dataBox.appendChild(span)					
+				})
+				rowElems.push(row)
+				accumRowCount += 1				
+				// tempHatsuwaGroups[i][j].endRow = accumRowCount
+				console.groupEnd()
+			})
+
+
+
+
+			const lineY = spansOfGroup[0][0].getBoundingClientRect().top - dataAreaStyle.top
+			var horizontalLine = document.createElement('div')
+			// console.log('水平線のlineY: ', lineY)
+			horizontalLine.style.top = num2Px(lineY)
+			horizontalLine.className = 'group-line'
+			dataArea.appendChild(horizontalLine)
+			console.groupEnd()
+		})
+
+	}
+	
 	console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	console.groupEnd()
 	// 更新
 	requestAnimationFrame(function () {})
+	console.groupEnd()
 }
 
 // 4: IDとSpeakerのラベルを左にDOM描画する関数
-async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
+async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 	// drawLabel()を、グローバル位置Xを引数にとるようにして、各ラベルの位置を指定する
 	// 行ラベル表示
 	// DEBUG:これ、drawHeaderLabelにする
 	drawHeaderLabel(document, headerArea, 0, 0, 'ID', _fontSize) //ID
+
 
 	// (1) ヘッダを描く
 	// 話者
@@ -533,8 +613,9 @@ async function drawIDandSpeaker(_hatsuwaGroups, _fontSize) {
 	// console.log('dataAreaStyle: ', dataAreaStyle)
 
 	// (2) 列ラベルを発話ごとに処理
+	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID + 1)
 	accumRowCount = 0
-	_hatsuwaGroups.forEach((hatsuwaGroup, i) => {
+	tempHatsuwaGroups.forEach((hatsuwaGroup, i) => {
 		hatsuwaGroup.forEach((hatsuwaObj, j) => {
 			for (let k = 0; k < hatsuwaObj.rowNum; k++) {
 				// 行連番を表示
@@ -600,14 +681,13 @@ async function addMouseEvents() {
 				// マウスダウン
 				span.addEventListener('mousedown', (e) => {
 					// console.groupCollapsed('spanのマウスダウン処理')
-					
 				})
 				// マウスムーブ
 				span.addEventListener('mousemove', () => {
 					// shift + マウスダウン中だったら、行の色を変える。
 				})
 				// // マウスアップ
-				// span.addEventListener('mouseup', (e) => {					
+				// span.addEventListener('mouseup', (e) => {
 				// })
 				// クリック（NOTE:マウスアップのあとに起こる）
 				span.addEventListener('click', (e) => {
@@ -700,7 +780,7 @@ async function addMouseEvents() {
 						// TODO:選択spanの数が1個以上なら、ボタン表示にする
 					}
 					// Shiftキー押してて、かつstartTagがあるときだけ
-					else if(e.shiftKey && selectionStartTag){
+					else if (e.shiftKey && selectionStartTag) {
 						/*
 						いま選択したタグ（span）の時間が、
 						- sタグよりも早い・・・sタグをeタグにいれ、いまタグをsタグにいれてから、処理
@@ -709,21 +789,6 @@ async function addMouseEvents() {
 						- (eタグそのもの・・・なんもしない)
 						- （eタグあり ∩）eタグよりも遅い・・・eタグをsタグにいれ、いまタグをeタグにしてから、処理
 						*/
-						// const hatsuwaObj = getHatsuwaObjFromSpan(span, hatsuwaGroups)
-						// let tempSObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)
-						// if (hatsuwaObj.start < tempSObj.start) {
-						// 	selectionEndTag = selectionStartTag
-						// 	selectionStartTag = span
-						// } else if (selectionEndTag) {
-						// 	let tempEObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)
-						// 	if (hatsuwaObj.start > tempEObj.start) {
-						// 		selectionStartTag = selectionEndTag
-						// 		selectionEndTag = span
-						// 	}
-						// } else {
-						// 	selectionEndTag = span
-						// }
-
 						selectionEndTag = span
 
 						// console.log('selectionEndTag: ', selectionEndTag)
@@ -738,12 +803,21 @@ async function addMouseEvents() {
 						console.log('sRowID: ', sRowID)
 						console.log('eRowID: ', eRowID)
 
-						// let sGlobalTagID = selectionStartTag.getAttribute("globalTagID")
-						// let eGlobalTagID = selectionEndTag.getAttribute("globalTagID")
+						let sGlobalTagID = selectionStartTag.getAttribute('globalTagID')
+						let eGlobalTagID = selectionEndTag.getAttribute('globalTagID')
+						// 選択順のせいでsがeより大きかったら、両者を入れ替える
+						if (parseInt(sGlobalTagID) > parseInt(eGlobalTagID)) {
+							;[sGlobalTagID, eGlobalTagID] = [eGlobalTagID, sGlobalTagID]
+						}
+						console.log('sGlobalTagID: ', sGlobalTagID)
+						// console.log('eGlobalTagID: ', eGlobalTagID)																								
+						drawnRange.sGroupID = Number(sGlobalTagID.split('-')[0])
+						drawnRange.eGroupID = Number(eGlobalTagID.split('-')[0])
+						console.log('drawnRange: ', drawnRange)
+
 						// 部分再生の時間をセット↓
 						let sObj = getHatsuwaObjFromSpan(selectionStartTag, hatsuwaGroups)
 						let eObj = getHatsuwaObjFromSpan(selectionEndTag, hatsuwaGroups)
-
 						video.startTime = sObj.start
 						console.log('video.startTime: ', video.startTime)
 						video.currentTime = video.startTime
@@ -1032,6 +1106,45 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
 
+	// 選択範囲のトラクリを精密描画
+	const positionAdjustmentButton = document.getElementById('positionAdjustment')
+	positionAdjustmentButton.addEventListener('click', ()=>{
+		positionAdjust(true)
+	})
+	// 全発話のトラクリを粗描画
+	const roughDrawButton = document.getElementById('roughdraw')
+	roughDrawButton.addEventListener('click', () => {
+		releaseSelection()
+		positionAdjust(false)
+	})	
+	async function positionAdjust(_isAdjustedPosition) {
+		await reload()				
+		await drawTranscript(hatsuwaGroups, fontSize, drawnRange, _isAdjustedPosition, null)		
+		drawIDandSpeaker(hatsuwaGroups, drawnRange, fontSize)
+		// spanやラベルにイベントを追加
+		await addMouseEvents()
+
+		// TODO:heightを更新
+		// 1:hatsuwaTagSpans[][][]の最終要素のbottomを取得して
+		const lastDataBottom = accumRowCount * fontSize * lineHeightRatio
+		transcriptArea.style.height = num2Px(lastDataBottom - headerAreaHeight)
+		headerArea.style.height = num2Px(headerAreaHeight)
+		dataArea.style.height = num2Px(lastDataBottom)
+		scrollableDivArea.style.top = num2Px(headerAreaHeight)
+		console.groupCollapsed('最終的な全体情報')
+		console.log('drawnRange: ', drawnRange)
+		console.log('hatsuwaObjs: ', hatsuwaObjs)
+		console.log('hatsuwaGroups: ', hatsuwaGroups)
+		console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
+		console.log('rowElems: ', rowElems)
+		console.log('行数: ', rowElems.length)
+		console.log('dataBoxX: ', dataBoxX)
+		console.groupEnd()
+
+		console.group('positionAdjust実行')
+		console.groupEnd()
+	}
+	// 文字位置調整の設定
 	// DEBUG:
 	// 一行あたり文字数の設定
 	const charNumPerRowInputField = document.getElementById('charNumPerRow')
@@ -1044,7 +1157,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		if (!isNaN(inputValue) && inputValue.trim() !== '') {
 			console.log(`The entered number is: ${inputValue}`)
 			// Call your custom function here
-			// drawHatsuwa(hatsuwaGroups, fontSize, inputValue)
+			// drawTranscript(hatsuwaGroups, fontSize, inputValue)
 			main(null, null, inputValue)
 		} else {
 			console.log('Please enter a valid number')
@@ -1069,9 +1182,9 @@ window.addEventListener('DOMContentLoaded', () => {
 			transcriptArea.style.fontFamily = 'Arial, sans-serif'
 		} else if (selectedFont === 'mincho') {
 			transcriptArea.style.fontFamily = '"Times New Roman", serif'
-		}else if (selectedFont === 'monospace') {
-            transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace';
-        }
+		} else if (selectedFont === 'monospace') {
+			transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace'
+		}
 	})
 
 	// // 設定メニュー開く
@@ -1101,9 +1214,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// プチ設定エリア
 	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
-	releaseSelectionButton.addEventListener('click', () => {
+	// 発話の部分選択を解除
+	function releaseSelection(){
 		// ボタン非表示
-		// releaseSelectionButton.style.display = 'none'
+		// releaseSelectionButton.style.display = 'none'		
+		drawnRange.sGroupID = 0
+		drawnRange.eGroupID = hatsuwaGroups.length
 
 		// spanの選択解除
 		let selectedSpans = document.getElementsByClassName('selected')
@@ -1124,10 +1240,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		// ビデオ再生範囲を初期状態へ
 		video.startTime = 0
 		video.endTime = video.duration
-		
-		// .classList.contains('selected')
-		// rele.classList.remove('selected');
-	})
+	}
+	releaseSelectionButton.addEventListener('click', releaseSelection)
 })
 
 // ウィンドウサイズ変更イベント

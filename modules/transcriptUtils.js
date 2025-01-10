@@ -92,10 +92,12 @@ export function roundTextValues(obj) {
     // 正規表現で () 内の数値を探し出し、処理する        
     if(obj.text){
         obj.text = obj.text.replace(/\((\d+\.\d+)\)/g, (match, p1) => {
-            // 数値を四捨五入して小数第二位に変換
-            let roundedValue = Math.round(parseFloat(p1) * 100) / 100;
+            // 数値を四捨五入して小数第二位に変換                    
+            let roundedValue = Math.round(parseFloat(p1) * 10) / 10;
+            let roundedValueText = `(${roundedValue.toFixed(1)})`
+            return roundedValueText
             // () の中に再度入れる
-            return `(${roundedValue.toFixed(2)})`;
+            
         });
     }
 }
