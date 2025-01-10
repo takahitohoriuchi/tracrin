@@ -18,7 +18,7 @@
 	<body>
     <div class="pageHeader">
       <div class="left-group">
-        <img src="./assets/tracrin_logo.png" alt="tracrin-logo" style="width: 30%; height: 30%;">
+        <img src="./assets/logo_tracrin.png" alt="logo-tracrin" style="width: 30%; height: 30%;">
         <div>ver.2.5.0</div>
       </div>
         <div>HOW TO USE</div>
@@ -28,7 +28,7 @@
 
     <div class="top" id="top">
       <div style="margin: 40px 0 0 0;">
-        <img src="./assets/tracrin_logo.png">
+        <img src="./assets/logo_tracrin.png">
         <p class="title">—トラクリン—</p>
       </div>
       <div class="caption">
@@ -40,13 +40,23 @@
       <p style="border-style: solid; width: 300px; margin-top: 0; font-weight: 700;">Please drag & drop here.</p>
       <div style="display: flex;">
         <div class="ddarea textfile">
-          <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにテキストファイル</p>
-          <a href="" class="button" id="inputTextFileButton">ファイルを参照</a>
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <img src="./assets/icon_textFile.png" class="icon">
+            <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにテキストファイル</p>
+          </div>
+          <a href="" class="button" id="inputTextFileButton" style="margin-left: 38px;">
+            <img src="./assets/icon_seachFile.png" class="buttonIcon">ファイルを参照
+          </a>
           <input type="file" id="TextFileInput" style="display: none;">
         </div>
         <div class="ddarea videofile">
-          <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにビデオファイル</p>
-          <a href="" class="button" id="inputVideoFileButton">ファイルを参照</a>
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <img src="./assets/icon_videoFile.png" class="icon">
+            <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにビデオファイル</p>
+          </div>
+          <a href="" class="button" id="inputVideoFileButton" style="margin-left: 38px;">
+            <img src="./assets/icon_seachFile.png" class="buttonIcon">ファイルを参照
+          </a>
           <input type="file" id="VideoFileInput" style="display: none;">
         </div>
       </div>

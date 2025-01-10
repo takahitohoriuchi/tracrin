@@ -143,7 +143,7 @@ body {
 .ddarea {
   width: 357px;
   height: 240px;
-  border: 2px solid;
+  border: 2px solid #000000;
   text-align: center;
   background-image:
   linear-gradient(to right, #ccc 1px, transparent 1px),
@@ -159,11 +159,25 @@ body {
 
 .ddarea.textfile {
   border-radius: 20px 0px 0px 20px;
+  justify-content: center;
 }
 
 .ddarea.videofile {
   border-left: none;
   border-radius: 0px 20px 20px 0px;
+  justify-content: center;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  padding: 20px 20px 0 0;
+}
+
+.buttonIcon {
+  width: 36px;
+  height: 36px;
+  padding-right: 20px;
 }
 
 .ddarea.ddefect {
@@ -179,7 +193,7 @@ body {
   line-height: 60px;
   
   position: relative;
-  display: inline-block;
+  display: flex;
   cursor: pointer;
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
@@ -187,6 +201,8 @@ body {
   vertical-align: middle;
   text-decoration: none;
   color: #666666;
+  align-items: center;
+  justify-content: center;
 
   border-radius: 100vh;
 
