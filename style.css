@@ -88,17 +88,17 @@ video {
   width: 357px;
   height: 240px;
   border: 2px solid;
-	/* width: 100%;
-	height: 150px;
-	border: 1px dotted #888;
-	margin: 1em auto; */
-	text-align: center;
-	/* display: table-cell; */
-	/* vertical-align: middle; */
+  text-align: center;
   background-image:
   linear-gradient(to right, #ccc 1px, transparent 1px),
   linear-gradient(to bottom, #ccc 1px, transparent 1px);
   background-size: 12px 12px; /* 方眼紙の一マスのサイズ */
+	/* width: 100%;
+	height: 150px;
+	border: 1px dotted #888;
+	margin: 1em auto;
+	display: table-cell;
+	vertical-align: middle; */
 }
 
 .ddarea.textfile {
@@ -110,9 +110,9 @@ video {
   border-radius: 0px 20px 20px 0px;
 }
 
-/* .ddarea.ddefect {
+.ddarea.ddefect {
 	border: 1px solid #000;
-} */
+}
 
 /* ここからボタン */
 
@@ -142,6 +142,13 @@ video {
 .button:hover {
   margin-top: 3px;
   box-shadow: 0 2px 0 #666666;
+}
+
+.next {
+  visibility: hidden;
+  /* height: 0; */
+  /* overflow: hidden; */
+  /* コンテンツがはみ出さないようにする */
 }
 
 /* トラクリのエリア */

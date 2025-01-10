@@ -979,6 +979,51 @@ window.addEventListener('DOMContentLoaded', () => {
 		})
 	})
 
+  document.getElementById('inputTextFileButton').addEventListener('click', function(event) {
+    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
+    document.getElementById('TextFileInput').click();  // 隠れているファイルインプットをクリックする
+  });
+  
+  document.getElementById('TextFileInput').addEventListener('change', function(event) {
+    var file = event.target.files[0];  // 選択されたファイルを取得
+    if (file) {
+      const fileType = file.type
+      if (fileType == 'text/plain') {
+        main(file)
+      } else {
+        alert("テキストファイルを選択してください。")
+      }
+    }
+  });
+
+  document.getElementById('inputVideoFileButton').addEventListener('click', function(event) {
+    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
+    document.getElementById('VideoFileInput').click();  // 隠れているファイルインプットをクリックする
+  });
+  
+  document.getElementById('VideoFileInput').addEventListener('change', function(event) {
+    var file = event.target.files[0];  // 選択されたファイルを取得
+    if (file) {
+      const fileType = file.type
+      if (fileType.startsWith('video/')) {
+        loadVideo(file)
+      } else {
+        alert("ビデオファイルを選択してください。")
+      }
+    }
+  });
+
+  document.getElementById('goButton').addEventListener('click', function(e) {
+    e.preventDefault();
+    // divのdisplayプロパティを変更して表示
+    var next = document.getElementById('next');
+    next.style.visibility = 'visible';
+    next.style.height = 'auto';
+    var top = document.getElementById('top');
+    top.style.display = 'none';
+  });
+
+
 	// DEBUG:
 	// 一行あたり文字数の設定
 	const charNumPerRowInputField = document.getElementById('charNumPerRow')

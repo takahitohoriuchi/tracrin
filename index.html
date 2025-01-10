@@ -65,13 +65,74 @@
         <div>HOW TO USE</div>
     </div>
 
-    <div id="content">Top page content will be loaded here</div>
+    <!-- <div id="content">Top page content will be loaded here</div> -->
+
+    <div class="top" id="top">
+      <img src="./assets/tracrin_logo.png">
+      <p>—トラクリン—</p>
+      <p>トランスクリプト</p>
+      <p>書き起こしアプリケーション</p>
+    
+      <p style="border-style: solid; width: 300px;">Please drag & drop here.</p>
+      <div style="display: flex;">
+        <div class="ddarea textfile">
+          <p style="height: 178px; line-height: 200px;">ここにテキストファイル</p>
+          <a href="" class="button" id="inputTextFileButton">ファイルを参照</a>
+          <input type="file" id="TextFileInput" style="display: none;">
+        </div>
+        <div class="ddarea videofile">
+          <p style="height: 178px; line-height: 200px;">ここにビデオファイル</p>
+          <a href="" class="button" id="inputVideoFileButton">ファイルを参照</a>
+          <input type="file" id="VideoFileInput" style="display: none;">
+        </div>
+      </div>
+      <a href="" class="button" id="goButton" style="margin-top: 50px;">Go</a>
+    </div>
+
+    <div id="next" class="next">
+    <!-- <div> -->
+      <!-- 設定メニュー -->
+      <div id="videoContainer">
+        <video id="myVideo" controls></video>
+      </div>
+
+      <!-- TODO:プチ設定エリア -->
+      <div id="editContainer">
+        <h6>設定</h6>
+        <label>
+          <button id="releaseSelectionButton" class="favorite styled" type="button">発話の部分選択を解除</button>
+          <button id="editCategoryButton">カテゴリを編集</button>
+          <button id="showOrHideCommentOptionButton">コメントオプション欄の表示/非表示を切り替え</button>
+          <button id="deleteSelectedCommentsButton">選択したコメントを削除</button>
+          <button id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</button>
+          <button id="outputSelectedCommentsAsFileButton">選択したコメントのファイルを出力</button>
+          <button id="outputCommentFileButton">コメントファイルを出力</button>
+          <button id="inputCommentFileButton">コメントファイルを入力</button>
+          <input type="file" id="commentFileInput" style="display: none" accept=".tsv" />
+          <div id="categoryList" style="display: none"></div>
+        </label>
+      </div>
+
+      <!-- 発話描画エリア -->
+      <div id="transcriptArea" class="layerTranscript">
+        <div id="headerArea">
+          <!-- ヘッダ行エリア -->
+        </div>
+        <div id="scrollable-div">
+          <div id="dataArea">
+            <!-- データ列エリア -->
+          </div>
+          <!-- コメント描画エリア -->
+          <div id="commentArea" class="layerComment"></div>
+        </div>
+      </div>
+    </div>
 
     <div class="footer">
       © 2025 Your Company Name. All rights reserved.
     </div>
 
-    <script>
+    <!-- <script>
         document.addEventListener("DOMContentLoaded", function() {
             fetch('top.html')
                 .then(response => response.text())
@@ -83,7 +144,13 @@
                     console.error('Failed to load top.html', error);
                 });
         });
-    </script>
+    </script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
+  <!-- ファイルの読み込み -->
+  <script src="./main.js" type="module"></script>
+  <!-- コメント表示領域をドラッグ可能にする -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	</body>
 </html>
 
