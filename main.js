@@ -1141,3 +1141,9 @@ window.addEventListener('resize', () => {
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
 })
+
+window.addEventListener('beforeunload', function(event) {
+  var message = 'このページを離れますか？';
+  event.returnValue = message;
+  return message;
+});
