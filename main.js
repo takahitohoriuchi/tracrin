@@ -1,4 +1,5 @@
 // SECTION:【import】
+import { addCommentObj, getCommentObjs, pushHatsuwaGroups } from './modules/commentUtils.js'
 import {
 	addArrow,
 	deleteArrow,
@@ -15,7 +16,6 @@ import {
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
-import { addComment, pushSpans, pushHatsuwaGroups } from './modules/commentUtils.js'
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -48,10 +48,8 @@ let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
-let textFile
-let videoFile
 
-// let commentObjs = []
+let commentObjs = []
 
 let windowSize = {
 	w: 0,
@@ -80,7 +78,7 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 	const fileReader = new FileReader()
 	fileReader.readAsText(file)
 	fileReader.onload = async () => {
-		// TODO:hatsuwaObjsとかの生成は、リロード時はやりなおさなくてよし！！！！		
+		// TODO:hatsuwaObjsとかの生成は、リロード時はやりなおさなくてよし！！！！
 		await reload()
 		await resize()
 
@@ -89,11 +87,11 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 			const textContent = fileReader.result
 			await genHatsuwaObjs(textContent)
 			// tempConvertKukuriMarks(hatsuwaObjs)
-			await groupingHatsuwaObjs(hatsuwaObjs)			
+			await groupingHatsuwaObjs(hatsuwaObjs)
 		}
 		drawnRange.sGroupID = 0
 		drawnRange.eGroupID = hatsuwaGroups.length
-		const isAdjustedPosition = false			
+		const isAdjustedPosition = false
 		await drawTranscript(hatsuwaGroups, fontSize, drawnRange, isAdjustedPosition, _charNumPerRow)
 		// 左の発話者&行数ラベルを表示
 		drawIDandSpeaker(hatsuwaGroups, drawnRange, fontSize)
@@ -160,9 +158,9 @@ async function genHatsuwaObjs(_textContent) {
 			// 沈黙だった場合の微調整
 			if (o.speaker == '') {
 				// 沈黙時間を小数第二位で四捨五入して、第一位までに
-				let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))																
+				let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
 				silentDuration = Math.round(silentDuration * 10) / 10
-				silentDuration = silentDuration.toFixed(1)				
+				silentDuration = silentDuration.toFixed(1)
 				o.text = silentDuration
 				o.text = '(' + o.text + ')'
 			} else {
@@ -259,10 +257,9 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 	console.groupCollapsed('drawTranscript()')
 	// _drawnRange.sGroupID = 13
 	// _drawnRange.eGroupID = 17
-	console.log('_drawnRange: ', _drawnRange)	
-	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID+1)
+	console.log('_drawnRange: ', _drawnRange)
+	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID + 1)
 	console.log('tempHatsuwaGroups: ', tempHatsuwaGroups)
-
 
 	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)
 	let dataBoxW = dataAreaStyle.width - labelBoxW
@@ -363,7 +360,7 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 		console.log('bracketsGroup: ', bracketsGroup)
 
 		// 位置調整アリの場合
-		if(_isAdjustedPosition){
+		if (_isAdjustedPosition) {
 			// (6) 各ブラケットグループの開始X位置を決定してゆく
 			let startX = 0
 			bracketsGroup.forEach((tagsInThisBracketGroup, i) => {
@@ -431,15 +428,14 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 			})
 		}
 		// 位置調整ナシの場合
-		else{
-			hatsuwaGroup.forEach((hatsuwaObj, i)=>{								
+		else {
+			hatsuwaGroup.forEach((hatsuwaObj, i) => {
 				const tagX = labelBoxW
 				const span = genSpan(document, dataArea, hatsuwaObj.text, `${groupIndex}-${i}-0`, fontSize, tagX)
-				hatsuwaTagSpans[tempGroupIndex][i].push(span)				
-			})			
+				hatsuwaTagSpans[tempGroupIndex][i].push(span)
+			})
 		}
 
-		
 		console.log('dataAreaStyle: ', dataAreaStyle)
 		console.groupEnd()
 		// console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
@@ -450,7 +446,7 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 	console.groupCollapsed('spanのY位置決定処理（rowの子要素にするのもここ）')
 	accumRowCount = 0 //累積行数
 	// 位置調整アリの場合
-	if(_isAdjustedPosition){
+	if (_isAdjustedPosition) {
 		hatsuwaTagSpans.forEach((spansOfGroup, i) => {
 			console.groupCollapsed(`発話グループ${i}のspan処理`)
 			spansOfGroup.forEach((spansOfHatsuwa, j) => {
@@ -540,12 +536,12 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 		})
 	}
 	// 位置調整ナシの場合（粗表示）
-	else{
+	else {
 		// 各グループ
 		hatsuwaTagSpans.forEach((spansOfGroup, i) => {
 			console.groupCollapsed(`発話グループ${i}のspan処理`)
 			let y = 0
-			// 各発話						
+			// 各発話
 			spansOfGroup.forEach((spansOfHatsuwa, j) => {
 				console.groupCollapsed(`発話${j}: ${tempHatsuwaGroups[i][j].text}`)
 				console.log('accumRowCount: ', accumRowCount)
@@ -553,8 +549,8 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 				let row = genRowDiv(document, dataArea, dataBoxW, y, accumRowCount, fontSize * lineHeightRatio)
 				let dataBox = row.querySelector('.dataBox')
 				// let dataBox = rowElems[rowElems.length - 1].querySelector('.dataBox')
-				console.log('dataBox: ', dataBox)				
-				tempHatsuwaGroups[i][j].startRow = accumRowCount								
+				console.log('dataBox: ', dataBox)
+				tempHatsuwaGroups[i][j].startRow = accumRowCount
 				tempHatsuwaGroups[i][j].rowNum = 1
 				// 各span
 				spansOfHatsuwa.forEach((span, k) => {
@@ -563,17 +559,14 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 					console.log('このspanのrowID: ', accumRowCount)
 					const y = accumRowCount * fontSize * lineHeightRatio
 					span.style.top = num2Px(y)
-					span.setAttribute('rowID', accumRowCount)						
-					dataBox.appendChild(span)					
+					span.setAttribute('rowID', accumRowCount)
+					dataBox.appendChild(span)
 				})
 				rowElems.push(row)
-				accumRowCount += 1				
+				accumRowCount += 1
 				// tempHatsuwaGroups[i][j].endRow = accumRowCount
 				console.groupEnd()
 			})
-
-
-
 
 			const lineY = spansOfGroup[0][0].getBoundingClientRect().top - dataAreaStyle.top
 			var horizontalLine = document.createElement('div')
@@ -583,9 +576,8 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 			dataArea.appendChild(horizontalLine)
 			console.groupEnd()
 		})
-
 	}
-	
+
 	console.log('hatsuwaTagSpans: ', hatsuwaTagSpans)
 	console.groupEnd()
 	// 更新
@@ -599,7 +591,6 @@ async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 	// 行ラベル表示
 	// DEBUG:これ、drawHeaderLabelにする
 	drawHeaderLabel(document, headerArea, 0, 0, 'ID', _fontSize) //ID
-
 
 	// (1) ヘッダを描く
 	// 話者
@@ -810,7 +801,7 @@ async function addMouseEvents() {
 							;[sGlobalTagID, eGlobalTagID] = [eGlobalTagID, sGlobalTagID]
 						}
 						console.log('sGlobalTagID: ', sGlobalTagID)
-						// console.log('eGlobalTagID: ', eGlobalTagID)																								
+						// console.log('eGlobalTagID: ', eGlobalTagID)
 						drawnRange.sGroupID = Number(sGlobalTagID.split('-')[0])
 						drawnRange.eGroupID = Number(eGlobalTagID.split('-')[0])
 						console.log('drawnRange: ', drawnRange)
@@ -848,10 +839,9 @@ async function addMouseEvents() {
 				span.addEventListener('contextmenu', () => {
 					event.preventDefault()
 					let globalTagID = span.getAttribute('globalTagID')
-					// getCommentObjs(commentObjs)
-          pushSpans()
-					addComment(globalTagID)
-					// console.log(commentObjs)
+					getCommentObjs(commentObjs)
+					addCommentObj(globalTagID)
+					console.log(commentObjs)
 				})
 			}
 		}
@@ -1042,11 +1032,9 @@ window.addEventListener('DOMContentLoaded', () => {
 				const fileType = files[0].type
 				if (fileType == 'text/plain') {
 					// console.log('.txtファイルだよ')
-					// main(files[0])
-          textFile = file
+					main(files[0])
 				} else if (fileType.startsWith('video/')) {
-					// loadVideo(files[0])
-          videoFile = file
+					loadVideo(files[0])
 				}
 				ddarea.classList.remove('ddefect')
 			},
@@ -1057,58 +1045,9 @@ window.addEventListener('DOMContentLoaded', () => {
 		})
 	})
 
-  document.getElementById('inputTextFileButton').addEventListener('click', function(event) {
-    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
-    document.getElementById('TextFileInput').click();  // 隠れているファイルインプットをクリックする
-  });
-  
-  document.getElementById('TextFileInput').addEventListener('change', function(event) {
-    var file = event.target.files[0];  // 選択されたファイルを取得
-    if (file) {
-      const fileType = file.type
-      if (fileType == 'text/plain') {
-        // main(file)
-        textFile = file
-      } else {
-        alert("テキストファイルを選択してください。")
-      }
-    }
-  });
-
-  document.getElementById('inputVideoFileButton').addEventListener('click', function(event) {
-    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
-    document.getElementById('VideoFileInput').click();  // 隠れているファイルインプットをクリックする
-  });
-  
-  document.getElementById('VideoFileInput').addEventListener('change', function(event) {
-    var file = event.target.files[0];  // 選択されたファイルを取得
-    if (file) {
-      const fileType = file.type
-      if (fileType.startsWith('video/')) {
-        // loadVideo(file)
-        videoFile = file
-      } else {
-        alert("ビデオファイルを選択してください。")
-      }
-    }
-  });
-
-  document.getElementById('goButton').addEventListener('click', function(e) {
-    e.preventDefault();
-    // divのdisplayプロパティを変更して表示
-    var next = document.getElementById('next');
-    next.style.visibility = 'visible';
-    next.style.height = 'auto';
-    var top = document.getElementById('top');
-    top.style.display = 'none';
-    main(textFile)
-    loadVideo(videoFile)
-  });
-
-
 	// 選択範囲のトラクリを精密描画
 	const positionAdjustmentButton = document.getElementById('positionAdjustment')
-	positionAdjustmentButton.addEventListener('click', ()=>{
+	positionAdjustmentButton.addEventListener('click', () => {
 		positionAdjust(true)
 	})
 	// 全発話のトラクリを粗描画
@@ -1116,10 +1055,10 @@ window.addEventListener('DOMContentLoaded', () => {
 	roughDrawButton.addEventListener('click', () => {
 		releaseSelection()
 		positionAdjust(false)
-	})	
+	})
 	async function positionAdjust(_isAdjustedPosition) {
-		await reload()				
-		await drawTranscript(hatsuwaGroups, fontSize, drawnRange, _isAdjustedPosition, null)		
+		await reload()
+		await drawTranscript(hatsuwaGroups, fontSize, drawnRange, _isAdjustedPosition, null)
 		drawIDandSpeaker(hatsuwaGroups, drawnRange, fontSize)
 		// spanやラベルにイベントを追加
 		await addMouseEvents()
@@ -1215,9 +1154,9 @@ window.addEventListener('DOMContentLoaded', () => {
 	// プチ設定エリア
 	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
 	// 発話の部分選択を解除
-	function releaseSelection(){
+	function releaseSelection() {
 		// ボタン非表示
-		// releaseSelectionButton.style.display = 'none'		
+		// releaseSelectionButton.style.display = 'none'
 		drawnRange.sGroupID = 0
 		drawnRange.eGroupID = hatsuwaGroups.length
 
@@ -1255,9 +1194,3 @@ window.addEventListener('resize', () => {
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
 })
-
-window.addEventListener('beforeunload', function(event) {
-  var message = 'このページを離れますか？';
-  event.returnValue = message;
-  return message;
-});
