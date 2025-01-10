@@ -82,6 +82,20 @@ video {
   text-align: center;       /* テキストも中央揃えにする */
   height: 100%;             /* コンテナの高さを親要素に合わせる（必要に応じて） */
   width: 100%;              /* コンテナの幅を親要素に合わせる（必要に応じて） */
+  color: #666666;
+}
+
+.title {
+  text-align: center;
+  color: #000000;
+  letter-spacing: 25px;
+  margin: 0 -25px 0 0;
+}
+
+.caption {
+  margin: 30px 0;
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .ddarea {
@@ -146,9 +160,8 @@ video {
 
 .next {
   visibility: hidden;
-  /* height: 0; */
-  /* overflow: hidden; */
-  /* コンテンツがはみ出さないようにする */
+  height: 0;
+  overflow: hidden; /* コンテンツがはみ出さないようにする */
 }
 
 /* トラクリのエリア */

@@ -68,20 +68,25 @@
     <!-- <div id="content">Top page content will be loaded here</div> -->
 
     <div class="top" id="top">
-      <img src="./assets/tracrin_logo.png">
-      <p>—トラクリン—</p>
-      <p>トランスクリプト</p>
-      <p>書き起こしアプリケーション</p>
+      <div style="margin: 40px 0 0 0;">
+        <img src="./assets/tracrin_logo.png">
+        <p class="title">—トラクリン—</p>
+      </div>
+      <div class="caption">
+        トランスクリプト
+        </br>
+        書き起こしアプリケーション
+      </div>
     
-      <p style="border-style: solid; width: 300px;">Please drag & drop here.</p>
+      <p style="border-style: solid; width: 300px; margin-top: 0; font-weight: 700;">Please drag & drop here.</p>
       <div style="display: flex;">
         <div class="ddarea textfile">
-          <p style="height: 178px; line-height: 200px;">ここにテキストファイル</p>
+          <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにテキストファイル</p>
           <a href="" class="button" id="inputTextFileButton">ファイルを参照</a>
           <input type="file" id="TextFileInput" style="display: none;">
         </div>
         <div class="ddarea videofile">
-          <p style="height: 178px; line-height: 200px;">ここにビデオファイル</p>
+          <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにビデオファイル</p>
           <a href="" class="button" id="inputVideoFileButton">ファイルを参照</a>
           <input type="file" id="VideoFileInput" style="display: none;">
         </div>
