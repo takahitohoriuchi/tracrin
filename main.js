@@ -44,6 +44,8 @@ let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
+let textFile
+let videoFile
 
 // let commentObjs = []
 
@@ -966,9 +968,11 @@ window.addEventListener('DOMContentLoaded', () => {
 				const fileType = files[0].type
 				if (fileType == 'text/plain') {
 					// console.log('.txtファイルだよ')
-					main(files[0])
+					// main(files[0])
+          textFile = file
 				} else if (fileType.startsWith('video/')) {
-					loadVideo(files[0])
+					// loadVideo(files[0])
+          videoFile = file
 				}
 				ddarea.classList.remove('ddefect')
 			},
@@ -989,7 +993,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (file) {
       const fileType = file.type
       if (fileType == 'text/plain') {
-        main(file)
+        // main(file)
+        textFile = file
       } else {
         alert("テキストファイルを選択してください。")
       }
@@ -1006,7 +1011,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (file) {
       const fileType = file.type
       if (fileType.startsWith('video/')) {
-        loadVideo(file)
+        // loadVideo(file)
+        videoFile = file
       } else {
         alert("ビデオファイルを選択してください。")
       }
@@ -1021,6 +1027,8 @@ window.addEventListener('DOMContentLoaded', () => {
     next.style.height = 'auto';
     var top = document.getElementById('top');
     top.style.display = 'none';
+    main(textFile)
+    loadVideo(videoFile)
   });
 
 
