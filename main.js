@@ -1,5 +1,4 @@
 // SECTION:【import】
-import { addCommentObj, getCommentObjs, pushHatsuwaGroups } from './modules/commentUtils.js'
 import {
 	addArrow,
 	deleteArrow,
@@ -16,6 +15,8 @@ import {
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { roundTextValues, tempConvertKukuriMarksInHatsuwa } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
+import { addComment, pushSpans, pushHatsuwaGroups } from './modules/commentUtils.js'
+
 
 // SECTION:【グローバル変数】
 let hatsuwaObjs = []
@@ -48,6 +49,8 @@ let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
 let headerAreaHeight = fontSize * 1
 let file
+let textFile
+let videoFile
 
 let commentObjs = []
 
@@ -839,9 +842,8 @@ async function addMouseEvents() {
 				span.addEventListener('contextmenu', () => {
 					event.preventDefault()
 					let globalTagID = span.getAttribute('globalTagID')
-					getCommentObjs(commentObjs)
-					addCommentObj(globalTagID)
-					console.log(commentObjs)
+          pushSpans()
+          addComment(globalTagID)
 				})
 			}
 		}
@@ -1032,9 +1034,11 @@ window.addEventListener('DOMContentLoaded', () => {
 				const fileType = files[0].type
 				if (fileType == 'text/plain') {
 					// console.log('.txtファイルだよ')
-					main(files[0])
+					// main(files[0])
+          textFile = files[0]
 				} else if (fileType.startsWith('video/')) {
-					loadVideo(files[0])
+					// loadVideo(files[0])
+          videoFile = files[0]
 				}
 				ddarea.classList.remove('ddefect')
 			},
@@ -1044,6 +1048,54 @@ window.addEventListener('DOMContentLoaded', () => {
 			document.body.addEventListener(e, ddEvent[e])
 		})
 	})
+  
+  document.getElementById('inputTextFileButton').addEventListener('click', function(event) {
+    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
+    document.getElementById('TextFileInput').click();  // 隠れているファイルインプットをクリックする
+  });
+  
+  document.getElementById('TextFileInput').addEventListener('change', function(event) {
+    var file = event.target.files[0];  // 選択されたファイルを取得
+    if (file) {
+      const fileType = file.type
+      if (fileType == 'text/plain') {
+        // main(file)
+        textFile = file
+      } else {
+        alert("テキストファイルを選択してください。")
+      }
+    }
+  });
+
+  document.getElementById('inputVideoFileButton').addEventListener('click', function(event) {
+    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
+    document.getElementById('VideoFileInput').click();  // 隠れているファイルインプットをクリックする
+  });
+  
+  document.getElementById('VideoFileInput').addEventListener('change', function(event) {
+    var file = event.target.files[0];  // 選択されたファイルを取得
+    if (file) {
+      const fileType = file.type
+      if (fileType.startsWith('video/')) {
+        // loadVideo(file)
+        videoFile = file
+      } else {
+        alert("ビデオファイルを選択してください。")
+      }
+    }
+  });
+
+  document.getElementById('goButton').addEventListener('click', function(e) {
+    e.preventDefault();
+    // divのdisplayプロパティを変更して表示
+    var next = document.getElementById('next');
+    next.style.visibility = 'visible';
+    next.style.height = 'auto';
+    var top = document.getElementById('top');
+    top.style.display = 'none';
+    main(textFile)
+    loadVideo(videoFile)
+  });
 
 	// 選択範囲のトラクリを精密描画
 	const positionAdjustmentButton = document.getElementById('positionAdjustment')
@@ -1194,3 +1246,10 @@ window.addEventListener('resize', () => {
 		// updatedataAreaSize(dataArea, windowSize)
 	}, 500)
 })
+
+
+// window.addEventListener('beforeunload', function(event) {
+//   var message = 'このページを離れますか？';
+//   event.returnValue = message;
+//   return message;
+// });
