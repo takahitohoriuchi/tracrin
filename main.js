@@ -1248,8 +1248,8 @@ window.addEventListener('resize', () => {
 })
 
 
-// window.addEventListener('beforeunload', function(event) {
-//   var message = 'このページを離れますか？';
-//   event.returnValue = message;
-//   return message;
-// });
+window.addEventListener('beforeunload', function(event) {
+  var message = 'このページを離れますか？';
+  event.returnValue = message;
+  return message;
+});
