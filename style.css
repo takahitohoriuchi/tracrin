@@ -125,18 +125,20 @@ body {
   height: 100%;             /* コンテナの高さを親要素に合わせる（必要に応じて） */
   width: 100%;              /* コンテナの幅を親要素に合わせる（必要に応じて） */
   color: #666666;
+  font-size: 16px;
 }
 
 .title {
   text-align: center;
   color: #000000;
   letter-spacing: 25px;
-  margin: 0 -25px 0 0;
+  margin: 20px -25px 0 0;
 }
 
 .caption {
+  /* margin: 30px 0; */
   margin: 30px 0;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
 }
 
