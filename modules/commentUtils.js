@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-function outputCommentFileForElan() {
+function outputCommentFileForElan(commentObjs, fileName) {
   let xmlData = `
   <?xml version="1.0" encoding="UTF-8"?>
   <ColTimeList xmlns="http://mpi.nl/tools/coltime"
@@ -469,18 +469,18 @@ function outputCommentFileForElan() {
       linkedGlobalTagIDs.forEach(linkedGlobalTagID => {
         const [ startTime, endTime ] = getHatsuwaTime(linkedGlobalTagID)
         const xmlItem = `
-        <ColTime ColTimeMessageID="cc518108-8583-4bef-8a27-acd4905c3d05" URL="">
+        <ColTime ColTimeMessageID="" URL="">
           <Metadata>
             <Initials/>
             <ThreadID/>
             <Sender/>
             <Recipient/>
-            <CreationDate>2017-05-08T06:04:25.301Z</CreationDate>
-            <ModificationDate>2017-05-08T06:04:25.301Z</ModificationDate>
+            <CreationDate/>
+            <ModificationDate/>
             <Category>unknown</Category>
             <Status>unknown</Status>
           </Metadata>
-          <AnnotationFile URL="" type="EAF">urn:nl-mpi-tools-elan-eaf:bcb79885-1575-46be-9e36-2c24a5580111#t=${startTime}/${endTime};tier=default</AnnotationFile>
+          <AnnotationFile URL="" type="EAF">#t=${startTime}/${endTime};tier=default</AnnotationFile>
           <Message>${category}:${comment}
           </Message>
         </ColTime>
@@ -502,7 +502,7 @@ function outputCommentFileForElan() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "data.eafcomment"; // ダウンロードされるファイル名
+  link.download = fileName + ".eafcomment"; // ダウンロードされるファイル名
   link.click();
 
   // 4. 生成したURLを解放
