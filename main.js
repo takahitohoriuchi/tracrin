@@ -1091,6 +1091,7 @@ window.addEventListener('DOMContentLoaded', () => {
     var next = document.getElementById('next');
     next.style.visibility = 'visible';
     next.style.height = 'auto';
+    next.style.overflow = 'visible'
     var top = document.getElementById('top');
     top.style.display = 'none';
     main(textFile)
