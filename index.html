@@ -64,9 +64,32 @@
       <a href="" class="button" id="goButton" style="margin: 50px 0;">GO！</a>
     </div>
 
+<!-- ---ページ切り替え--------------------------------------------------- -->
+
     <div id="next" class="next">
-      <div id="videoContainer">
-        <video id="myVideo" controls></video>
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <div id="videoContainer">
+          <video id="myVideo" controls></video>
+        </div>
+      </div>
+
+      <div class="optionBar">
+        <div>オプション</div>
+        <a href="" class="optionButton">発話</a>
+        <a href="" class="optionButton">コメント</a>
+      </div>
+
+      <div id="transcriptArea" class="layerTranscript">
+        <div id="headerArea">
+          <!-- ヘッダ行エリア -->
+        </div>
+        <div id="scrollable-div">
+          <div id="dataArea">
+            <!-- データ列エリア -->
+          </div>
+            <!-- コメント描画エリア -->
+          <div id="commentArea" class="layerComment"></div>
+        </div>
       </div>
   
         <!-- TODO:プチ設定エリア -->

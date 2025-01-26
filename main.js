@@ -968,7 +968,7 @@ async function resize() {
 	// videoContainer.style.width = num2Px(window.innerWidth)
 	// videoContainer.style.height = num2Px(window.innerWidth / videoAspectRatio)
 
-	videoContainer.style.width = num2Px(scrollableDivAreaStyle.width)
+	// videoContainer.style.width = num2Px(scrollableDivAreaStyle.width)
 	videoContainer.style.height = num2Px(scrollableDivAreaStyle.width / videoAspectRatio)
 
 	console.groupEnd()

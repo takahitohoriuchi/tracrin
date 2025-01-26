@@ -62,6 +62,7 @@ nav {
 	height: 270px;
 	/* width: 960px;
 	height: 540px; */
+  margin: 20px;
 }
 video {
 	width: 100%;
@@ -93,6 +94,18 @@ video {
   box-sizing: border-box; /* パディングとボーダーを幅に含める */
   align-items: center; /* 垂直方向の中央揃え */
   }
+
+.optionBar {
+  left: 0; /* 左端から0pxの位置に配置 */
+  width: 100%; /* 画面の全幅に広がる */
+  height: 50px; /* 高さは60px */
+  background: #D9F487; /* 背景色の設定 */
+  color: black; /* 文字色は黒 */
+  display: flex;
+  align-items: center;
+  border-top: 2px solid #868686;
+  padding: 0 20px;
+}
 
 /* ページのコンテンツにパディングを追加して、ヘッダーと重ならないようにする */
 body {
@@ -216,6 +229,31 @@ body {
 .button:hover {
   margin-top: 3px;
   box-shadow: 0 2px 0 #666666;
+}
+
+.optionButton {
+  color: #000000;
+  background-color: transparent;
+  width: 100px;
+  height: 30px;
+  border-radius: 3px;
+
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 10px;
+}
+
+.optionButton:hover {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .next {
