@@ -38,7 +38,7 @@ let lineHeightRatio = 1.2 //フォントサイズに対するテキストのボ�
 let transcriptArea = document.getElementById('transcriptArea')
 let transcriptAreaStyle
 let scrollableDivArea = document.getElementById('scrollable-div')
-let scrollableDivAreaMargin = 10
+let scrollableDivAreaMargin = 0
 let scrollableDivAreaStyle
 let dataArea = document.getElementById('dataArea')
 let dataAreaMargin = 10
@@ -107,7 +107,7 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 		transcriptArea.style.height = num2Px(lastDataBottom - headerAreaHeight)
 		headerArea.style.height = num2Px(headerAreaHeight)
 		dataArea.style.height = num2Px(lastDataBottom)
-		scrollableDivArea.style.top = num2Px(headerAreaHeight)
+		scrollableDivArea.style.top = num2Px(headerAreaHeight+5)
 		console.groupCollapsed('最終的な全体情報')
 		console.log('drawnRange: ', drawnRange)
 		console.log('hatsuwaObjs: ', hatsuwaObjs)
@@ -958,8 +958,8 @@ async function resize() {
 	// console.log('dataBoxX: ', dataBoxX)
 
 	// (3) headerAreaサイズ
-	headerArea.style.margin = num2Px(dataAreaMargin)
-	headerArea.style.width = num2Px(dataAreaStyle.width)
+	// headerArea.style.margin = num2Px(dataAreaMargin)
+	// headerArea.style.width = num2Px(dataAreaStyle.width)
 	headerAreaStyle = headerArea.getBoundingClientRect()
 	// console.log('scrollableDivAreaStyle.margin: ', scrollableDivArea.style.padding)
 
@@ -1120,9 +1120,9 @@ window.addEventListener('DOMContentLoaded', () => {
 		// 1:hatsuwaTagSpans[][][]の最終要素のbottomを取得して
 		const lastDataBottom = accumRowCount * fontSize * lineHeightRatio
 		transcriptArea.style.height = num2Px(lastDataBottom - headerAreaHeight)
-		headerArea.style.height = num2Px(headerAreaHeight)
+		// headerArea.style.height = num2Px(headerAreaHeight)
 		dataArea.style.height = num2Px(lastDataBottom)
-		scrollableDivArea.style.top = num2Px(headerAreaHeight)
+		scrollableDivArea.style.top = num2Px(headerAreaHeight+5)
 		console.groupCollapsed('最終的な全体情報')
 		console.log('drawnRange: ', drawnRange)
 		console.log('hatsuwaObjs: ', hatsuwaObjs)
