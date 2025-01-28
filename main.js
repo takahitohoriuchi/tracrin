@@ -252,28 +252,31 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 }
 
 // 3: 発話たちを描画する。
-async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjustedPosition, _maxCharNumPerRow = null) {
+async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjustedPosition) {
 	/*TODO:		
 	・globalTagIDはちゃんと「hatsuwaGroupsの何グループ目か」が必要：groupIndexとtempGroupIndexのつかいわけ（tempHatsuwaGroupsの何番目かではなく）
 	・ただし、tempHatsuwaGroupsに削除とかすると、参照ゆえに元のhatsuwaGroupsからも削除されかねない。。
 	*/
 	console.groupCollapsed('drawTranscript()')
-	// _drawnRange.sGroupID = 13
-	// _drawnRange.eGroupID = 17
 	console.log('_drawnRange: ', _drawnRange)
 	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID + 1)
 	console.log('tempHatsuwaGroups: ', tempHatsuwaGroups)
 
 	// 現在の発話描画エリアの最下端位置(各発話グループの処理が終わるたび更新)
-	let dataBoxW = dataAreaStyle.width - labelBoxW
-	// console.log('dataBoxW: ', dataBoxWreleaseSelectionButton)
-	// dataBoxX = document.getElementsByClassName('dataBox')[0]
-	let maxCharNumPerRow = _maxCharNumPerRow ? _maxCharNumPerRow : Math.floor(dataBoxW / fontSize)
-	console.log('maxCharNumPerRow: ', maxCharNumPerRow)
-	// DEBUG:ひとまず、maxCharNumPerRowまではOK。だけど、文字数表示はウィンドウサイズとの関係性っぽいから変わらない
-	// NOTE:remainedHabaは、maxCharNumPerRowを参照していない
-	// let charNumPerRow = document.getElementById('charNumPerRow')
+	// dataBoxWの定義を、行内最大文字数とフォントサイズによって決める。
+	// 取得する
+	let maxCharNumPerRow = 0
+	if(_isAdjustedPosition){		
+		maxCharNumPerRow = document.getElementById('charNumPerRow').value
+	}else{
+		document.getElementById('charNumPerRow').value = 50
+		maxCharNumPerRow = 50
+	}
+		
+	let dataBoxW = maxCharNumPerRow * fontSize
 
+	console.log('maxCharNumPerRow: ', maxCharNumPerRow)
+	console.log('dataBoxW: ', dataBoxW)
 	// 発話グループそれぞれにおいて
 	tempHatsuwaGroups.forEach((hatsuwaGroup, tempGroupIndex) => {
 		console.groupCollapsed(`発話グループ${tempGroupIndex}`)
@@ -385,12 +388,12 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 					// spanの幅
 					const spanW = span.getBoundingClientRect().width // NOTE:下のやりかただと、12pxぶん違いがでる。。。？
 					// console.log('spanW: ', spanW)
-					// 残りの画面幅
+					// 残りの画面幅（px）
 					const remainedHaba = dataBoxW - startX
 					// console.log('remainedHaba: ', remainedHaba)
 					// この行にはあと何文字ぶんの余白が残っている？
 					const charNumFirstRow = Math.floor(remainedHaba / fontSize)
-					// console.log('charNumFirstRow: ', charNumFirstRow)
+					// console.log('この行にはあと何文字ぶん余白？（charNumFirstRow）: ', charNumFirstRow)
 
 					// spanをnコのテキストへと分割(DOM操作。発話特殊記号にかんする境界処理はsplitSpanにて。)
 					const splittedSpanTexts = splitSpan(document, span, charNumFirstRow, maxCharNumPerRow, tagsInThisBracketGroup[j])
