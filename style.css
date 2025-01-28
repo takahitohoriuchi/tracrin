@@ -95,18 +95,6 @@ video {
   align-items: center; /* 垂直方向の中央揃え */
   }
 
-.optionBar {
-  left: 0; /* 左端から0pxの位置に配置 */
-  width: 100%; /* 画面の全幅に広がる */
-  height: 50px; /* 高さは60px */
-  background: #D9F487; /* 背景色の設定 */
-  color: black; /* 文字色は黒 */
-  display: flex;
-  align-items: center;
-  border-top: 2px solid #868686;
-  padding: 0 20px;
-}
-
 /* ページのコンテンツにパディングを追加して、ヘッダーと重ならないようにする */
 body {
   padding-top: 60px; /* ヘッダーの高さと同じ分のパディングを追加 */
@@ -115,6 +103,7 @@ body {
 
 .left-group {
   display: flex; /* 左側のグループもフレックスコンテナとして設定 */
+  align-items: center; /* 垂直方向の中央揃え */
 }
 
 .pageFooter {
@@ -231,12 +220,53 @@ body {
   box-shadow: 0 2px 0 #666666;
 }
 
+.videoArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image:
+  linear-gradient(to right, #eeeeee 1px, transparent 1px),
+  linear-gradient(to bottom, #eeeeee 1px, transparent 1px);
+  background-size: 12px 12px; /* 方眼紙の一マスのサイズ */
+}
+
+.optionBar {
+  left: 0; /* 左端から0pxの位置に配置 */
+  width: 100%; /* 画面の全幅に広がる */
+  height: 50px; /* 高さは60px */
+  background: #D9F487; /* 背景色の設定 */
+  color: black; /* 文字色は黒 */
+  display: flex;
+  align-items: center;
+  border-top: 2px solid #999999;
+  /* padding: 0 20px; */
+  justify-content: space-between; /* 左右の要素を端に寄せる */
+}
+
+.optionPartition {
+  width: 65px; /* divの幅 */
+  height: 50px; /* divの高さ */
+  position: relative; /* 位置を相対的に設定 */
+}
+
+.optionPartition::after {
+  content: ""; /* 擬似要素の内容を空に */
+  position: absolute; /* 絶対位置 */
+  top: 5px; /* 上から10pxの位置 */
+  bottom: 5px; /* 下から10pxの位置 */
+  right: 0; /* 右側に配置 */
+  width: 2px; /* ボーダーの幅 */
+  background-color: #999999; /* ボーダーの色 */
+}
+
 .optionButton {
   color: #000000;
   background-color: transparent;
-  width: 100px;
+  /* width: 100px; */
+  min-width: 60px;
   height: 30px;
   border-radius: 3px;
+  font-weight: 600;
 
   position: relative;
   display: flex;
@@ -254,6 +284,49 @@ body {
 
 .optionButton:hover {
   background-color: rgba(255, 255, 255, 0.5);
+}
+
+.fontOption {
+  color: #000000;
+  background-color: #ffffff;
+  /* width: 120px; */
+  height: 30px;
+  border-radius: 3px;
+
+  position: relative;
+  display: flex;
+  vertical-align: middle;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 10px;
+  padding: 0 10px;
+}
+
+.optionA {
+  /* width: 20px; */
+  height: 26px;
+  /* margin: 0; */
+
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionIcon {
+  width: 20px;
+  height: 20px;
+  margin: 3px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+.optionIcon:hover {
+  background-color: #eeeeee;
 }
 
 .next {
@@ -278,23 +351,27 @@ body {
 /* ヘッダ行 */
 #headerArea{
 	/* background-color: #eeeeee; */
-	background-color: #ffffff;
+	background-color: #989898;
 	border-color: #000;		
 	position: absolute;
-	height: 20px;
-	width: 320px;
+	/* height: 300px; */
+	width: 100%;
 	top: 0px;
 	left: 0px;	
-	padding: 0%;
-	margin-bottom: 0px;
+	/* padding: 10px; */
+  /* text-align: center; */
+  /* margin: 0px; */
+	/* margin-bottom: 0px; */
 	/* margin: 10px; */
 	/* margin-left: 10px; */
+  border-bottom: 2px solid #888888;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); /* 影を追加 */
 }
 
 #scrollable-div{
 	position: absolute;
 	overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
-	border: 1px solid #ccc; /* 枠線を追加 */	
+	/* border: 1px solid #ccc; 枠線を追加	 */
 	left: 0px;	
 	height: 570px;/*NOTE:transcriptAreaとおなじ*/		
 }

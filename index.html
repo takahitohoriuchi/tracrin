@@ -5,6 +5,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="./style.css" />
+    <link rel="icon" href="./assets/favicon_tracrin.ico">
 		<title>tracrin--2.5.0</title>
     <style>
       #content {
@@ -18,18 +19,18 @@
 	<body>
     <div class="pageHeader">
       <div class="left-group">
-        <img src="./assets/logo_tracrin.png" alt="logo-tracrin" style="width: 30%; height: 30%;">
-        <div>ver.2.5.0</div>
+        <img src="./assets/logo_tracrin.png" alt="logo-tracrin" style="width: 80px; margin-right: 10px;">
+        <div style="margin-top: 5px; font-weight: 700;">ver.2.5.0</div>
       </div>
         <!-- <div>更新履歴</div> -->
-        <div>使い方</div>
+        <div style="font-weight: 700;">使い方</div>
     </div>
 
 		
 
     <div class="top" id="top">
       <div style="margin: 70px 0 0 0; height: 150px;">
-        <img src="./assets/logo_tracrin.png">
+        <img src="./assets/logo_tracrin.png" style="width: 300px;">
         <p class="title">—トラクリン—</p>
       </div>
       <div class="caption">
@@ -42,7 +43,7 @@
       <div style="display: flex;">
         <div class="ddarea textfile">
           <div style="display: flex; align-items: center; justify-content: center;">
-            <img src="./assets/icon_textFile.png" class="icon">
+            <img src="./assets/icons8-txt-50.png" class="icon">
             <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにテキストファイルをドロップ</p>
           </div>
           <a href="" class="button" id="inputTextFileButton" style="margin-left: 38px;">
@@ -52,7 +53,7 @@
         </div>
         <div class="ddarea videofile">
           <div style="display: flex; align-items: center; justify-content: center;">
-            <img src="./assets/icon_videoFile.png" class="icon">
+            <img src="./assets/icons8-video-file-50.png" class="icon">
             <p style="height: 178px; line-height: 200px; font-weight: 700;">ここにビデオファイルをドロップ</p>
           </div>
           <a href="" class="button" id="inputVideoFileButton" style="margin-left: 38px;">
@@ -67,16 +68,50 @@
 <!-- ---ページ切り替え--------------------------------------------------- -->
 
     <div id="next" class="next">
-      <div style="display: flex; justify-content: center; align-items: center;">
+      <!-- <div style="display: flex; justify-content: center; align-items: center;" class="videoArea"> -->
+      <div class="videoArea">
         <div id="videoContainer">
           <video id="myVideo" controls></video>
         </div>
       </div>
 
       <div class="optionBar">
-        <div>オプション</div>
-        <a href="" class="optionButton">発話</a>
-        <a href="" class="optionButton">コメント</a>
+        <div class="left-group">
+          <div class="optionPartition"></div>
+          <a href="" class="optionButton">発話</a>
+          <a href="" class="optionButton">コメント</a>
+          <a href="" class="optionButton">インポート</a>
+          <a href="" class="optionButton">エクスポート</a>
+        </div>
+        <div class="left-group">
+          <a href="" style="display: flex;">
+            <img src="./assets/icons8-multiline-text-50.png" style="width: 20px; height: 20px;">
+            <img src="./assets/icons8-resize-vertical-50.png" style="width: 20px; height: 20px;">
+          </a>
+          <a href="" class="optionA">
+            <img src="./assets/icons8-play-50.png" style="transform: rotate(90deg);" class="optionIcon">
+          </a>
+          <a href="" class="optionA">
+            <img src="./assets/icons8-play-50.png" style="transform: rotate(-90deg);" class="optionIcon">
+          </a>
+          <div style="display: flex; background-color: white;" class="fontOption">
+            <img src="./assets/icons8-lowercase-50.png" style="width: 20px; height: 20px; margin: 0 3px;">
+            <select id="fontSizeSelector" style="margin-right: 10px;">
+              <option value="10">10</option>
+              <option value="12" selected>12</option>
+              <option value="14">14</option>
+              <option value="16">16</option>
+              <option value="18">18</option>
+              <option value="20">20</option>
+            </select>
+            <a href="" class="optionA">
+              <img src="./assets/icons8-increase-font-50.png" class="optionIcon">
+            </a>
+            <a href="" class="optionA">
+              <img src="./assets/icons8-decrease-font-50.png" class="optionIcon">
+            </a>
+          </div>
+        </div>
       </div>
 
       <div id="transcriptArea" class="layerTranscript">
@@ -120,14 +155,14 @@
           </select>				
           <!-- フォントサイズセレクタ -->
           <label for="fontSizeSelector">font size: </label>
-          <select id="fontSizeSelector">
+          <!-- <select id="fontSizeSelector">
             <option value="10">10</option>
             <option value="12" selected>12</option>
             <option value="14">14</option>
             <option value="16">16</option>
             <option value="18">18</option>
             <option value="20">20</option>
-          </select>
+          </select> -->
         </label>
       </div>
   
