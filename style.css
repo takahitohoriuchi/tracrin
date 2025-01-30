@@ -38,6 +38,8 @@ nav {
 	line-height: 120%
 	/* font-size: 12px; */
 }
+/* 行 */
+
 /* 矢印 */
 .arrow{
 	position: absolute;
@@ -385,6 +387,25 @@ body {
 	height: 570px;	
 	top: 0px;	
 	padding: none;		
+}
+
+.plus-button {
+    position: absolute;
+    right: -30px; /* 要素の右側に配置 */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: none; /* 初期状態は非表示 */
+}
+
+.plus-button:hover {
+    background-color: #2980b9;
 }
 
 /* :::設定メニュー */

@@ -81,34 +81,77 @@ export function genLabelBox(_document, _row){
 }
 
 export function genRowDiv(_document, _parentElem, _w, _y, _rowID, _h){
+	// (1) row
 	var row = _document.createElement('div')
 	row.className = 'row'
 	row.setAttribute('rowID', _rowID)
-	row.style.display = 'flex'		
+	row.style.display = 'flex'
 	// X位置
 	row.style.top = num2Px(_y)
 	row.style.width = num2Px(_parentElem.width)
 	row.style.height = num2Px(_h)
 
-	// gendataBox
+	// (2) +ボタン
+	// const plusButton = document.createElement('button')
+	// const left = num2Px(row.getBoundingClientRect().left)
+	// // plusButton.style.left = left
+	// plusButton.style.left = left
+	// // plusButton.style.left = row.style.left
+
+	// // 「+」ボタンがクリックされたときのイベント
+	// plusButton.addEventListener('click', (event) => {
+	// 	event.stopPropagation() // 親要素の mouseleave を防ぐ
+	// 	alert('+ボタンがクリック。空白行追加します')
+	// })
+	// // row.prepend(plusButton)
+	// _document.body.appendChild(plusButton)
+	// TODO:要検討：以下を書く場所はここか、あるいは、861行目や875行目か？
+	// // rowのマウスオーバー時にボタンを表示
+	// row.addEventListener('mouseenter', () => {
+	// 	plusButton.style.display = 'inline-block'
+	// })
+	// // マウスリーブ時にボタンを非表示
+	// row.addEventListener('mouseleave', () => {
+	// 	plusButton.style.display = 'none'
+	// })
+
+	// (3) dataBox（発話タグ群が描かれる）
 	var dataBox = _document.createElement('div')
-	dataBox.className = 'dataBox'	
+	dataBox.className = 'dataBox'
 	dataBox.setAttribute('rowID', _rowID)
 	// dataBox.style.position = 'absolute'
 	dataBox.style.top = num2Px(_y)
 	dataBox.style.height = num2Px(_h)
 	dataBox.style.width = num2Px(_w)
-	dataBox.style.flex = 1	
+	dataBox.style.flex = 1
 	dataBox.style.backgroundColor = 'transparent'
-			
-	// dataBoxをrowに追加し、	
 	row.appendChild(dataBox)
+
 	// rowをdataAreaに追加する
 	_parentElem.appendChild(row)
 
 	console.log('row: ', row)
 	return row
+}
 
+/**
+ * 空っぽrowElemを生成する（メモスペースとしてつかう空行を生成）
+ * @param {*} _document 
+ * @param {*} _parentElem 
+ * @param {*} _rowElems 
+ * @param {*} _y 
+ * @param {*} _h 
+ */
+export function addRow(_document, _parentElem, _rowElems, _y, _h){
+	var row = _document.createElement('div')
+	row.className = 'row'	
+	row.style.display = 'flex'
+	// X位置
+	row.style.top = num2Px(_y)
+	row.style.width = num2Px(_parentElem.width)
+	row.style.height = num2Px(_h)
+	_parentElem.appendChild(row)
+	_rowElems.push(row)
 }
 
 /**
