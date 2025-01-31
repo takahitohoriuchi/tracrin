@@ -45,7 +45,7 @@ let scrollableDivAreaStyle
 let dataArea = document.getElementById('dataArea')
 let dataAreaMargin = 10
 let dataAreaStyle
-let labelBoxW = 90
+let labelBoxW = fontSize * 7
 let dataBoxX
 let headerArea = document.getElementById('headerArea')
 let headerAreaStyle
@@ -595,10 +595,15 @@ async function drawTranscript(_hatsuwaGroups, _fontSize, _drawnRange, _isAdjuste
 
 // 4: IDとSpeakerのラベルを左にDOM描画する関数
 async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
-	// drawLabel()を、グローバル位置Xを引数にとるようにして、各ラベルの位置を指定する
-	// 行ラベル表示	
+	// drawLabel()を、グローバル位置Xを引数にとるようにして、各ラベルの位置を指定する	
+	// "headerlabel" クラスをもつ要素を一括で取得
+	const elements = document.querySelectorAll('.headerlabel')
+	// 取得した全ての要素を削除
+	elements.forEach((element) => {
+		element.remove()
+	})
+	// 行ラベル表示
 	drawHeaderLabel(document, headerArea, 0, 0, 'ID', _fontSize) //ID
-
 	// (1) ヘッダを描く
 	// 話者
 	const speakerLabelX = _fontSize * 3
@@ -608,7 +613,7 @@ async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 	const textLabelX = _fontSize * 8
 	drawHeaderLabel(document, headerArea, textLabelX, 0, 'Text', _fontSize) // text
 
-	// console.log('dataAreaStyle: ', dataAreaStyle)
+	// console.log('dataAreaStyle: ', dataAreaStyle)	
 
 	// (2) 列ラベルを発話ごとに処理
 	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID + 1)
@@ -654,6 +659,7 @@ async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 // 発話やIDやSpeakerを描画する
 async function positionAdjust(_isAdjustedPosition) {
 	await reload()
+	labelBoxW = fontSize * 7
 	await drawTranscript(hatsuwaGroups, fontSize, drawnRange, _isAdjustedPosition, null)
 	drawIDandSpeaker(hatsuwaGroups, drawnRange, fontSize)
 	// spanやラベルにイベントを追加
@@ -1231,10 +1237,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// フォントサイズの設定
 	const fontSizeSelector = document.getElementById('fontSizeSelector')
-	fontSizeSelector.addEventListener('change', () => {
+	fontSizeSelector.addEventListener('change', async() => {
 		console.log('フォントサイズの変更')
 		fontSize = fontSizeSelector.value
-		main(null, fontSize, null)
+		// TODO:labelBoxのwidthを更新
+		// TODO:トラクリのヘッダ列を再描画
+		// →drawIdAndSpeaker()の処理で、前のやつを削除する処理をつくる）
+		// main(null, fontSize, null)
+		await positionAdjust(isAdjustedPosition)
+		
 	})
 
 	// フォントの設定

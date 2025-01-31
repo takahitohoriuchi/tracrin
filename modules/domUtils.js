@@ -181,7 +181,7 @@ export function drawSpeakerLabel(_document, _element, _x, _y, _label, _rowID, _h
 	var dummy = _document.createElement('span')
 	dummy.setAttribute('rowID', _rowID)
 	dummy.setAttribute('hatsuwaID', _hatsuwaID)
-	dummy.className = 'label'
+	dummy.className = 'label'	
 	dummy.innerText = _label
 	dummy.style.fontSize = num2Px(_fontSize)
 	dummy.style.left = num2Px(_x)
@@ -192,7 +192,8 @@ export function drawSpeakerLabel(_document, _element, _x, _y, _label, _rowID, _h
 
 export function drawHeaderLabel(_document, _headerArea, _x, _y, _label, _fontSize){
 	var label = _document.createElement('span')	
-	label.className = 'label'	
+	label.className = 'label'
+	label.classList.add('headerlabel')
 	label.innerText = _label
 	label.style.fontSize = num2Px(_fontSize)
 	label.style.left = num2Px(_x)
