@@ -224,6 +224,7 @@ body {
 
 .videoArea {
   display: flex;
+  flex-direction: column; /* 垂直方向にアイテムを配置 */
   justify-content: center;
   align-items: center;
   background-image:
