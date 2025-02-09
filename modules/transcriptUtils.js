@@ -102,43 +102,43 @@ export function roundTextValues(obj) {
     }
 }
 
-export async function tempConvertKukuriMarksInHatsuwa(_hatsuwaObj){
-    console.log('この発話objを変換します', _hatsuwaObj)        
-    console.log('_hatsuwaObj.text: ', _hatsuwaObj.text)
-    console.log('isIncludeAnyKukuriMark(_hatsuwaObj.text): ', isIncludeAnyKukuriMark(_hatsuwaObj.text))    
-    while(isIncludeAnyKukuriMark(_hatsuwaObj.text)){
-        const sortedMarkObjs = Object.values(kukuriMarkObjs).map(v=>{               
-            let beginIndex = findStartIndexOfSubstring(_hatsuwaObj.text, v.begin.key)
-            // return beginIndex
-            return {
-                beginKey: v.begin.key,
-                beginModifiedKey: v.begin.modifiedKey,
-                endKey: v.end.key,
-                endModifiedKey: v.end.modifiedKey,
-                index: beginIndex,
-            }
+// export async function tempConvertKukuriMarksInHatsuwa(_hatsuwaObj){
+//     console.log('この発話objを変換します', _hatsuwaObj)        
+//     console.log('_hatsuwaObj.text: ', _hatsuwaObj.text)
+//     console.log('isIncludeAnyKukuriMark(_hatsuwaObj.text): ', isIncludeAnyKukuriMark(_hatsuwaObj.text))    
+//     while(isIncludeAnyKukuriMark(_hatsuwaObj.text)){
+//         const sortedMarkObjs = Object.values(kukuriMarkObjs).map(v=>{               
+//             let beginIndex = findStartIndexOfSubstring(_hatsuwaObj.text, v.begin.key)
+//             // return beginIndex
+//             return {
+//                 beginKey: v.begin.key,
+//                 beginModifiedKey: v.begin.modifiedKey,
+//                 endKey: v.end.key,
+//                 endModifiedKey: v.end.modifiedKey,
+//                 index: beginIndex,
+//             }
             
-        })
-        // nullは排除
-        .filter(e=>e.index)
-        // .indexが小さい順にソート
-        .sort((a,b)=>a.index - b.index)
+//         })
+//         // nullは排除
+//         .filter(e=>e.index)
+//         // .indexが小さい順にソート
+//         .sort((a,b)=>a.index - b.index)
         
-        // ソート後最初要素オブジェについて、それ自身（=begin）と、それとペアとなるend記号を変換する
-        _hatsuwaObj.text = _hatsuwaObj.text.replace(
-            sortedMarkObjs[0].beginKey, 
-            sortedMarkObjs[0].beginModifiedKey, 
-        )
-        console.log('sortedMarkObjs: ', sortedMarkObjs)
+//         // ソート後最初要素オブジェについて、それ自身（=begin）と、それとペアとなるend記号を変換する
+//         _hatsuwaObj.text = _hatsuwaObj.text.replace(
+//             sortedMarkObjs[0].beginKey, 
+//             sortedMarkObjs[0].beginModifiedKey, 
+//         )
+//         console.log('sortedMarkObjs: ', sortedMarkObjs)
 
-        _hatsuwaObj.text = _hatsuwaObj.text.replace(
-            sortedMarkObjs[0].endKey, 
-            sortedMarkObjs[0].endModifiedKey, 
-        )
-        console.log('変換後_hatsuwaObj.text: ', _hatsuwaObj.text)                                                    
-    }
+//         _hatsuwaObj.text = _hatsuwaObj.text.replace(
+//             sortedMarkObjs[0].endKey, 
+//             sortedMarkObjs[0].endModifiedKey, 
+//         )
+//         console.log('変換後_hatsuwaObj.text: ', _hatsuwaObj.text)                                                    
+//     }
     
-}
+// }
 
 /*
     TODO:
