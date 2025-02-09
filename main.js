@@ -875,7 +875,7 @@ async function addMouseEvents() {
 				})
 
 				// ダブルクリックでコメントを追加
-				span.addEventListener('contextmenu', () => {
+				span.addEventListener('contextmenu', (event) => {
 					event.preventDefault()
 					let globalTagID = span.getAttribute('globalTagID')
           pushSpans()
@@ -1203,13 +1203,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// 選択範囲のトラクリを精密描画
 	const positionAdjustmentButton = document.getElementById('positionAdjustment')
-	positionAdjustmentButton.addEventListener('click', () => {
+	positionAdjustmentButton.addEventListener('click', (event) => {
+    event.preventDefault()
 		isAdjustedPosition = true
 		positionAdjust(isAdjustedPosition)
 	})
 	// 全発話のトラクリを粗描画
 	const roughDrawButton = document.getElementById('roughdraw')
 	roughDrawButton.addEventListener('click', () => {
+    event.preventDefault()
 		releaseSelection()
 		isAdjustedPosition = false
 		positionAdjust(isAdjustedPosition)
@@ -1315,7 +1317,10 @@ window.addEventListener('DOMContentLoaded', () => {
 		video.startTime = 0
 		video.endTime = video.duration
 	}
-	releaseSelectionButton.addEventListener('click', releaseSelection)
+	releaseSelectionButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    releaseSelection()
+  })
 })
 
 // ウィンドウサイズ変更イベント

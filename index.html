@@ -74,9 +74,9 @@
           <video id="myVideo" controls></video>
         </div>
         <div>
-          <button id="releaseSelectionButton" class="favorite styled" type="button">発話の部分選択を解除</button>
-          <button id="positionAdjustment">選択範囲のトラクリをきちんと描画</button>
-          <button id="roughdraw">全発話トラクリ粗描画</button>
+          <!-- <button id="releaseSelectionButton" class="favorite styled" type="button">発話の部分選択を解除</button> -->
+          <!-- <button id="positionAdjustment">選択範囲のトラクリをきちんと描画</button> -->
+          <!-- <button id="roughdraw">全発話トラクリ粗描画</button> -->
           <button id="editCategoryButton">カテゴリを編集</button>
           <button id="showOrHideCommentOptionButton">コメントオプション欄の表示/非表示を切り替え</button>
           <button id="deleteSelectedCommentsButton">選択したコメントを削除</button>
@@ -93,7 +93,11 @@
         <div class="left-group">
           <div class="optionPartition"></div>
           <a href="" class="optionButton">発話</a>
+            <a href="" class="optionButton" id="releaseSelectionButton">部分選択を解除</a>
+            <a href="" class="optionButton" id="positionAdjustment">選択範囲を描画</a>
+            <a href="" class="optionButton" id="roughdraw">全範囲を描画</a>
           <a href="" class="optionButton">コメント</a>
+
           <a href="" class="optionButton">インポート</a>
           <a href="" class="optionButton">エクスポート</a>
         </div>
@@ -110,6 +114,13 @@
           </a>
           <div style="display: flex; background-color: white;" class="fontOption">
             <img src="./assets/icons8-lowercase-50.png" style="width: 20px; height: 20px; margin: 0 3px;">
+            <!-- フォントセレクタ -->
+            <select id="fontSelector">
+              <option value="gothic">Gothic</option>
+              <option value="mincho">Mincho</option>
+              <option value="monospace">Monospace</option>
+            </select>
+            <!-- フォントサイズセレクタ -->
             <select id="fontSizeSelector" style="margin-right: 10px;">
               <option value="10">10</option>
               <option value="12" selected>12</option>
@@ -147,13 +158,13 @@
           <label>一行あたり文字数<input type="text" id="charNumPerRow" /></label>
           <button id="charNumChange">文字数変更を反映</button>
           <!-- フォントセレクタ -->
-          <select id="fontSelector">
+          <!-- <select id="fontSelector">
             <option value="gothic">Gothic</option>
             <option value="mincho">Mincho</option>
             <option value="monospace">Monospace</option>
-          </select>				
+          </select>	-->
           <!-- フォントサイズセレクタ -->
-          <label for="fontSizeSelector">font size: </label>
+          <!-- <label for="fontSizeSelector">font size: </label> -->
           <!-- <select id="fontSizeSelector">
             <option value="10">10</option>
             <option value="12" selected>12</option>
