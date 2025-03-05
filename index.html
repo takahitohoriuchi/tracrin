@@ -77,13 +77,13 @@
           <!-- <button id="releaseSelectionButton" class="favorite styled" type="button">発話の部分選択を解除</button> -->
           <!-- <button id="positionAdjustment">選択範囲のトラクリをきちんと描画</button> -->
           <!-- <button id="roughdraw">全発話トラクリ粗描画</button> -->
-          <button id="editCategoryButton">カテゴリを編集</button>
-          <button id="showOrHideCommentOptionButton">コメントオプション欄の表示/非表示を切り替え</button>
-          <button id="deleteSelectedCommentsButton">選択したコメントを削除</button>
-          <button id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</button>
+          <!-- <button id="editCategoryButton">カテゴリを編集</button>
+          <button id="showOrHideCommentOptionButton">コメントオプション欄の表示/非表示を切り替え</button> -->
+          <!-- <button id="deleteSelectedCommentsButton">選択したコメントを削除</button> -->
+          <!-- <button id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</button> -->
           <button id="outputSelectedCommentsAsFileButton">選択したコメントのファイルを出力</button>
-          <button id="outputCommentFileButton">コメントファイルを出力</button>
-          <button id="inputCommentFileButton">コメントファイルを入力</button>
+          <!-- <button id="outputCommentFileButton">コメントファイルを出力</button> -->
+          <!-- <button id="inputCommentFileButton">コメントファイルを入力</button> -->
           <input type="file" id="commentFileInput" style="display: none" accept=".tsv" />
           <div id="categoryList" style="display: none"></div>
         </div>
@@ -92,14 +92,20 @@
       <div class="optionBar">
         <div class="left-group">
           <div class="optionPartition"></div>
-          <a href="" class="optionButton">発話</a>
-            <a href="" class="optionButton" id="releaseSelectionButton">部分選択を解除</a>
-            <a href="" class="optionButton" id="positionAdjustment">選択範囲を描画</a>
-            <a href="" class="optionButton" id="roughdraw">全範囲を描画</a>
-          <a href="" class="optionButton">コメント</a>
-
-          <a href="" class="optionButton">インポート</a>
-          <a href="" class="optionButton">エクスポート</a>
+          <a href="" class="optionButton" id="toggleHatsuwaButton">発話</a>
+            <a href="" class="optionButton hidden" id="releaseSelectionButton">部分選択を解除</a>
+            <a href="" class="optionButton hidden" id="positionAdjustment">選択範囲をきちんと描画</a>
+            <a href="" class="optionButton hidden" id="roughdraw">全範囲をざっくり描画</a>
+          <a href="" class="optionButton" id="toggleCommentButton">コメント</a>
+            <a href="" class="optionButton hidden" id="editCategoryButton">カテゴリを編集</a>
+            <a href="" class="optionButton hidden" id="showOrHideCommentOptionButton">オプション欄の表示を切り替え</a>
+            <a href="" class="optionButton hidden" id="deleteSelectedCommentsButton">選択したコメントを削除</a>
+            <a href="" class="optionButton hidden" id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</a>
+          <a href="" class="optionButton" id="toggleImportFileButton">インポート</a>
+            <a href="" class="optionButton hidden" id="inputVideoFileButton2">ビデオファイル</a>
+            <a href="" class="optionButton hidden" id="inputCommentFileButton">コメントファイル</a>
+          <a href="" class="optionButton" id="toggleExportFileButton">エクスポート</a>
+            <a href="" class="optionButton hidden" id="outputCommentFileButton">コメントファイル</a>
         </div>
         <div class="left-group">
           <a href="" style="display: flex;">

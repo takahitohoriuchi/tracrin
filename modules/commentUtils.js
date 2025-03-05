@@ -353,7 +353,8 @@ function changeCategory(newCategory, commentObj) {
   changeCommentStickerColor(commentObj)
 }
 
-document.getElementById('editCategoryButton').addEventListener('click', function(){
+document.getElementById('editCategoryButton').addEventListener('click', function(event){
+  event.preventDefault()
   const categoryList = document.getElementById('categoryList')
   const display = categoryList.style.display
   if (display == 'none') {
@@ -363,14 +364,16 @@ document.getElementById('editCategoryButton').addEventListener('click', function
   }
 })
 
-document.getElementById('deleteSelectedCommentsButton').addEventListener('click', function() {
+document.getElementById('deleteSelectedCommentsButton').addEventListener('click', function(event) {
+  event.preventDefault()
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
     confirmDeleteComments(selectedCommentObjs)
   }
 })
 
-document.getElementById('showOrHideSelectedCommentsButton').addEventListener('click', function() {
+document.getElementById('showOrHideSelectedCommentsButton').addEventListener('click', function(event) {
+  event.preventDefault()
   const selectedCommentObjs = commentObjs.filter(commentObj => commentObj.isSelected === true)
   if (selectedCommentObjs) {
     selectedCommentObjs.forEach(selectedCommentObj => {
@@ -394,7 +397,8 @@ document.getElementById('outputSelectedCommentsAsFileButton').addEventListener('
 //   outputCommentFile(commentObjs)
 // })
 
-document.getElementById('inputCommentFileButton').addEventListener('click', function() {
+document.getElementById('inputCommentFileButton').addEventListener('click', function(event) {
+  event.preventDefault()
   document.getElementById('commentFileInput').click()
 })
 
@@ -403,7 +407,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const openPopupBtn = document.getElementById("outputCommentFileButton");
 
-  openPopupBtn.addEventListener('click', () => {
+  openPopupBtn.addEventListener('click', (event) => {
+    event.preventDefault()
     if (!popup) {
       // 初回クリック時にポップアップを生成
       const content = document.createElement('p');
@@ -702,7 +707,8 @@ function confirmDeleteComments(targetCommentObjs) {
 
 let commentOptionDisplay = true
 
-document.getElementById('showOrHideCommentOptionButton').addEventListener('click', function() {
+document.getElementById('showOrHideCommentOptionButton').addEventListener('click', function(event) {
+  event.preventDefault()
   commentOptionDisplay = !commentOptionDisplay
   showOrHideCommentOption()
 })

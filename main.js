@@ -1210,7 +1210,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	})
 	// 全発話のトラクリを粗描画
 	const roughDrawButton = document.getElementById('roughdraw')
-	roughDrawButton.addEventListener('click', () => {
+	roughDrawButton.addEventListener('click', (event) => {
     event.preventDefault()
 		releaseSelection()
 		isAdjustedPosition = false
@@ -1321,6 +1321,63 @@ window.addEventListener('DOMContentLoaded', () => {
     event.preventDefault()
     releaseSelection()
   })
+
+  // ボタンの表示切り替え
+  const toggleHatsuwaButton = document.getElementById('toggleHatsuwaButton')
+  toggleHatsuwaButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    const buttons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
+    toggleButtons(buttons)
+  })
+
+  const toggleCommentButton = document.getElementById('toggleCommentButton')
+  const editCategoryButton = document.getElementById('editCategoryButton')
+  const showOrHideCommentOptionButton = document.getElementById('showOrHideCommentOptionButton')
+  const deleteSelectedCommentsButton = document.getElementById('deleteSelectedCommentsButton')
+  const showOrHideSelectedCommentsButton = document.getElementById('showOrHideSelectedCommentsButton')
+  toggleCommentButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    const buttons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton]
+    toggleButtons(buttons)
+  })
+
+  const toggleImportFileButton = document.getElementById('toggleImportFileButton')
+  const inputVideoFileButton2 = document.getElementById('inputVideoFileButton2')
+  const inputCommentFileButton = document.getElementById('inputCommentFileButton')
+  toggleImportFileButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    const buttons = [inputVideoFileButton2, inputCommentFileButton]
+    toggleButtons(buttons)
+  })
+
+  const toggleExportFileButton = document.getElementById('toggleExportFileButton')
+  const outputCommentFileButton = document.getElementById('outputCommentFileButton')
+  toggleExportFileButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    const buttons = [outputCommentFileButton]
+    toggleButtons(buttons)
+  })
+
+  function toggleButtons(targetButtons) {
+    const isVisible = targetButtons[0].classList.contains("show")
+    if (isVisible) {
+      // 非表示にする
+      targetButtons.forEach((btn, index) => {
+        setTimeout(() => {
+          btn.classList.remove("show");
+        }, (targetButtons.length - index - 1) * 100); // 逆順で非表示に
+      });
+    } else {
+      console.log("aaa")
+      // 順番に表示
+      targetButtons.forEach((btn, index) => {
+        setTimeout(() => {
+          btn.classList.add("show")
+        }, index * 100) // 100msずつ遅延
+      })
+    }
+  }
+
 })
 
 // ウィンドウサイズ変更イベント
@@ -1341,3 +1398,4 @@ window.addEventListener('beforeunload', function(event) {
   event.returnValue = message;
   return message;
 });
+
