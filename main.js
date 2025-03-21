@@ -1139,9 +1139,15 @@ window.addEventListener('DOMContentLoaded', () => {
 					// console.log('.txtファイルだよ')
 					// main(files[0])
           textFile = files[0]
+          const fileName = files[0].name
+          console.log(fileName)
+          document.getElementById('TextFileName').textContent = fileName
 				} else if (fileType.startsWith('video/')) {
 					// loadVideo(files[0])
           videoFile = files[0]
+          const fileName = files[0].name
+          document.getElementById('VideoFileName').textContent = fileName
+          console.log(fileName)
 				}
 				ddarea.classList.remove('ddefect')
 			},
@@ -1164,6 +1170,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (fileType == 'text/plain') {
         // main(file)
         textFile = file
+        const fileName = file.name
+        console.log(fileName)
+        document.getElementById('TextFileName').textContent = fileName
       } else {
         alert("テキストファイルを選択してください。")
       }
@@ -1182,6 +1191,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (fileType.startsWith('video/')) {
         // loadVideo(file)
         videoFile = file
+        const fileName = file.name
+        document.getElementById('VideoFileName').textContent = fileName
+        console.log(fileName)
       } else {
         alert("ビデオファイルを選択してください。")
       }
