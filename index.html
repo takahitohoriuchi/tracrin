@@ -99,9 +99,17 @@
             <img src="./assets/icons8-txt-50.png">ファイル
           </a>
           <div class="fileMenu" id="fileMenu">
-            <a href="" class="fileMenuOption">開く</a>
-            <a href="" class="fileMenuOption">書き出し</a>
-            <a href="" class="fileMenuOption">TOP画面へ戻る（終了）</a>
+            <a href="" class="fileMenuOption" id="fileMenuOptionImportFileButton">開く</a>
+              <div class="fileOptionMenu" id="importFileMenu">
+                <a href="" class="fileMenuOption" id="inputVideoFileButton2">ビデオ</a>
+                <a href="" class="fileMenuOption" id="inputCommentFileButton">コメント</a>
+              </div>
+            <a href="" class="fileMenuOption" id="fileMenuOptionExportFileButton">書き出し</a>
+              <div class="fileOptionMenu" id="exportFileMenu">
+                <a href="" class="fileMenuOption" id="outputCommentFileButton">全てのコメント</a>
+                <a href="" class="fileMenuOption" id="outputSelectedCommentsAsFileButton">選択したコメント</a>
+              </div>
+            <a href="" class="fileMenuOption" id="fileMenuOptionBackButton">TOP画面へ戻る（終了）</a>
           </div>
           <div class="optionPartition"></div>
           <div>
@@ -228,10 +236,10 @@
             <a href="" class="optionButton hidden" id="deleteSelectedCommentsButton">選択したコメントを削除</a>
             <a href="" class="optionButton hidden" id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</a> -->
           <a href="" class="optionButton" id="toggleImportFileButton">インポート</a>
-            <a href="" class="optionButton hidden" id="inputVideoFileButton2">ビデオファイル</a>
-            <a href="" class="optionButton hidden" id="inputCommentFileButton">コメントファイル</a>
+            <!-- <a href="" class="optionButton hidden" id="inputVideoFileButton2">ビデオファイル</a>
+            <a href="" class="optionButton hidden" id="inputCommentFileButton">コメントファイル</a> -->
           <a href="" class="optionButton" id="toggleExportFileButton">エクスポート</a>
-            <a href="" class="optionButton hidden" id="outputCommentFileButton">コメントファイル</a>
+            <!-- <a href="" class="optionButton hidden" id="outputCommentFileButton">コメントファイル</a> -->
         </div>
         <div class="left-group">
           <a href="" style="display: flex;">

@@ -231,8 +231,8 @@ body {
   position: relative;
   display: flex;
   cursor: pointer;
-  /* -webkit-transition: all 0.3s;
-  transition: all 0.3s; */
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
   text-align: center;
   vertical-align: middle;
   text-decoration: none;
@@ -242,11 +242,7 @@ body {
 
   margin-left: 10px;
 
-  /* border-radius: 100vh;
-
-  border: 1px solid #000000;
-  box-shadow: 0 4px 0 #666666;
-  background-image: linear-gradient(to right, #7ffaa4, #eff699, #eff699, #7ffaa4); */
+  border-radius: 3px;
 }
 
 .fileButton:hover {
@@ -262,8 +258,9 @@ body {
   /* border: 1px solid #ccc; */
   border-radius: 3px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  min-width: 150px;
+  width: 200px;
   z-index: 1000;
+  padding: 7px 0;
 }
 
 .fileMenuOption {
@@ -277,6 +274,19 @@ body {
 
 .fileMenuOption:hover {
   background-color: rgba(100, 100, 100, 0.3);
+}
+
+.fileOptionMenu {
+  display: none; /* 初期状態は非表示 */
+  position: absolute;
+  top: 0px; /* ボタンの下に配置 */
+  left: 195px;
+  background: white;
+  /* border: 1px solid #ccc; */
+  border-radius: 3px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 200px;
+  z-index: 1000;
 }
 
 .videoArea {
@@ -347,7 +357,7 @@ body {
 }
 
 .optionButton:hover {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(100, 100, 100, 0.3);
 }
 
 .optionButton.hidden {

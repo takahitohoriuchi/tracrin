@@ -1194,6 +1194,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const fileName = file.name
         document.getElementById('VideoFileName').textContent = fileName
         console.log(fileName)
+        loadVideo(videoFile)
       } else {
         alert("ビデオファイルを選択してください。")
       }
@@ -1211,7 +1212,6 @@ window.addEventListener('DOMContentLoaded', () => {
     top.style.display = 'none';
     main(textFile)
     loadVideo(videoFile)
-    getMenuButtons()
   });
 
 	// 選択範囲のトラクリを精密描画
@@ -1366,6 +1366,11 @@ window.addEventListener('DOMContentLoaded', () => {
     toggleButtons(buttons)
   })
 
+  inputVideoFileButton2.addEventListener('click', function(event) {
+    event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
+    document.getElementById('VideoFileInput').click();  // 隠れているファイルインプットをクリックする
+  });
+
   const toggleExportFileButton = document.getElementById('toggleExportFileButton')
   const outputCommentFileButton = document.getElementById('outputCommentFileButton')
   toggleExportFileButton.addEventListener('click', (event) => {
@@ -1401,19 +1406,45 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  const button = document.getElementById("toggleFileButton")
-  const menu = document.getElementById("fileMenu")
+  const toggleFileButton = document.getElementById("toggleFileButton")
+  const fileMenu = document.getElementById("fileMenu")
 
   // メニューを開閉する
-  button.addEventListener("click", function (event) {
+  toggleFileButton.addEventListener("click", function (event) {
     event.preventDefault()
-    menu.style.display = (menu.style.display === "block") ? "none" : "block"
+    fileMenu.style.display = (fileMenu.style.display === "block") ? "none" : "block"
+  })
+
+  const fileMenuOptionImportFileButton = document.getElementById("fileMenuOptionImportFileButton")
+  const fileMenuOptionExportFileButton = document.getElementById("fileMenuOptionExportFileButton")
+  const fileMenuOptionBackButton = document.getElementById("fileMenuOptionBackButton")
+  
+  const importFileMenu = document.getElementById("importFileMenu")
+  const exportFileMenu = document.getElementById("exportFileMenu")
+
+  // メニューを開閉する
+  fileMenuOptionImportFileButton.addEventListener("click", function (event) {
+    event.preventDefault()
+    console.log("開く")
+    importFileMenu.style.display = (importFileMenu.style.display === "block") ? "none" : "block"
+  })
+
+  fileMenuOptionExportFileButton.addEventListener("click", function (event) {
+    event.preventDefault()
+    console.log("書き出し")
+    exportFileMenu.style.display = (exportFileMenu.style.display === "block") ? "none" : "block"
   })
 
   // メニュー外をクリックしたら閉じる
   document.addEventListener("click", function (event) {
-    if (!button.contains(event.target) && !menu.contains(event.target)) {
-      menu.style.display = "none"
+    if (!toggleFileButton.contains(event.target) && !fileMenu.contains(event.target)) {
+      fileMenu.style.display = "none"
+    }
+    if (!fileMenuOptionImportFileButton.contains(event.target) && !importFileMenu.contains(event.target)) {
+      importFileMenu.style.display = "none"
+    }
+    if (!fileMenuOptionExportFileButton.contains(event.target) && !exportFileMenu.contains(event.target)) {
+      exportFileMenu.style.display = "none"
     }
   })
 
