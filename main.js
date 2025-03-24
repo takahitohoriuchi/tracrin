@@ -1,22 +1,22 @@
 // SECTION:【import】
+import { addComment, pushHatsuwaGroups, pushSpans } from './modules/commentUtils.js'
 import {
 	addArrow,
-	addRow,
 	deleteArrow,
 	drawHeaderLabel,
 	drawLabel,
+	drawPlusButton,
 	drawSpeakerLabel,
 	genHatsuwaTags,
 	genLabelBox,
 	genRowDiv,
 	genSpan,
 	getHatsuwaObjFromSpan,
-	splitSpan,
+	splitSpan
 } from './modules/domUtils.js'
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { roundTextValues, /* tempConvertKukuriMarksInHatsuwa */ } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
-import { addComment, pushSpans, pushHatsuwaGroups } from './modules/commentUtils.js'
 
 
 // SECTION:【グローバル変数】
@@ -602,38 +602,47 @@ async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 	elements.forEach((element) => {
 		element.remove()
 	})
+
+	let headerFontSize = 12
 	// 行ラベル表示
-	drawHeaderLabel(document, headerArea, 0, 0, 'ID', _fontSize) //ID
+	drawHeaderLabel(document, headerArea, 0, 0, 'ID', headerFontSize) //ID	
+	
 	// (1) ヘッダを描く
 	// 話者
 	const speakerLabelX = _fontSize * 3
-	drawHeaderLabel(document, headerArea, speakerLabelX, 0, 'Speaker', _fontSize) // speaker
+	drawHeaderLabel(document, headerArea, speakerLabelX, 0, 'Speaker', headerFontSize) // speaker
 	// 矢印
 	// const arrowLabelX = _fontSize * 6
 	const textLabelX = _fontSize * 8
-	drawHeaderLabel(document, headerArea, textLabelX, 0, 'Text', _fontSize) // text
+	drawHeaderLabel(document, headerArea, textLabelX, 0, 'Text', headerFontSize) // text
 
 	// console.log('dataAreaStyle: ', dataAreaStyle)	
 
 	// (2) 列ラベルを発話ごとに処理
 	let tempHatsuwaGroups = _hatsuwaGroups.slice(_drawnRange.sGroupID, _drawnRange.eGroupID + 1)
 	accumRowCount = 0
+	let accumEmptyRowCount = 0
 	tempHatsuwaGroups.forEach((hatsuwaGroup, i) => {
 		hatsuwaGroup.forEach((hatsuwaObj, j) => {
 			for (let k = 0; k < hatsuwaObj.rowNum; k++) {
 				// 行連番を表示
-				const idColX = 0
-				const idColY = _fontSize * lineHeightRatio * (accumRowCount + k)
+				const idColX = 0				
+				const idColY = _fontSize * lineHeightRatio * (accumRowCount + accumEmptyRowCount + k)
+				const id = formatNumber(accumRowCount  + k + 1) //NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。				
+				const rowID = accumRowCount + accumEmptyRowCount + k
+				let labelBox = genLabelBox(document, rowElems[rowID])
+				let label
+				if(hatsuwaObj.text != ''){					
+					label = drawLabel(document, labelBox, idColX, idColY, id, rowID, _fontSize)					
+				}else{					
+					label = drawLabel(document, labelBox, idColX, idColY, '', rowID, _fontSize)					
+				}				
 
-				const id = formatNumber(accumRowCount + k + 1) //NOTE:この+1は、ユーザからすると「IDが0からだとヘンだから1からにする」ってだけ。
-				const rowID = id - 1
 				// const id = accumRowCount + k + 1
 				// TODO:親となるdiv
 				// let labelBox = document.createElement('div')
 				// console.log('rowElems[rowID]: ', rowElems[rowID])
-				let labelBox = genLabelBox(document, rowElems[rowID])
-				// labelBoxをrowにapppendせねば
-				const label = drawLabel(document, labelBox, idColX, idColY, id, rowID, _fontSize)
+				// const plusButtonLabel = drawPlusButton(document, labelBox, idColX, idColY, rowID, _fontSize)
 
 				// 矢印用のボックスを用意
 				// let arrowLabel = drawLabel(document, labelBox, )
@@ -642,7 +651,7 @@ async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 				// 「話者ラベル」を表示（発話の最初行だけ）
 				if (k == 0) {
 					const speakerColX = speakerLabelX
-					const speakerColY = _fontSize * lineHeightRatio * accumRowCount
+					const speakerColY = _fontSize * lineHeightRatio * (accumRowCount + accumEmptyRowCount)
 					const speaker = hatsuwaObj.speaker
 					const label = drawSpeakerLabel(document, labelBox, speakerColX, speakerColY, speaker, rowID, hatsuwaObj.ID, _fontSize)
 					speakerLabels.push(label)
@@ -651,6 +660,11 @@ async function drawIDandSpeaker(_hatsuwaGroups, _drawnRange, _fontSize) {
 				rowElems[rowID].insertBefore(labelBox, rowElems[rowID].firstChild)
 			}
 			accumRowCount += hatsuwaObj.rowNum
+			if(hatsuwaObj.text == ''){
+				accumRowCount -= 1
+				accumEmptyRowCount += 1
+			}
+			
 		})
 	})
 	// console.log('最終的に描画される行数: ', accumRowCount)
@@ -689,7 +703,13 @@ async function positionAdjust(_isAdjustedPosition) {
 // 5: マウスイベントを追加
 async function addMouseEvents() {
 	let clickTimeout = null
-	// 発話spanタグとrowの選択
+	// rowの選択
+	// for (let row of rowElems){
+	// 	row.addEventListener('mouseover', ()=>{
+	// 		console.log('マウスオンrow: ', row)
+	// 	})
+	// }
+	// 発話spanタグの選択
 	for (let group of hatsuwaTagSpans) {
 		for (let hatsuwa of group) {
 			for (let span of hatsuwa) {
@@ -886,17 +906,38 @@ async function addMouseEvents() {
 	}
 	// IDラベルの選択
 	for (let [i, label] of idLabels.entries()) {
-			
-
 		// マウスオン
-		label.addEventListener('mouseover', () => {						
+		label.addEventListener('mouseover', () => {
 			label.style.backgroundColor = mouseon4Label
 			let rowID = label.getAttribute('rowID')
 			let row = rowElems[rowID]
 			row.style.backgroundColor = mouseon4HatsuwarowColor
-		})
+		})		
+		// DEBUG:
+		// 要素Xにマウスが入ったとき（mouseenter）にボタンを表示
+		// label.addEventListener('mouseenter', () => {
+		// 	console.log('IDのlabelにmouse enter')
+		// 	// マウスオン時に+ボタンを生成する
+		// 	let plusButton = document.createElement('button')
+		// 	plusButton.id = 'plusButton'
+		// 	plusButton.innerText = '+'
+		// 	plusButton.classList.add('plus-button')
+
+		// 	// ＋ボタンがクリックされたときのイベント処理
+		// 	plusButton.addEventListener('click', () => {
+		// 		// ここに実行したい処理を記述
+		// 		alert('＋ボタンがクリックされました！')
+		// 	})
+		// 	// 要素Xに追加			
+		// 	scrollableDivArea.appendChild(plusButton)
+		// 	console.log('plusButton outerHTML:', plusButton.outerHTML)
+
+		// 	// デバッグ用: ボタンの位置とサイズを出力
+		// 	console.log('plusButton bounding rect:', plusButton.getBoundingClientRect())
+		// })		
+		DEBUG:		// 
 		// マウスリーブ
-		label.addEventListener('mouseout', () => {			
+		label.addEventListener('mouseout', () => {
 			label.style.backgroundColor = 'transparent'
 			let rowID = label.getAttribute('rowID')
 			let row = rowElems[rowID]
@@ -916,51 +957,9 @@ async function addMouseEvents() {
 				clearTimeout(clickTimeout) // シングルクリックをキャンセル
 				clickTimeout = null
 				console.log('IDラベルがダブルクリックされました')
-				
-
-				// (1) クリックしたlabelが属するrowを取得（おじいちゃん要素）
-				const grandparentDiv = label.parentElement?.parentElement
-				if (!grandparentDiv) return
-
-				// (2) row傘下のhatsuwaSpanTagをひとつ取得
-				const span = grandparentDiv.querySelector('span.tag')
-				console.log('span: ', span)
-				if (!span) return
-
-				// (3) hatsuwaSpanTagの'globalTagID'(i-j-k)を取得
-				const globalTagID = span.getAttribute('globalTagID')
-				console.log('globalTagID: ', globalTagID)
-				if (!globalTagID) return
-
-				// (4) 該当するhatsuwaObjを取得
-				const [j, k, l] = globalTagID.split('-').map(Number)
-				const clickedHatsuwaObj = hatsuwaGroups[j][k]
-				// (5) 該当obj直後に空白obj追加 or 該当obj削除
-				if(clickedHatsuwaObj.text != ''){
-					// (5a) hatsuwaGroups[i][j+1]として、空っぽhatsuwaObjを挿入
-					if (isNaN(j) || isNaN(k)) return
-					const hatsuwaObj = {
-						label: '', // 発話ラベル
-						speaker: '', // 発話者
-						start: hatsuwaGroups[j][k].start, // 発話開始時間
-						end: hatsuwaGroups[j][k].end, // 発話終了時間
-						text: '', // 発話内容
-					}
-					hatsuwaGroups[j].splice(k + 1, 0, hatsuwaObj)
-				}else{
-					// (5b) 該当空行の削除
-					hatsuwaGroups[j].splice(k, 1)
-				}
-				// TODO:ここでもいちどdrawTranscript()する
-				await positionAdjust(isAdjustedPosition)					
-
-
+				await updateEmptyRow(label)
 				return
 			}
-
-
-				
-			
 
 			clickTimeout = setTimeout(() => {
 				clickTimeout = null
@@ -984,12 +983,10 @@ async function addMouseEvents() {
 				addArrow(document, label, fontSize * 1.5, 15, y)
 			}
 		})
-		// ダブルクリック
+		// デフォルトのダブルクリックは阻止
 		label.addEventListener('dblick', () => {
 			e.preventDefault() // デフォルトの動作を防ぐ（ブラウザのダブルクリック動作対策）
-			
 		})
-		
 	}
 	// speakerラベルの選択
 	for (let label of speakerLabels) {
@@ -1000,6 +997,25 @@ async function addMouseEvents() {
 			let row = rowElems[rowID]
 			row.style.backgroundColor = mouseon4HatsuwarowColor
 		})
+		// DEBUG:ここに、このlabelの親要素であるlabelBoxに、このlabelのひとつ前に、divボタンを追加？
+		// マウスエンター
+		// label.addEventListener('mouseenter', () => {
+		// 	// TODO:plusButtonをvisibleにする
+		// 	console.log('IDのlabelにmouse over')
+		// 	// +ボタンを生成
+		// 	let plusButton = document.createElement('button')
+		// 	plusButton.innerText = '+'
+		// 	plusButton.classList.add('plus-button')
+
+		// 	// クリックイベントを追加
+		// 	plusButton.addEventListener('click', () => {
+		// 		alert('＋ボタンがクリックされました！')
+		// 	})
+
+		// 	// `label` の直前に `plusButton` を挿入
+		// 	label.before(plusButton)
+		// })
+		// DEBUG:
 		// マウスリーブ
 		label.addEventListener('mouseout', () => {
 			label.style.backgroundColor = 'transparent'
@@ -1028,6 +1044,45 @@ async function addMouseEvents() {
 			// console.log('video.endTime: ', video.endTime)
 		})
 	}
+}
+
+async function updateEmptyRow(_label){
+	let label = _label
+	// (1) クリックしたlabelが属するrowを取得（おじいちゃん要素）
+	const grandparentDiv = label.parentElement?.parentElement
+	if (!grandparentDiv) return
+
+	// (2) row傘下のhatsuwaSpanTagをひとつ取得
+	const span = grandparentDiv.querySelector('span.tag')
+	console.log('span: ', span)
+	if (!span) return
+
+	// (3) hatsuwaSpanTagの'globalTagID'(i-j-k)を取得
+	const globalTagID = span.getAttribute('globalTagID')
+	console.log('globalTagID: ', globalTagID)
+	if (!globalTagID) return
+
+	// (4) 該当するhatsuwaObjを取得
+	const [j, k, l] = globalTagID.split('-').map(Number)
+	const clickedHatsuwaObj = hatsuwaGroups[j][k]
+	// (5) 該当obj直後に空白obj追加 or 該当obj削除
+	if(clickedHatsuwaObj.text != ''){
+		// (5a) hatsuwaGroups[i][j+1]として、空っぽhatsuwaObjを挿入
+		if (isNaN(j) || isNaN(k)) return
+		const hatsuwaObj = {
+			label: '', // 発話ラベル
+			speaker: '', // 発話者
+			start: hatsuwaGroups[j][k].start, // 発話開始時間
+			end: hatsuwaGroups[j][k].end, // 発話終了時間
+			text: '', // 発話内容
+		}
+		hatsuwaGroups[j].splice(k + 1, 0, hatsuwaObj)
+	}else{
+		// (5b) 該当空行の削除
+		hatsuwaGroups[j].splice(k, 1)
+	}
+	// ここでもいちどdrawTranscript()する
+	await positionAdjust(isAdjustedPosition)
 }
 
 // エリアのサイズ調整
