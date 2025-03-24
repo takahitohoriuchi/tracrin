@@ -42,6 +42,7 @@ const colorOptions = [
 let commentObjs = []
 let hatsuwaGroups
 let spans
+let textFileName
 let zIndexCounter = 2
 let isEditingGlobal = false // コメントに対応するspanタグ要素を編集状態を制御、わかりやすい変数名に変更予定
 let currentCategory = categories[0].categoryName
@@ -58,6 +59,10 @@ export function pushSpans(){
 export function pushHatsuwaGroups(_hatsuwaGroups){
   hatsuwaGroups = _hatsuwaGroups
   console.log(hatsuwaGroups[5][0]['end'])
+}
+
+export function pushTextfileName(fileName){
+  textFileName = fileName.split(".")[0]
 }
 
 // function getSpans() {
@@ -144,7 +149,7 @@ function addCommentSticker(commentObj, xPosition, yPosition) {
   }
 
   const commentInput = document.createElement('textarea')
-  commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力'
+  commentInput.placeholder = commentObj.linkedGlobalTagIDs[0] + 'のコメントを入力 id: ' + commentObj.commentID
   commentInput.className = 'input'
   commentInput.value = commentObj.comment
   commentInput.onchange = function() {
@@ -414,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const content = document.createElement('p');
       content.innerHTML = `
         <label>
-          ファイル名: <input type="text" id="fileName" value="comment" />
+          ファイル名: <input type="text" id="fileName" value="${textFileName}_comment" />
         </label>
         <br>
         <label>
@@ -437,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           let fileName = fileNameInput.value;
           if (!fileName) {
-            fileName = 'comment'
+            fileName = textFileName + '_comment'
           }
           const fileType = fileTypeSelect.value;
 

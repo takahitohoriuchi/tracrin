@@ -16,7 +16,7 @@ import {
 import { formatNumber, num2Px, px2Num } from './modules/otherUtils.js'
 import { roundTextValues, /* tempConvertKukuriMarksInHatsuwa */ } from './modules/transcriptUtils.js'
 import { loadVideo, video, videoAspectRatio } from './modules/video.js'
-import { addComment, pushSpans, pushHatsuwaGroups } from './modules/commentUtils.js'
+import { addComment, pushSpans, pushTextfileName, pushHatsuwaGroups } from './modules/commentUtils.js'
 
 
 // SECTION:【グローバル変数】
@@ -123,6 +123,7 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 	}
 
   pushSpans()
+  pushTextfileName(textFile.name)
 }
 
 // 1: 発話オブジェクト群[]を生成する関数
@@ -1436,6 +1437,8 @@ window.addEventListener('DOMContentLoaded', () => {
     exportFileMenu.style.display = (exportFileMenu.style.display === "block") ? "none" : "block"
   })
 
+  const categoryList = document.getElementById('categoryList')
+
   // メニュー外をクリックしたら閉じる
   document.addEventListener("click", function (event) {
     if (!toggleFileButton.contains(event.target) && !fileMenu.contains(event.target)) {
@@ -1446,6 +1449,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     if (!fileMenuOptionExportFileButton.contains(event.target) && !exportFileMenu.contains(event.target)) {
       exportFileMenu.style.display = "none"
+    }
+    if (!editCategoryButton.contains(event.target) && !categoryList.contains(event.target)){
+      categoryList.style.display = "none"
     }
   })
 
