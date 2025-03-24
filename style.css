@@ -40,6 +40,16 @@ nav {
 }
 /* 行 */
 
+/* ＋ボタンのスタイル（最初は非表示） */
+.plus-button {
+  position: absolute;
+  top: 10px;     /* 要素Xの上から10px */
+  right: 10px;   /* 要素Xの右端から10px */  
+  z-index: 10000;  /* 要素Xより前面に表示する */
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;  
+}
 /* 矢印 */
 .arrow{
 	position: absolute;

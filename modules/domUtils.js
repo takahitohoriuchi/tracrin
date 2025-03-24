@@ -176,6 +176,26 @@ export function drawLabel(_document, _element, _x, _y, _label, _rowID, _fontSize
 	return dummy
 }
 
+export function drawPlusButton(_document, _element, _x, _y, _rowID, _fontSize) {
+	// +ボタンを生成
+	let plusButton = document.createElement('button')
+	plusButton.innerText = '+'
+	plusButton.setAttribute('rowID', _rowID)
+	plusButton.classList.add('plus-button')
+	// plusButton.className = 'label'
+
+	// クリックイベントを追加
+	plusButton.addEventListener('click', () => {
+		alert('＋ボタンがクリックされました！')
+	})
+				
+	dummy.style.fontSize = num2Px(_fontSize)
+	dummy.style.left = num2Px(_x)
+	dummy.style.top = num2Px(_y)
+	_element.appendChild(dummy)
+	return dummy
+}
+
 
 export function drawSpeakerLabel(_document, _element, _x, _y, _label, _rowID, _hatsuwaID, _fontSize) {
 	var dummy = _document.createElement('span')
@@ -279,8 +299,7 @@ export function splitSpan(_document, _span, _charNumFirstRow, _maxCharNumPerRow,
 				remainingText = remainingText.slice(charNumFstRow - 1)
 			}	
 			// (1-4)中途半端になってなければ、
-			else {
-				// DEBUG:20240718
+			else {				
 				// (1-2) '()','<>','°'などのククリ系記号が、あるタグ内で開いたら閉じてるか？をチェックし、開きっぱだったら調整。
 				console.log('_tag: ', _tag)
 				const kukuriMarkName = isIncompleteKukuri(firstRowString)
