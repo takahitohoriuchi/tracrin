@@ -121,6 +121,8 @@ async function main(_file = null, _fontSize = null, _charNumPerRow = null) {
 		console.groupEnd()
 		console.log('-----データロード完了-----')
 	}
+
+  pushSpans()
 }
 
 // 1: 発話オブジェクト群[]を生成する関数
@@ -878,7 +880,6 @@ async function addMouseEvents() {
 				span.addEventListener('contextmenu', (event) => {
 					event.preventDefault()
 					let globalTagID = span.getAttribute('globalTagID')
-          pushSpans()
           addComment(globalTagID)
 				})
 			}
