@@ -1,5 +1,4 @@
 // SECTION:【import】
-import { addComment, pushHatsuwaGroups, pushSpans } from './modules/commentUtils.js'
 import {
 	addArrow,
 	deleteArrow,
