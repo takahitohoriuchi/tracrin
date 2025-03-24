@@ -1211,6 +1211,7 @@ window.addEventListener('DOMContentLoaded', () => {
     top.style.display = 'none';
     main(textFile)
     loadVideo(videoFile)
+    getMenuButtons()
   });
 
 	// 選択範囲のトラクリを精密描画
@@ -1334,23 +1335,26 @@ window.addEventListener('DOMContentLoaded', () => {
     releaseSelection()
   })
 
-  // ボタンの表示切り替え
-  const toggleHatsuwaButton = document.getElementById('toggleHatsuwaButton')
-  toggleHatsuwaButton.addEventListener('click', (event) => {
-    event.preventDefault()
-    const buttons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
-    toggleButtons(buttons)
-  })
-
-  const toggleCommentButton = document.getElementById('toggleCommentButton')
   const editCategoryButton = document.getElementById('editCategoryButton')
   const showOrHideCommentOptionButton = document.getElementById('showOrHideCommentOptionButton')
   const deleteSelectedCommentsButton = document.getElementById('deleteSelectedCommentsButton')
   const showOrHideSelectedCommentsButton = document.getElementById('showOrHideSelectedCommentsButton')
+
+  // ボタンの表示切り替え
+  const toggleHatsuwaButton = document.getElementById('toggleHatsuwaButton')
+  toggleHatsuwaButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    const targetButtons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
+    const otherButtons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton]
+    toggleButtons(targetButtons, otherButtons)
+  })
+
+  const toggleCommentButton = document.getElementById('toggleCommentButton')
   toggleCommentButton.addEventListener('click', (event) => {
     event.preventDefault()
-    const buttons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton]
-    toggleButtons(buttons)
+    const targetButtons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton]
+    const otherButtons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
+    toggleButtons(targetButtons, otherButtons)
   })
 
   const toggleImportFileButton = document.getElementById('toggleImportFileButton')
@@ -1370,7 +1374,7 @@ window.addEventListener('DOMContentLoaded', () => {
     toggleButtons(buttons)
   })
 
-  function toggleButtons(targetButtons) {
+  function toggleButtons(targetButtons, otherButtons) {
     const isVisible = targetButtons[0].classList.contains("show")
     if (isVisible) {
       // 非表示にする
@@ -1381,6 +1385,12 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     } else {
       console.log("aaa")
+      // otherButtonsを非表示にする
+      otherButtons.forEach((btn, index) => {
+        setTimeout(() => {
+          btn.classList.remove("show");
+        }, (targetButtons.length - index - 1) * 100); // 逆順で非表示に
+      });
       // 順番に表示
       targetButtons.forEach((btn, index) => {
         setTimeout(() => {
@@ -1389,6 +1399,23 @@ window.addEventListener('DOMContentLoaded', () => {
       })
     }
   }
+
+
+  const button = document.getElementById("toggleFileButton")
+  const menu = document.getElementById("fileMenu")
+
+  // メニューを開閉する
+  button.addEventListener("click", function (event) {
+    event.preventDefault()
+    menu.style.display = (menu.style.display === "block") ? "none" : "block"
+  })
+
+  // メニュー外をクリックしたら閉じる
+  document.addEventListener("click", function (event) {
+    if (!button.contains(event.target) && !menu.contains(event.target)) {
+      menu.style.display = "none"
+    }
+  })
 
 })
 
@@ -1410,4 +1437,3 @@ window.addEventListener('beforeunload', function(event) {
   event.returnValue = message;
   return message;
 });
-
