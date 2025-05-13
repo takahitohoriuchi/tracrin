@@ -86,6 +86,29 @@
           <!-- <button id="inputCommentFileButton">コメントファイルを入力</button> -->
           <input type="file" id="commentFileInput" style="display: none" accept=".tsv" />
           <div id="categoryList" style="display: none"></div>
+          <div id="popupContentTemplate" style="display: none;">
+            <p>
+              <label>
+                ファイル名:
+                <input type="text" id="fileName" />
+              </label>
+              <br />
+              <label>
+                ファイル形式:
+                <select id="fileType">
+                  <option value="tsv">tracrin(.tsv)</option>
+                  <option value="elan">elan(.eafcomment)</option>
+                </select>
+              </label>
+            </p>
+          </div>
+          <div id="changeNumOfCharsPerRowPopup" style="display: none;">
+            <p>
+              <!-- 一行あたり文字数 -->
+              <label><input type="text" id="charNumPerRow" /></label>
+              <!-- <button id="charNumChange">文字数変更を反映</button> -->
+            </p>
+          </div>
         </div>
       </div>
 
@@ -96,7 +119,7 @@
             <a>ファイル</a>
           </div> -->
           <a href="" class="fileButton" id="toggleFileButton">
-            <img src="./assets/icons8-txt-50.png">ファイル
+            <img src="./assets/icons8-file-48.png">ファイル
           </a>
           <div class="fileMenu" id="fileMenu">
             <a href="" class="fileMenuOption" id="fileMenuOptionImportFileButton">開く</a>
@@ -116,6 +139,7 @@
             <div style="display: flex;">
               <a href="" class="optionButton" id="toggleHatsuwaButton">発話</a>
               <a href="" class="optionButton" id="toggleCommentButton">コメント</a>
+              <a href="" class="optionButton" id="toggleDisplayButton">表示</a>
             </div>
             <div style="background-color: white; height: 30px; border-radius: 15px; width: 100%; display: flex; line-height: 30px; padding: 0 0 0 10px;">
               <!-- 発話関連ボタン -->
@@ -127,11 +151,9 @@
               <a href="" class="optionButton hidden" id="deleteSelectedCommentsButton">選択したコメントを削除</a>
               <a href="" class="optionButton hidden" id="editCategoryButton">カテゴリを編集</a>
               <a href="" class="optionButton hidden" id="showOrHideCommentOptionButton">オプション欄の表示を切り替え</a>
-            <!-- <a href="" class="optionButton" id="toggleImportFileButton">インポート</a> -->
-              <!-- <a href="" class="optionButton hidden" id="inputVideoFileButton2">ビデオファイル</a>
-              <a href="" class="optionButton hidden" id="inputCommentFileButton">コメントファイル</a> -->
-            <!-- <a href="" class="optionButton" id="toggleExportFileButton">エクスポート</a> -->
-              <!-- <a href="" class="optionButton hidden" id="outputCommentFileButton">コメントファイル</a> -->
+              <!-- 表示関連ボタン -->
+               <a href="" class="optionButton hidden" id="changeNumOfCharsPerRowButton">一行あたりの文字数を変更</a>
+               <a href="" class="optionButton hidden" id="changeFontButton">フォント設定</a>
             </div>
           </div>
         </div>
@@ -179,8 +201,8 @@
       <!-- TODO:プチ設定エリア -->
       <div id="editContainer" style="position: relative; top: 600px;">
           <!-- 一行あたり文字数 -->
-          <label>一行あたり文字数<input type="text" id="charNumPerRow" /></label>
-          <button id="charNumChange">文字数変更を反映</button>
+          <!-- <label>一行あたり文字数<input type="text" id="charNumPerRow" /></label>
+          <button id="charNumChange">文字数変更を反映</button> -->
           <!-- フォントセレクタ -->
           <!-- <select id="fontSelector">
             <option value="gothic">Gothic</option>

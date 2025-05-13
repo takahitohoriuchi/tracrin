@@ -1271,138 +1271,19 @@ window.addEventListener('DOMContentLoaded', () => {
     loadVideo(videoFile)
   });
 
-	// 選択範囲のトラクリを精密描画
-	const positionAdjustmentButton = document.getElementById('positionAdjustment')
-	positionAdjustmentButton.addEventListener('click', (event) => {
-    event.preventDefault()
-		isAdjustedPosition = true
-		positionAdjust(isAdjustedPosition)
-	})
-	// 全発話のトラクリを粗描画
-	const roughDrawButton = document.getElementById('roughdraw')
-	roughDrawButton.addEventListener('click', (event) => {
-    event.preventDefault()
-		releaseSelection()
-		isAdjustedPosition = false
-		positionAdjust(isAdjustedPosition)
-	})
-	
-	// 文字位置調整の設定	
-	// 一行あたり文字数の設定
-	const charNumPerRowInputField = document.getElementById('charNumPerRow')
-	const charNumChangeConfirmButton = document.getElementById('charNumChange')
-	charNumChangeConfirmButton.addEventListener('click', handleCharNumInput)
-	function handleCharNumInput(event) {
-		const inputValue = charNumPerRowInputField.value
-
-		// Check if the input is a valid number
-		if (!isNaN(inputValue) && inputValue.trim() !== '') {
-			console.log(`The entered number is: ${inputValue}`)
-			// Call your custom function here
-			// drawTranscript(hatsuwaGroups, fontSize, inputValue)
-			main(null, null, inputValue)
-		} else {
-			console.log('Please enter a valid number')
-			alert('Please enter a valid number')
-		}
-	}	
-
-	// フォントサイズの設定
-	const fontSizeSelector = document.getElementById('fontSizeSelector')
-	fontSizeSelector.addEventListener('change', async() => {
-		console.log('フォントサイズの変更')
-		fontSize = fontSizeSelector.value
-		// TODO:labelBoxのwidthを更新
-		// TODO:トラクリのヘッダ列を再描画
-		// →drawIdAndSpeaker()の処理で、前のやつを削除する処理をつくる）
-		// main(null, fontSize, null)
-		await positionAdjust(isAdjustedPosition)
-		
-	})
-
-	// フォントの設定
-	const fontSelector = document.getElementById('fontSelector')
-	fontSelector.addEventListener('change', () => {
-		const selectedFont = fontSelector.value
-		if (selectedFont === 'gothic') {
-			transcriptArea.style.fontFamily = 'Arial, sans-serif'
-		} else if (selectedFont === 'mincho') {
-			transcriptArea.style.fontFamily = '"Times New Roman", serif'
-		} else if (selectedFont === 'monospace') {
-			transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace'
-		}
-	})
-
-	// // 設定メニュー開く
-	// const settingsIcon = document.getElementById('settings-icon')
-	// if (settingsIcon) {
-	// 	settingsIcon.addEventListener('click', function () {
-	// 		const menu = document.getElementById('settings-menu')
-	// 		menu.style.display = 'block'
-	// 	})
-	// }
-	// // 設定メニュー閉じる
-	// const settingsMenu = document.getElementById('settings-menu')
-	// document.addEventListener('click', function (e) {
-	// 	// クリックがメニュー内またはアイコン上でなければメニューを閉じる
-	// 	if (!settingsMenu.contains(e.target) && e.target !== settingsIcon) {
-	// 		settingsMenu.style.display = 'none'
-	// 	}
-	// })
-
-	// 発話グループ水平線をトグル@設定メニュー
-	// const toggleLineCheckbox = document.getElementById('toggle-line');
-	// toggleLineCheckbox.addEventListener('change', toggleLine)
-
-	// 開発用表示＠設定メニュー
-	// const toggleDevCheckbox = document.getElementById('toggle-dev');
-	// toggleDevCheckbox.addEventListener('change', toggleDev)
-
-	// プチ設定エリア
-	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
-	// 発話の部分選択を解除
-	function releaseSelection() {
-		// ボタン非表示
-		// releaseSelectionButton.style.display = 'none'
-		drawnRange.sGroupID = 0
-		drawnRange.eGroupID = hatsuwaGroups.length
-
-		// spanの選択解除
-		let selectedSpans = document.getElementsByClassName('selected')
-		// このspanが元々selectedなら、
-		Array.from(selectedSpans).forEach((spn) => {
-			spn.classList.remove('selected')
-			spn.style.color = ''
-		})
-		// 選択開始タグと終了タグを解除
-		;(selectionStartTag = null), (selectionEndTag = null)
-
-		// rowの選択解除
-		rowElems.forEach((row, i) => {
-			row.removeAttribute('selected')
-			row.style.backgroundColor = 'transparent'
-		})
-
-		// ビデオ再生範囲を初期状態へ
-		video.startTime = 0
-		video.endTime = video.duration
-	}
-	releaseSelectionButton.addEventListener('click', (event) => {
-    event.preventDefault()
-    releaseSelection()
-  })
-
   const editCategoryButton = document.getElementById('editCategoryButton')
   const showOrHideCommentOptionButton = document.getElementById('showOrHideCommentOptionButton')
   const deleteSelectedCommentsButton = document.getElementById('deleteSelectedCommentsButton')
   const showOrHideSelectedCommentsButton = document.getElementById('showOrHideSelectedCommentsButton')
-
+  const changeNumOfCharsPerRowButton = document.getElementById('changeNumOfCharsPerRowButton')
+  const changeFontButton = document.getElementById('changeFontButton')
+  
   // ボタンの表示切り替え
   const toggleHatsuwaButton = document.getElementById('toggleHatsuwaButton')
   toggleHatsuwaButton.addEventListener('click', (event) => {
     event.preventDefault()
     const targetButtons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
-    const otherButtons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton]
+    const otherButtons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton, changeNumOfCharsPerRowButton, changeFontButton]
     toggleButtons(targetButtons, otherButtons)
   })
 
@@ -1410,7 +1291,15 @@ window.addEventListener('DOMContentLoaded', () => {
   toggleCommentButton.addEventListener('click', (event) => {
     event.preventDefault()
     const targetButtons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton]
-    const otherButtons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
+    const otherButtons = [releaseSelectionButton, positionAdjustmentButton, roughDrawButton, changeNumOfCharsPerRowButton, changeFontButton]
+    toggleButtons(targetButtons, otherButtons)
+  })
+
+  const toggleDisplayButton = document.getElementById('toggleDisplayButton')
+  toggleDisplayButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    const targetButtons = [changeNumOfCharsPerRowButton, changeFontButton]
+    const otherButtons = [editCategoryButton, showOrHideCommentOptionButton, deleteSelectedCommentsButton, showOrHideSelectedCommentsButton, releaseSelectionButton, positionAdjustmentButton, roughDrawButton]
     toggleButtons(targetButtons, otherButtons)
   })
 
@@ -1510,6 +1399,147 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   })
 
+	// 選択範囲のトラクリを精密描画
+	const positionAdjustmentButton = document.getElementById('positionAdjustment')
+	positionAdjustmentButton.addEventListener('click', (event) => {
+    event.preventDefault()
+		isAdjustedPosition = true
+		positionAdjust(isAdjustedPosition)
+	})
+	// 全発話のトラクリを粗描画
+	const roughDrawButton = document.getElementById('roughdraw')
+	roughDrawButton.addEventListener('click', (event) => {
+    event.preventDefault()
+		releaseSelection()
+		isAdjustedPosition = false
+		positionAdjust(isAdjustedPosition)
+	})
+
+  let popup;
+  changeNumOfCharsPerRowButton.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    if (!popup) {
+      // HTMLテンプレートをクローンして使用
+      const template = document.getElementById('changeNumOfCharsPerRowPopup');
+      const content = template.cloneNode(true);
+      content.style.display = 'block'; // 表示用に変更（実際にはPopupクラスで処理）
+
+      popup = new Popup(
+        '一行あたりの文字数設定',
+        content,
+        () => {
+          // 文字位置調整の設定	
+          // 一行あたり文字数の設定
+          const charNumPerRowInputField = document.getElementById('charNumPerRow')
+          // const charNumChangeConfirmButton = document.getElementById('charNumChange')
+          // charNumChangeConfirmButton.addEventListener('click', handleCharNumInput)
+          // function handleCharNumInput(event) {
+            const inputValue = charNumPerRowInputField.value
+
+            // Check if the input is a valid number
+            if (!isNaN(inputValue) && inputValue.trim() !== '') {
+              console.log(`The entered number is: ${inputValue}`)
+              // Call your custom function here
+              // drawTranscript(hatsuwaGroups, fontSize, inputValue)
+              main(null, null, inputValue)
+            } else {
+              console.log('Please enter a valid number')
+              alert('Please enter a valid number')
+            }
+          // }
+        }
+      );
+    }
+
+    popup.show();
+  })	
+
+	// フォントサイズの設定
+	const fontSizeSelector = document.getElementById('fontSizeSelector')
+	fontSizeSelector.addEventListener('change', async() => {
+		console.log('フォントサイズの変更')
+		fontSize = fontSizeSelector.value
+		// TODO:labelBoxのwidthを更新
+		// TODO:トラクリのヘッダ列を再描画
+		// →drawIdAndSpeaker()の処理で、前のやつを削除する処理をつくる）
+		// main(null, fontSize, null)
+		await positionAdjust(isAdjustedPosition)
+		
+	})
+
+	// フォントの設定
+	const fontSelector = document.getElementById('fontSelector')
+	fontSelector.addEventListener('change', () => {
+		const selectedFont = fontSelector.value
+		if (selectedFont === 'gothic') {
+			transcriptArea.style.fontFamily = 'Arial, sans-serif'
+		} else if (selectedFont === 'mincho') {
+			transcriptArea.style.fontFamily = '"Times New Roman", serif'
+		} else if (selectedFont === 'monospace') {
+			transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace'
+		}
+	})
+
+	// // 設定メニュー開く
+	// const settingsIcon = document.getElementById('settings-icon')
+	// if (settingsIcon) {
+	// 	settingsIcon.addEventListener('click', function () {
+	// 		const menu = document.getElementById('settings-menu')
+	// 		menu.style.display = 'block'
+	// 	})
+	// }
+	// // 設定メニュー閉じる
+	// const settingsMenu = document.getElementById('settings-menu')
+	// document.addEventListener('click', function (e) {
+	// 	// クリックがメニュー内またはアイコン上でなければメニューを閉じる
+	// 	if (!settingsMenu.contains(e.target) && e.target !== settingsIcon) {
+	// 		settingsMenu.style.display = 'none'
+	// 	}
+	// })
+
+	// 発話グループ水平線をトグル@設定メニュー
+	// const toggleLineCheckbox = document.getElementById('toggle-line');
+	// toggleLineCheckbox.addEventListener('change', toggleLine)
+
+	// 開発用表示＠設定メニュー
+	// const toggleDevCheckbox = document.getElementById('toggle-dev');
+	// toggleDevCheckbox.addEventListener('change', toggleDev)
+
+	// プチ設定エリア
+	const releaseSelectionButton = document.getElementById('releaseSelectionButton')
+	// 発話の部分選択を解除
+	function releaseSelection() {
+		// ボタン非表示
+		// releaseSelectionButton.style.display = 'none'
+		drawnRange.sGroupID = 0
+		drawnRange.eGroupID = hatsuwaGroups.length
+
+		// spanの選択解除
+		let selectedSpans = document.getElementsByClassName('selected')
+		// このspanが元々selectedなら、
+		Array.from(selectedSpans).forEach((spn) => {
+			spn.classList.remove('selected')
+			spn.style.color = ''
+		})
+		// 選択開始タグと終了タグを解除
+		;(selectionStartTag = null), (selectionEndTag = null)
+
+		// rowの選択解除
+		rowElems.forEach((row, i) => {
+			row.removeAttribute('selected')
+			row.style.backgroundColor = 'transparent'
+		})
+
+		// ビデオ再生範囲を初期状態へ
+		video.startTime = 0
+		video.endTime = video.duration
+	}
+	releaseSelectionButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    releaseSelection()
+  })
+
 })
 
 // ウィンドウサイズ変更イベント
@@ -1530,3 +1560,88 @@ window.addEventListener('beforeunload', function(event) {
   event.returnValue = message;
   return message;
 });
+
+class Popup {
+  constructor(headerTitle, contentElement, onConfirm) {
+    // モーダル要素を作成
+    this.modal = document.createElement('div');
+    this.modal.style.display = 'none';
+    this.modal.style.position = 'fixed';
+    this.modal.style.top = '0';
+    this.modal.style.left = '0';
+    this.modal.style.width = '100%';
+    this.modal.style.height = '100%';
+    this.modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    this.modal.style.display = 'flex';
+    this.modal.style.justifyContent = 'center';
+    this.modal.style.alignItems = 'center';
+    this.modal.style.zIndex = 10000
+
+    // モーダルの中身を作成
+    const modalContent = document.createElement('div');
+    modalContent.style.background = 'white';
+    modalContent.style.padding = '20px';
+    modalContent.style.borderRadius = '5px';
+    modalContent.style.textAlign = 'center';
+    modalContent.style.minWidth = '300px';
+    modalContent.style.zIndex = 10001
+
+    // ヘッダー部分を作成
+    const header = document.createElement('h3');
+    header.textContent = headerTitle;
+
+    // 内容部分を挿入
+    const content = document.createElement('div');
+    content.appendChild(contentElement);
+
+    // ボタン部分を作成
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.marginTop = '20px';
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'space-around';
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'キャンセル';
+    cancelButton.addEventListener('click', () => this.hide());
+
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = '実行';
+    confirmButton.addEventListener('click', () => {
+      if (typeof onConfirm === 'function') {
+        onConfirm();
+      }
+      this.hide();
+    });
+
+    // ボタンを追加
+    buttonContainer.appendChild(cancelButton);
+    buttonContainer.appendChild(confirmButton);
+
+    // モーダルの中身を結合
+    modalContent.appendChild(header);
+    modalContent.appendChild(content);
+    modalContent.appendChild(buttonContainer);
+    this.modal.appendChild(modalContent);
+
+    // モーダル外をクリックしたときに閉じる
+    this.modal.addEventListener('click', (event) => {
+      // クリックした箇所がmodalContentではない場合に閉じる
+      if (event.target === this.modal) {
+        this.hide();
+      }
+    });
+
+    // DOMに追加
+    document.body.appendChild(this.modal);
+  }
+
+  // モーダルを表示
+  show() {
+    this.modal.style.display = 'flex';
+  }
+
+  // モーダルを非表示
+  hide() {
+    this.modal.style.display = 'none';
+  }
+}

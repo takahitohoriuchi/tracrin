@@ -407,62 +407,105 @@ document.getElementById('inputCommentFileButton').addEventListener('click', func
   document.getElementById('commentFileInput').click()
 })
 
+// document.addEventListener('DOMContentLoaded', () => {
+//   let popup; // ポップアップのインスタンスを保持
+
+//   const openPopupBtn = document.getElementById("outputCommentFileButton");
+
+//   openPopupBtn.addEventListener('click', (event) => {
+//     event.preventDefault()
+//     if (!popup) {
+//       // 初回クリック時にポップアップを生成
+//       const content = document.createElement('p');
+//       content.innerHTML = `
+//         <label>
+//           ファイル名: <input type="text" id="fileName" value="${textFileName}_comment" />
+//         </label>
+//         <br>
+//         <label>
+//           ファイル形式: 
+//           <select id="fileType">
+//             <option value="tsv">tracrin(.tsv)</option>
+//             <option value="elan">elan(.eafcomment)</option>
+//           </select>
+//         </label>
+//       `;
+
+//       // ポップアップを作成
+//       popup = new Popup(
+//         'コメントファイルを出力',
+//         content,
+//         () => {
+//           // コールバック内で最新の値を取得
+//           const fileNameInput = document.getElementById('fileName');
+//           const fileTypeSelect = document.getElementById('fileType');
+
+//           let fileName = fileNameInput.value;
+//           if (!fileName) {
+//             fileName = textFileName + '_comment'
+//           }
+//           const fileType = fileTypeSelect.value;
+
+//           if (fileType === 'tsv') {
+//             outputCommentFile(commentObjs, fileName)
+//           } else if (fileType === 'elan') {
+//             outputCommentFileForElan(commentObjs, fileName)
+//           } else {
+//             alert('無効な形式が選択されました。');
+//           }
+//         }
+//       );
+
+//       // 初期生成後、ポップアップを保持して再利用
+//     }
+
+//     // ポップアップを表示
+//     popup.show();
+//   });
+// });
+
 document.addEventListener('DOMContentLoaded', () => {
-  let popup; // ポップアップのインスタンスを保持
+  let popup;
 
   const openPopupBtn = document.getElementById("outputCommentFileButton");
 
   openPopupBtn.addEventListener('click', (event) => {
-    event.preventDefault()
-    if (!popup) {
-      // 初回クリック時にポップアップを生成
-      const content = document.createElement('p');
-      content.innerHTML = `
-        <label>
-          ファイル名: <input type="text" id="fileName" value="${textFileName}_comment" />
-        </label>
-        <br>
-        <label>
-          ファイル形式: 
-          <select id="fileType">
-            <option value="tsv">tracrin(.tsv)</option>
-            <option value="elan">elan(.eafcomment)</option>
-          </select>
-        </label>
-      `;
+    event.preventDefault();
 
-      // ポップアップを作成
+    if (!popup) {
+      // HTMLテンプレートをクローンして使用
+      const template = document.getElementById('popupContentTemplate');
+      const content = template.cloneNode(true);
+      content.style.display = 'block'; // 表示用に変更（実際にはPopupクラスで処理）
+
+      // 初期値を設定
+      content.querySelector('#fileName').value = `${textFileName}_comment`;
+
       popup = new Popup(
         'コメントファイルを出力',
         content,
         () => {
-          // コールバック内で最新の値を取得
-          const fileNameInput = document.getElementById('fileName');
-          const fileTypeSelect = document.getElementById('fileType');
+          const fileNameInput = content.querySelector('#fileName');
+          const fileTypeSelect = content.querySelector('#fileType');
 
-          let fileName = fileNameInput.value;
-          if (!fileName) {
-            fileName = textFileName + '_comment'
-          }
+          let fileName = fileNameInput.value || `${textFileName}_comment`;
           const fileType = fileTypeSelect.value;
 
           if (fileType === 'tsv') {
-            outputCommentFile(commentObjs, fileName)
+            outputCommentFile(commentObjs, fileName);
           } else if (fileType === 'elan') {
-            outputCommentFileForElan(commentObjs, fileName)
+            outputCommentFileForElan(commentObjs, fileName);
           } else {
             alert('無効な形式が選択されました。');
           }
         }
       );
-
-      // 初期生成後、ポップアップを保持して再利用
     }
 
-    // ポップアップを表示
     popup.show();
   });
 });
+
 
 function outputCommentFileForElan(commentObjs, fileName) {
   let xmlData = `
