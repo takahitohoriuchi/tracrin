@@ -1415,17 +1415,17 @@ window.addEventListener('DOMContentLoaded', () => {
 		positionAdjust(isAdjustedPosition)
 	})
 
-  let popup;
+  let changeNumOfCharsPerRowPopup;
   changeNumOfCharsPerRowButton.addEventListener('click', (event) => {
     event.preventDefault();
 
-    if (!popup) {
+    if (!changeNumOfCharsPerRowPopup) {
       // HTMLテンプレートをクローンして使用
       const template = document.getElementById('changeNumOfCharsPerRowPopup');
       const content = template.cloneNode(true);
       content.style.display = 'block'; // 表示用に変更（実際にはPopupクラスで処理）
 
-      popup = new Popup(
+      changeNumOfCharsPerRowPopup = new Popup(
         '一行あたりの文字数設定',
         content,
         () => {
@@ -1452,34 +1452,74 @@ window.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    popup.show();
-  })	
+    changeNumOfCharsPerRowPopup.show();
+  })
 
-	// フォントサイズの設定
-	const fontSizeSelector = document.getElementById('fontSizeSelector')
-	fontSizeSelector.addEventListener('change', async() => {
-		console.log('フォントサイズの変更')
-		fontSize = fontSizeSelector.value
-		// TODO:labelBoxのwidthを更新
-		// TODO:トラクリのヘッダ列を再描画
-		// →drawIdAndSpeaker()の処理で、前のやつを削除する処理をつくる）
-		// main(null, fontSize, null)
-		await positionAdjust(isAdjustedPosition)
+  let changeFontPopup
+  changeFontButton.addEventListener('click', (event) => {
+    event.preventDefault();
+
+      if (!changeFontPopup) {
+      // HTMLテンプレートをクローンして使用
+      const template = document.getElementById('changeFontPopup');
+      const content = template.cloneNode(true);
+      content.style.display = 'block'; // 表示用に変更（実際にはPopupクラスで処理）
+
+      changeFontPopup = new Popup(
+        'フォント設定',
+        content,
+        async () => {
+          // フォントサイズの設定
+          const fontSizeSelector = document.getElementById('fontSizeSelector')
+          console.log('フォントサイズの変更')
+          fontSize = fontSizeSelector.value
+          // TODO:labelBoxのwidthを更新
+          // TODO:トラクリのヘッダ列を再描画
+          // →drawIdAndSpeaker()の処理で、前のやつを削除する処理をつくる）
+          // main(null, fontSize, null)
+          await positionAdjust(isAdjustedPosition)
+
+          // フォントの設定
+          const fontSelector = document.getElementById('fontSelector')
+            const selectedFont = fontSelector.value
+            if (selectedFont === 'gothic') {
+              transcriptArea.style.fontFamily = 'Arial, sans-serif'
+            } else if (selectedFont === 'mincho') {
+              transcriptArea.style.fontFamily = '"Times New Roman", serif'
+            } else if (selectedFont === 'monospace') {
+              transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace'
+            }
+        }
+      )
+    }
+    changeFontPopup.show()
+  })
+
+	// // フォントサイズの設定
+	// const fontSizeSelector = document.getElementById('fontSizeSelector')
+	// fontSizeSelector.addEventListener('change', async() => {
+	// 	console.log('フォントサイズの変更')
+	// 	fontSize = fontSizeSelector.value
+	// 	// TODO:labelBoxのwidthを更新
+	// 	// TODO:トラクリのヘッダ列を再描画
+	// 	// →drawIdAndSpeaker()の処理で、前のやつを削除する処理をつくる）
+	// 	// main(null, fontSize, null)
+	// 	await positionAdjust(isAdjustedPosition)
 		
-	})
+	// })
 
-	// フォントの設定
-	const fontSelector = document.getElementById('fontSelector')
-	fontSelector.addEventListener('change', () => {
-		const selectedFont = fontSelector.value
-		if (selectedFont === 'gothic') {
-			transcriptArea.style.fontFamily = 'Arial, sans-serif'
-		} else if (selectedFont === 'mincho') {
-			transcriptArea.style.fontFamily = '"Times New Roman", serif'
-		} else if (selectedFont === 'monospace') {
-			transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace'
-		}
-	})
+	// // フォントの設定
+	// const fontSelector = document.getElementById('fontSelector')
+	// fontSelector.addEventListener('change', () => {
+	// 	const selectedFont = fontSelector.value
+	// 	if (selectedFont === 'gothic') {
+	// 		transcriptArea.style.fontFamily = 'Arial, sans-serif'
+	// 	} else if (selectedFont === 'mincho') {
+	// 		transcriptArea.style.fontFamily = '"Times New Roman", serif'
+	// 	} else if (selectedFont === 'monospace') {
+	// 		transcriptArea.style.fontFamily = '"Noto Sans Mono", "Courier New", monospace'
+	// 	}
+	// })
 
 	// // 設定メニュー開く
 	// const settingsIcon = document.getElementById('settings-icon')

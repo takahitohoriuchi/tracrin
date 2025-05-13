@@ -109,6 +109,34 @@
               <!-- <button id="charNumChange">文字数変更を反映</button> -->
             </p>
           </div>
+          <div id="changeFontPopup" style="display: none;">
+            <div>
+              <div style="display: flex; background-color: white;" class="fontOption">
+                <img src="./assets/icons8-lowercase-50.png" style="width: 20px; height: 20px; margin: 0 3px;">
+                <!-- フォントセレクタ -->
+                <select id="fontSelector">
+                  <option value="gothic">Gothic</option>
+                  <option value="mincho">Mincho</option>
+                  <option value="monospace">Monospace</option>
+                </select>
+                <!-- フォントサイズセレクタ -->
+                <select id="fontSizeSelector" style="margin-right: 10px;">
+                  <option value="10">10</option>
+                  <option value="12" selected>12</option>
+                  <option value="14">14</option>
+                  <option value="16">16</option>
+                  <option value="18">18</option>
+                  <option value="20">20</option>
+                </select>
+                <!-- <a href="" class="optionA">
+                  <img src="./assets/icons8-increase-font-50.png" class="optionIcon">
+                </a>
+                <a href="" class="optionA">
+                  <img src="./assets/icons8-decrease-font-50.png" class="optionIcon">
+                </a> -->
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -155,32 +183,6 @@
                <a href="" class="optionButton hidden" id="changeNumOfCharsPerRowButton">一行あたりの文字数を変更</a>
                <a href="" class="optionButton hidden" id="changeFontButton">フォント設定</a>
             </div>
-          </div>
-        </div>
-        <div class="left-group">
-          <div style="display: flex; background-color: white;" class="fontOption">
-            <img src="./assets/icons8-lowercase-50.png" style="width: 20px; height: 20px; margin: 0 3px;">
-            <!-- フォントセレクタ -->
-            <select id="fontSelector">
-              <option value="gothic">Gothic</option>
-              <option value="mincho">Mincho</option>
-              <option value="monospace">Monospace</option>
-            </select>
-            <!-- フォントサイズセレクタ -->
-            <select id="fontSizeSelector" style="margin-right: 10px;">
-              <option value="10">10</option>
-              <option value="12" selected>12</option>
-              <option value="14">14</option>
-              <option value="16">16</option>
-              <option value="18">18</option>
-              <option value="20">20</option>
-            </select>
-            <a href="" class="optionA">
-              <img src="./assets/icons8-increase-font-50.png" class="optionIcon">
-            </a>
-            <a href="" class="optionA">
-              <img src="./assets/icons8-decrease-font-50.png" class="optionIcon">
-            </a>
           </div>
         </div>
       </div>
