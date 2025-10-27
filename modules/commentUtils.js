@@ -58,7 +58,7 @@ export function pushSpans(){
 
 export function pushHatsuwaGroups(_hatsuwaGroups){
   hatsuwaGroups = _hatsuwaGroups
-  console.log(hatsuwaGroups[5][0]['end'])
+  // console.log(hatsuwaGroups[5][0]['end'])
 }
 
 export function pushTextfileName(fileName){
