@@ -1303,27 +1303,27 @@ window.addEventListener('DOMContentLoaded', () => {
     toggleButtons(targetButtons, otherButtons)
   })
 
-  const toggleImportFileButton = document.getElementById('toggleImportFileButton')
+  // const toggleImportFileButton = document.getElementById('toggleImportFileButton')
   const inputVideoFileButton2 = document.getElementById('inputVideoFileButton2')
   const inputCommentFileButton = document.getElementById('inputCommentFileButton')
-  toggleImportFileButton.addEventListener('click', (event) => {
-    event.preventDefault()
-    const buttons = [inputVideoFileButton2, inputCommentFileButton]
-    toggleButtons(buttons)
-  })
+  // toggleImportFileButton.addEventListener('click', (event) => {
+  //   event.preventDefault()
+  //   const buttons = [inputVideoFileButton2, inputCommentFileButton]
+  //   toggleButtons(buttons)
+  // })
 
   inputVideoFileButton2.addEventListener('click', function(event) {
     event.preventDefault();  // デフォルトのリンククリック動作をキャンセル
     document.getElementById('VideoFileInput').click();  // 隠れているファイルインプットをクリックする
   });
 
-  const toggleExportFileButton = document.getElementById('toggleExportFileButton')
+  // const toggleExportFileButton = document.getElementById('toggleExportFileButton')
   const outputCommentFileButton = document.getElementById('outputCommentFileButton')
-  toggleExportFileButton.addEventListener('click', (event) => {
-    event.preventDefault()
-    const buttons = [outputCommentFileButton]
-    toggleButtons(buttons)
-  })
+  // toggleExportFileButton.addEventListener('click', (event) => {
+  //   event.preventDefault()
+  //   const buttons = [outputCommentFileButton]
+  //   toggleButtons(buttons)
+  // })
 
   function toggleButtons(targetButtons, otherButtons) {
     const isVisible = targetButtons[0].classList.contains("show")
@@ -1400,7 +1400,7 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
 	// 選択範囲のトラクリを精密描画
-	const positionAdjustmentButton = document.getElementById('positionAdjustment')
+	const positionAdjustmentButton = document.getElementById('positionAdjustmentButton')
 	positionAdjustmentButton.addEventListener('click', (event) => {
     event.preventDefault()
 		isAdjustedPosition = true
