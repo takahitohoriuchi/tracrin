@@ -1,12 +1,12 @@
 import { bleachSpans, colorSpans } from './domUtils.js'
+import { hatsuwaObjs } from '../main.js'
+// console.log(hatsuwaObjs.length)
+
 
 // DEBUG:20260214
 // ==== timeupdate 用の状態 ====
 let coloredSpans = [] // 前回色付けしていた span たち
 let lastStructureID = null // 前回ヒットしたID（同じなら更新しない）
-
-// transcriptRoot があるならここを絞ると速い（例：document.getElementById('transcript')）
-const SPAN_SELECTOR = 'span'
 
 // ===== デバッグスイッチ =====
 const DEBUG = true
@@ -26,15 +26,14 @@ export let videoAspectRatio
 let videoPath = './movies/test.mp4'
 video.startTime = 0
 video.endTime = 100
-const hatsuwaObjs = []
-for (let i = 0; i < 50; i++) {
-	hatsuwaObjs.push({
-		start: i,
-		end: i + 1,
-		structureID: `${i}-0`,
-	})
-}
-// function
+// const hatsuwaObjs = []
+// for (let i = 0; i < 50; i++) {
+// 	hatsuwaObjs.push({
+// 		start: i,
+// 		end: i + 1,
+// 		structureID: `${i}-0`,
+// 	})
+// }
 
 export function loadVideo(_file) {
 	const url = URL.createObjectURL(_file)

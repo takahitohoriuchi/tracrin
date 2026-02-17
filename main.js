@@ -20,9 +20,9 @@ import { addComment, pushSpans, pushTextfileName, pushHatsuwaGroups } from './mo
 
 
 // SECTION:【グローバル変数】
-let hatsuwaObjs = []
-let hatsuwaGroups = []
-let hatsuwaTagSpans = [] //三重配列:[グループ][発話][発話タグ]
+export const hatsuwaObjs = []
+export const hatsuwaGroups = []
+export const hatsuwaTagSpans = [] //三重配列:[グループ][発話][発話タグ]
 const drawnRange = {
 	sGroupID: 0,
 	eGroupID: 0,
@@ -142,51 +142,95 @@ async function genHatsuwaObjs(_textContent) {
 	const rowNum = rows.length
 	console.log('データ行の数: ', rowNum)
 	// 発話オブジェクト群を生成
-	hatsuwaObjs = rows
+	const next = rows
 		.map((row, i) => {
 			/*
-			[.txtのrowの中身]
-			1列目:CM_Utter??
-			2列目:CM??
-			3列目:発話開始時間（秒）
-			4列目:発話終了時間（秒）
-			5列目:発話内容（発話記号含む）			
-			*/
+    [.txtのrowの中身]
+    1列目:CM_Utter??
+    2列目:CM??
+    3列目:発話開始時間（秒）
+    4列目:発話終了時間（秒）
+    5列目:発話内容（発話記号含む）
+    */
 			const cells = row.split('\t')
-			// console.log('cells: ', cells)
 			let o = {
-				// ID: i + 1, //発話インデックス
-				label: cells[0], // 発話ラベル
-				speaker: cells[1], // 発話者
-				start: Number(cells[2]), // 発話開始時間
-				end: Number(cells[3]), // 発話終了時間
-				text: cells[4], // 発話内容
+				label: cells[0],
+				speaker: cells[1],
+				start: Number(cells[2]),
+				end: Number(cells[3]),
+				text: cells[4],
 			}
 
 			// 沈黙だった場合の微調整
 			if (o.speaker == '') {
-				// 沈黙時間を小数第二位で四捨五入して、第一位までに
 				let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
 				silentDuration = Math.round(silentDuration * 10) / 10
 				silentDuration = silentDuration.toFixed(1)
-				o.text = silentDuration
-				o.text = '(' + o.text + ')'
+				o.text = '(' + silentDuration + ')'
 			} else {
 				roundTextValues(o)
 			}
 			return o
 		})
 		.filter((o) => o.text)
-	// 発話オブジェクト群から、「0.15秒未満の沈黙」を削除
-	hatsuwaObjs = hatsuwaObjs.filter((o) => {
-		if (o.speaker == '') {
-			let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
-			console.log('silentDuration: ', silentDuration)
-			return silentDuration >= 0.15
-		} else {
+		// 発話オブジェクト群から、「0.15秒未満の沈黙」を削除
+		.filter((o) => {
+			if (o.speaker == '') {
+				const silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
+				console.log('silentDuration: ', silentDuration)
+				return silentDuration >= 0.15
+			}
 			return true
-		}
-	})
+		})
+
+	// hatsuwaObjs は const のまま、中身だけ入れ替える（参照維持）
+	hatsuwaObjs.splice(0, hatsuwaObjs.length, ...next)
+
+	// hatsuwaObjs = rows
+	// 	.map((row, i) => {
+	// 		/*
+	// 		[.txtのrowの中身]
+	// 		1列目:CM_Utter??
+	// 		2列目:CM??
+	// 		3列目:発話開始時間（秒）
+	// 		4列目:発話終了時間（秒）
+	// 		5列目:発話内容（発話記号含む）			
+	// 		*/
+	// 		const cells = row.split('\t')
+	// 		// console.log('cells: ', cells)
+	// 		let o = {
+	// 			// ID: i + 1, //発話インデックス
+	// 			label: cells[0], // 発話ラベル
+	// 			speaker: cells[1], // 発話者
+	// 			start: Number(cells[2]), // 発話開始時間
+	// 			end: Number(cells[3]), // 発話終了時間
+	// 			text: cells[4], // 発話内容
+	// 		}
+
+	// 		// 沈黙だった場合の微調整
+	// 		if (o.speaker == '') {
+	// 			// 沈黙時間を小数第二位で四捨五入して、第一位までに
+	// 			let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
+	// 			silentDuration = Math.round(silentDuration * 10) / 10
+	// 			silentDuration = silentDuration.toFixed(1)
+	// 			o.text = silentDuration
+	// 			o.text = '(' + o.text + ')'
+	// 		} else {
+	// 			roundTextValues(o)
+	// 		}
+	// 		return o
+	// 	})
+	// 	.filter((o) => o.text)
+	// // 発話オブジェクト群から、「0.15秒未満の沈黙」を削除
+	// hatsuwaObjs = hatsuwaObjs.filter((o) => {
+	// 	if (o.speaker == '') {
+	// 		let silentDuration = parseFloat(o.text.replace(/[()]/g, ''))
+	// 		console.log('silentDuration: ', silentDuration)
+	// 		return silentDuration >= 0.15
+	// 	} else {
+	// 		return true
+	// 	}
+	// })
 	// TODO:発話オブジェクト群から、silentオンリーの発話は先頭末尾に'(',')'がなければつける。
 
 	// 発話オブジェクトを「発話開始時間」でソート
@@ -1149,7 +1193,8 @@ async function reload() {
 	}
 
 	// 初期化
-	hatsuwaTagSpans = []
+	// hatsuwaTagSpans = []
+	hatsuwaTagSpans.splice(0)
 	idLabels = []
 	speakerLabels = []
 	rowElems = []
