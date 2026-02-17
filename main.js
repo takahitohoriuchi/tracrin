@@ -237,6 +237,9 @@ async function groupingHatsuwaObjs(_hatsuwaObjs) {
 				else {
 					// 発話グループ完成、グループ一覧に加える
 					hatsuwaGroups.push(hatsuwaGroup)
+					for(let hatsuwaObj of hatsuwaGroup){
+						hatsuwaObj.structureID = `${hatsuwaGroups.length -1}-${hatsuwaGroup.indexOf(hatsuwaObj)}`
+					}
 					// グループの最若インデックスを更新
 					groupStartIndex = j
 					// console.log('かぶりなし。次ループのgroupStartIndex: ', groupStartIndex)

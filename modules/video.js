@@ -5,7 +5,16 @@ export let videoAspectRatio;
 let videoPath = './movies/test.mp4';
 video.startTime = 0
 video.endTime = 100
+const hatsuwaObjs = []    
+for(let i=0; i<50; i++){
+    hatsuwaObjs.push({
+        start: i,
+        end: i+1,
+        structureID: `${i}-0`
+    })
+}
 
+// function 
 
 export function loadVideo(_file){
     const url = URL.createObjectURL(_file);
@@ -45,18 +54,28 @@ export function loadVideo(_file){
 
 	 // 再生中の現在時刻を監視
     video.addEventListener('timeupdate', function() {				
-		// console.log('動画コマうごきました（timeupdate）')
+		console.log('動画コマ更新')
         // TODO:currentTimeをつかって、hatsuwaObjsを検索し、そのrowを装飾せよ
-        // TODO:hatsuwaObjをどうやってここで受け取るか？constにしないとexportできないが。。    
-        // for(let i=0; i<hatsuwaObjs.length; i++){
-            // if(
-            //     (currentTime >= hatsuwaObj.start)
-            //     &&
-            //     (currentTime < hatsuwaObj.end)
-            // ){
-
-            // }                                    
-        // }
+        // TODO:hatsuwaObjをどうやってここで受け取るか？constにしないとexportできないが。。
+        // TODO:発話の探索アルゴリズムを最適化したほうがいいかも。まずは次の発話から・・・とか。
+        for (let hatsuwaObj of hatsuwaObjs){
+            if(
+                (video.currentTime >= hatsuwaObj.start)
+                &&
+                (video.currentTime < hatsuwaObj.end)
+            ){
+                console.log('hatsuwaObj.structureID: ', hatsuwaObj.structureID)
+                /*
+                <span>たちから、.globalTagID == i-j-k
+                domUtils.jsでspan着色・脱色関数をつくる
+                （）現在の
+                ・colorSpanByCurrentTime(hatsuwaObj.structureID)
+                （）前ループの塗りつぶし済spansを脱色
+                ・bleachSpan(hatsuwaObj.structureID)                
+                （）新しい着色spansをセット。
+                */
+            }                                    
+        }
 
 
 		// TODO:手動スライダで動画を動かしたときに、video.startTimeとvideo.endTimeをどうする？
