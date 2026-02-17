@@ -1,6 +1,5 @@
 {
-    "remote.SSH.defaultForwardedPorts": [
-
-    ],
-    "remote.SSH.remoteServerListenOnSocket": true
+	"remote.SSH.defaultForwardedPorts": [],
+	"remote.SSH.remoteServerListenOnSocket": true,
+	"liveServer.settings.port": 5501
 }

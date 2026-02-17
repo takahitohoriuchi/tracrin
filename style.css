@@ -38,6 +38,15 @@ nav {
 	line-height: 120%
 	/* font-size: 12px; */
 }
+/* 例：現在の発話のspanをハイライト */
+.is-current {
+  background: rgba(255, 230, 0, 0.45);
+  border-radius: 4px;
+}
+
+
+
+
 /* 行 */
 
 /* ＋ボタンのスタイル（最初は非表示） */
