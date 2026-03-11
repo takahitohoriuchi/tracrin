@@ -1,0 +1,649 @@
+/* spanタグの折り返し改行が画面左端から始まるように。 */
+.breakable {
+	/* word-break: break-all; */
+	/* color: red; */
+}
+
+body{		
+	/* display: flex;
+	justify-content: center;
+	align-items: center; */
+}
+nav {
+  width: 100%;
+  height: 70px;  
+  padding: 10px 10px;
+  box-sizing: border-box;
+  margin: 0%;
+}
+
+/* :::SECTION */
+
+/* タグspan */
+.tag {
+	/* border: 1px solid #aaaaaa; */
+	position: absolute; /* absolute指定しないと、widthが出てこない。 */
+	/* font-size: 12px; */
+	margin: 0%;
+	padding: 0%;
+	line-height: 120%
+}
+/* ラベルspan（左のspeakerやID） */
+.label {
+	/* background: #888; */
+	/* border: 1px solid #22aaaa; */
+	position: absolute;
+	margin: 0%;
+	padding: 0%;
+	line-height: 120%
+	/* font-size: 12px; */
+}
+/* 行 */
+
+/* ＋ボタンのスタイル（最初は非表示） */
+.plus-button {
+  position: absolute;
+  top: 10px;     /* 要素Xの上から10px */
+  right: 10px;   /* 要素Xの右端から10px */  
+  z-index: 10000;  /* 要素Xより前面に表示する */
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;  
+}
+/* 矢印 */
+.arrow{
+	position: absolute;
+	text-align: center;
+}
+
+.group-line {
+	position: absolute;    
+	overflow: visible;
+    left: 0px;
+    width: 300px;
+    /* border-top: 0.5px dashed #000; 線の色や太さを指定 */
+}
+
+/* 動画エリア */
+#videoContainer {
+	resize: both;
+	overflow: auto;
+	display: inline-block;
+	/* 初期サイズ指定 */
+	width: 480px;
+	height: 270px;
+	/* width: 960px;
+	height: 540px; */
+  margin: 20px;
+}
+video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* 編集エリア */
+#editContainer {
+	height: 100px;	
+}
+
+/* ヘッダーのスタイリング */
+.pageHeader {
+  position: fixed; /* ページの上部に固定 */
+  top: 0; /* 上端から0pxの位置に配置 */
+  left: 0; /* 左端から0pxの位置に配置 */
+  width: 100%; /* 画面の全幅に広がる */
+  height: 60px; /* 高さは60px */
+  background: linear-gradient(to right, #eff699, #75e477, #eff699, #eff699, #7ffaa4); /* 背景色の設定 */
+  color: black; /* 文字色は黒 */
+  line-height: 60px; /* 文字を中央に配置 */
+  text-align: center; /* テキストを中央揃え */
+  z-index: 1000; /* 他の要素より前面に表示 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* 影を追加 */
+  display: flex;
+  justify-content: space-between; /* 左右の要素を端に寄せる */
+  padding: 0 10px;
+  box-sizing: border-box; /* パディングとボーダーを幅に含める */
+  align-items: center; /* 垂直方向の中央揃え */
+  }
+
+/* ページのコンテンツにパディングを追加して、ヘッダーと重ならないようにする */
+body {
+  padding-top: 60px; /* ヘッダーの高さと同じ分のパディングを追加 */
+  height: 100%;
+}
+
+.left-group {
+  display: flex; /* 左側のグループもフレックスコンテナとして設定 */
+  align-items: center; /* 垂直方向の中央揃え */
+}
+
+.pageFooter {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 20px; /* フッターの高さ */
+  background-color: transparent; /* フッターの背景色 */
+  color: #666666;
+  text-align: center;
+  line-height: 20px; /* テキストを垂直中央に配置 */
+}
+
+.top {
+  display: flex;            /* フレックスコンテナとして設定 */
+  flex-direction: column;   /* 子要素を縦並びにする */
+  justify-content: center; /* 水平方向の中央揃え */
+  align-items: center;      /* 垂直方向の中央揃え */
+  text-align: center;       /* テキストも中央揃えにする */
+  height: 100%;             /* コンテナの高さを親要素に合わせる（必要に応じて） */
+  width: 100%;              /* コンテナの幅を親要素に合わせる（必要に応じて） */
+  color: #666666;
+  font-size: 16px;
+}
+
+.title {
+  text-align: center;
+  color: #000000;
+  letter-spacing: 25px;
+  margin: 20px -25px 0 0;
+}
+
+.caption {
+  /* margin: 30px 0; */
+  margin: 30px 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.ddarea {
+  width: 357px;
+  height: 240px;
+  border: 2px solid #000000;
+  text-align: center;
+  background-image:
+  linear-gradient(to right, #ccc 1px, transparent 1px),
+  linear-gradient(to bottom, #ccc 1px, transparent 1px);
+  background-size: 12px 12px; /* 方眼紙の一マスのサイズ */
+	/* width: 100%;
+	height: 150px;
+	border: 1px dotted #888;
+	margin: 1em auto;
+	display: table-cell;
+	vertical-align: middle; */
+}
+
+.ddarea.textfile {
+  border-radius: 20px 0px 0px 20px;
+  justify-content: center;
+}
+
+.ddarea.videofile {
+  border-left: none;
+  border-radius: 0px 20px 20px 0px;
+  justify-content: center;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  padding: 20px 20px 0 0;
+}
+
+.buttonIcon {
+  width: 36px;
+  height: 36px;
+  padding-right: 20px;
+}
+
+.ddarea.ddefect {
+	border: 1px solid #000;
+}
+
+/* ここからボタン */
+
+.button {
+  font-size: 16px;
+  width: 280px;
+  height: 60px;
+  line-height: 60px;
+  
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  color: #666666;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 100vh;
+
+  border: 1px solid #000000;
+  box-shadow: 0 4px 0 #666666;
+  background-image: linear-gradient(to right, #7ffaa4, #eff699, #eff699, #7ffaa4);
+}
+
+.button:hover {
+  margin-top: 3px;
+  box-shadow: 0 2px 0 #666666;
+}
+
+.fileButton {
+  font-size: 16px;
+  width: 130px;
+  height: 60px;
+  line-height: 60px;
+  
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  color: #000000;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: 10px;
+
+  border-radius: 3px;
+}
+
+.fileButton:hover {
+  background-color: rgba(100, 100, 100, 0.3);
+}
+
+.fileMenu {
+  display: none; /* 初期状態は非表示 */
+  position: absolute;
+  top: 70px; /* ボタンの下に配置 */
+  left: 10px;
+  background: white;
+  /* border: 1px solid #ccc; */
+  border-radius: 3px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 200px;
+  z-index: 1000;
+  padding: 7px 0;
+}
+
+.fileMenuOption {
+  display: block;
+  text-decoration: none;
+  color: #000000;
+  height: 16px;
+  line-height: 16px;
+  padding: 8px 15px;
+}
+
+.fileMenuOption:hover {
+  background-color: rgba(100, 100, 100, 0.3);
+}
+
+.fileOptionMenu {
+  display: none; /* 初期状態は非表示 */
+  position: absolute;
+  top: 0px; /* ボタンの下に配置 */
+  left: 195px;
+  background: white;
+  /* border: 1px solid #ccc; */
+  border-radius: 3px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 200px;
+  z-index: 1000;
+  padding: 7px 0;
+}
+
+.videoArea {
+  display: flex;
+  flex-direction: column; /* 垂直方向にアイテムを配置 */
+  justify-content: center;
+  align-items: center;
+  background-image:
+  linear-gradient(to right, #eeeeee 1px, transparent 1px),
+  linear-gradient(to bottom, #eeeeee 1px, transparent 1px);
+  background-size: 12px 12px; /* 方眼紙の一マスのサイズ */
+}
+
+.optionBar {
+  left: 0; /* 左端から0pxの位置に配置 */
+  width: 100%; /* 画面の全幅に広がる */
+  height: 75px;
+  background: #D9F487; /* 背景色の設定 */
+  color: black; /* 文字色は黒 */
+  display: flex;
+  align-items: center;
+  border-top: 2px solid #999999;
+  /* padding: 0 20px; */
+  justify-content: space-between; /* 左右の要素を端に寄せる */
+  position: relative;
+}
+
+.optionPartition {
+  /* width: 95px; divの幅 */
+  height: 60px; /* divの高さ */
+  position: relative; /* 位置を相対的に設定 */
+  margin: 0 15px 0 10px;
+}
+
+.optionPartition::after {
+  content: ""; /* 擬似要素の内容を空に */
+  position: absolute; /* 絶対位置 */
+  top: 5px; /* 上から10pxの位置 */
+  bottom: 5px; /* 下から10pxの位置 */
+  right: 0; /* 右側に配置 */
+  width: 2px; /* ボーダーの幅 */
+  background-color: #999999; /* ボーダーの色 */
+}
+
+.optionButton {
+  color: #000000;
+  background-color: transparent;
+  /* width: 100px; */
+  /* min-width: 60px; */
+  height: 25px;
+  border-radius: 3px;
+  /* font-weight: 600; */
+
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 5px;
+  margin: 3px 10px;
+  white-space: nowrap;
+}
+
+.optionButton:hover {
+  background-color: rgba(100, 100, 100, 0.3);
+}
+
+.optionButton.hidden {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  width: 0;
+  overflow: hidden;
+  min-width: 0px;
+  margin: 0;
+  padding: 0;
+}
+
+.optionButton.show {
+  opacity: 1;
+  transform: translateX(0);
+  width: auto;
+  margin: 3px 10px;
+  padding: 0 5px;
+  transition: opacity 0.3s ease, transform 0.3s ease, width 0.3s ease, margin 0.3s ease;
+}
+
+.fontOption {
+  color: #000000;
+  background-color: #ffffff;
+  /* width: 120px; */
+  height: 40px;
+  border-radius: 20px;
+
+  position: relative;
+  display: flex;
+  vertical-align: middle;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 10px;
+  padding: 0 10px;
+}
+
+.optionA {
+  /* width: 20px; */
+  height: 26px;
+  /* margin: 0; */
+
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionIcon {
+  width: 20px;
+  height: 20px;
+  margin: 3px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+.optionIcon:hover {
+  background-color: #eeeeee;
+}
+
+.next {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden; /* コンテンツがはみ出さないようにする */
+}
+
+/* トラクリのエリア */
+#transcriptArea {
+	/* background-color: #eeeeee; */
+	/* border-color: #000; */
+	/* border-width: thick;	 */
+	display: none;
+	position: relative;
+	height: 600px;	
+	top: 0px;	
+	/* margin: 10px;		 */
+	padding: 0%;
+}
+
+/* ヘッダ行 */
+#headerArea{
+	/* background-color: #eeeeee; */
+	background-color: #989898;
+	border-color: #000;		
+	position: absolute;
+	/* height: 300px; */
+	width: 100%;
+	top: 0px;
+	left: 0px;	
+	/* padding: 10px; */
+  /* text-align: center; */
+  /* margin: 0px; */
+	/* margin-bottom: 0px; */
+	/* margin: 10px; */
+	/* margin-left: 10px; */
+  border-bottom: 2px solid #888888;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); /* 影を追加 */
+}
+
+#scrollable-div{
+	position: absolute;
+	overflow: auto; /* コンテンツがはみ出した場合にスクロールバーを表示 */
+	/* border: 1px solid #ccc; 枠線を追加	 */
+	left: 0px;	
+	height: 570px;/*NOTE:transcriptAreaとおなじ*/		
+}
+
+/* トラクリタグたちが描かれるエリア */
+#dataArea{
+	background-color: #ffffff;
+	border-color: #000;
+	position: absolute;
+	/* position: relative; */
+	height: 570px;	
+	top: 0px;	
+	padding: none;		
+}
+
+.plus-button {
+    position: absolute;
+    right: -30px; /* 要素の右側に配置 */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: none; /* 初期状態は非表示 */
+}
+
+.plus-button:hover {
+    background-color: #2980b9;
+}
+
+/* :::設定メニュー */
+#settings-icon {
+	cursor: pointer;
+	font-size: 24px;
+	position: fixed;
+	top: 20px;
+	right: 20px;
+}
+
+#settings-menu {
+	position: fixed;
+	top: 50px;
+	right: 20px;
+	background: white;
+	border: 1px solid #ccc;
+	padding: 10px;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.layerTranscript {
+  position: absolute;
+  z-index: 1;
+}
+
+.layerComment {
+  position: absolute;
+  z-index: 2;
+}
+
+.comment {
+  width: 200px;
+  /* height: 18px; */
+  position: absolute;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.3);
+}
+.comment .header {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  display: flex;
+  /* box-shadow: 0px -3px 10px rgba(0, 0, 0, 0.2); */
+}
+.comment .header .p {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.comment .header .deleteButton {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  text-align: center;
+}
+.comment .field {
+  width: 100%;
+  min-height: 18px;
+  /* height: 36px; */
+  box-sizing: border-box;
+  border: none;
+  font-size: 12px;
+  resize: vertical;
+  /* box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); */
+}
+.comment .field .input {
+  width: 100%;
+  min-height: 18px;
+  box-sizing: border-box;
+  border: none;
+  font-size: 12px;
+  resize: vertical;
+  background-color: transparent;
+}
+.comment .field .select {
+  background-color: transparent;
+  border: none;
+  width: 100px;
+}
+
+/* コメント付箋のカラーパレット */
+.comment.blue .header {
+  background-color: #89f0ff;
+}
+.comment.blue .field {
+  background-color: #adf4ff;
+}
+
+.comment.yellow .header {
+  background-color: #FEEA3D;
+}
+.comment.yellow .field {
+  background-color: #FEF49C;
+}
+
+.comment.green .header {
+  background-color: #83FE83;
+}
+.comment.green .field {
+  background-color: #B2FFA0;
+}
+
+.comment.pink .header {
+  background-color: #FFB2B2;
+}
+.comment.pink .field {
+  background-color: #FFC7C7;
+}
+
+.comment.purple .header {
+  background-color: #9BB6FE;
+}
+.comment.purple .field {
+  background-color: #B6CAFF;
+}
+
+.comment.gray .header {
+  background-color: #DADADA;
+}
+.comment.gray .field {
+  background-color: #EEEEEE;
+}
+
+.categoryList {
+  position: fixed;
+	top: 50px;
+	right: 20px;
+	background: white;
+	border: 1px solid #ccc;
+	padding: 10px;
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}

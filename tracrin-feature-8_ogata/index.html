@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./style.css" />
+    <link rel="icon" href="./assets/favicon_tracrin.ico">
+		<title>tracrin--2.5.0</title>
+    <style>
+      #content {
+        overflow: auto; /* スクロールバーを適宜表示 */
+        height: auto;  /* 高さを内容に合わせる */
+        min-height: 100vh; /* 最低でもビューポートの高さ */
+      }
+
+    </style>
+	</head>
+	<body>
+    <div class="pageHeader">
+      <div class="left-group">
+        <img src="./assets/logo_tracrin.png" alt="logo-tracrin" style="width: 80px; margin-right: 10px;">
+        <div style="margin-top: 5px; font-weight: 700;">ver.2.5.0</div>
+      </div>
+        <!-- <div>更新履歴</div> -->
+        <div style="font-weight: 700;">使い方</div>
+    </div>
+
+		
+
+    <div class="top" id="top">
+      <div style="margin: 70px 0 0 0; height: 150px;">
+        <img src="./assets/logo_tracrin.png" style="width: 300px;">
+        <p class="title">—トラクリン—</p>
+      </div>
+      <div class="caption">
+        トランスクリプト
+        </br>
+        書き起こしアプリケーション
+      </div>
+    
+      <!-- <p style="border-style: solid; width: 300px; margin-top: 0; margin-bottom: 24px; font-weight: 700; font-size: 20px;">Please drag & drop.</p> -->
+      <div style="display: flex;">
+        <div class="ddarea textfile">
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <img src="./assets/icons8-txt-50.png" class="icon">
+            <p id="TextFileName" style="height: 178px; line-height: 200px; font-weight: 700; width: 254px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">ここにテキストファイルをドロップ</p>
+          </div>
+          <a href="" class="button" id="inputTextFileButton" style="margin-left: 38px;">
+            <img src="./assets/icons8-seach-folder-48.png" class="buttonIcon">ファイルを参照
+          </a>
+          <input type="file" id="TextFileInput" style="display: none;">
+        </div>
+        <div class="ddarea videofile">
+          <div style="display: flex; align-items: center; justify-content: center;">
+            <img src="./assets/icons8-video-file-50.png" class="icon">
+            <p id="VideoFileName" style="height: 178px; line-height: 200px; font-weight: 700; width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">ここにビデオファイルをドロップ</p>
+          </div>
+          <a href="" class="button" id="inputVideoFileButton" style="margin-left: 38px;">
+            <img src="./assets/icons8-seach-folder-48.png" class="buttonIcon">ファイルを参照
+          </a>
+          <input type="file" id="VideoFileInput" style="display: none;">
+        </div>
+      </div>
+      <a href="" class="button" id="goButton" style="margin: 50px 0; font-weight: 700;">GO！</a>
+    </div>
+
+<!-- ---ページ切り替え--------------------------------------------------- -->
+
+    <div id="next" class="next">
+      <!-- <div style="display: flex; justify-content: center; align-items: center;" class="videoArea"> -->
+      <div class="videoArea">
+        <div id="videoContainer">
+          <video id="myVideo" controls></video>
+        </div>
+        <div>
+          <!-- <button id="releaseSelectionButton" class="favorite styled" type="button">発話の部分選択を解除</button> -->
+          <!-- <button id="positionAdjustment">選択範囲のトラクリをきちんと描画</button> -->
+          <!-- <button id="roughdraw">全発話トラクリ粗描画</button> -->
+          <!-- <button id="editCategoryButton">カテゴリを編集</button>
+          <button id="showOrHideCommentOptionButton">コメントオプション欄の表示/非表示を切り替え</button> -->
+          <!-- <button id="deleteSelectedCommentsButton">選択したコメントを削除</button> -->
+          <!-- <button id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</button> -->
+          <!-- <button id="outputSelectedCommentsAsFileButton">選択したコメントのファイルを出力</button> -->
+          <!-- <button id="outputCommentFileButton">コメントファイルを出力</button> -->
+          <!-- <button id="inputCommentFileButton">コメントファイルを入力</button> -->
+          <input type="file" id="commentFileInput" style="display: none" accept=".tsv" />
+          <div id="categoryList" style="display: none"></div>
+          <div id="popupContentTemplate" style="display: none;">
+            <p>
+              <label>
+                ファイル名:
+                <input type="text" id="fileName" />
+              </label>
+              <br />
+              <label>
+                ファイル形式:
+                <select id="fileType">
+                  <option value="tsv">tracrin(.tsv)</option>
+                  <option value="elan">elan(.eafcomment)</option>
+                </select>
+              </label>
+            </p>
+          </div>
+          <div id="changeNumOfCharsPerRowPopup" style="display: none;">
+            <p>
+              <!-- 一行あたり文字数 -->
+              <label><input type="text" id="charNumPerRow" /></label>
+              <!-- <button id="charNumChange">文字数変更を反映</button> -->
+            </p>
+          </div>
+          <div id="changeFontPopup" style="display: none;">
+            <div>
+              <div style="display: flex; background-color: white;" class="fontOption">
+                <img src="./assets/icons8-lowercase-50.png" style="width: 20px; height: 20px; margin: 0 3px;">
+                <!-- フォントセレクタ -->
+                <select id="fontSelector">
+                  <option value="gothic">Gothic</option>
+                  <option value="mincho">Mincho</option>
+                  <option value="monospace">Monospace</option>
+                </select>
+                <!-- フォントサイズセレクタ -->
+                <select id="fontSizeSelector" style="margin-right: 10px;">
+                  <option value="10">10</option>
+                  <option value="12" selected>12</option>
+                  <option value="14">14</option>
+                  <option value="16">16</option>
+                  <option value="18">18</option>
+                  <option value="20">20</option>
+                </select>
+                <!-- <a href="" class="optionA">
+                  <img src="./assets/icons8-increase-font-50.png" class="optionIcon">
+                </a>
+                <a href="" class="optionA">
+                  <img src="./assets/icons8-decrease-font-50.png" class="optionIcon">
+                </a> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="optionBar">
+        <div class="left-group">
+          <!-- <div style="display: flex; width: 150px; justify-content: center;">
+            <img src="./assets/icons8-txt-50.png" class="icon">
+            <a>ファイル</a>
+          </div> -->
+          <a href="" class="fileButton" id="toggleFileButton">
+            <img src="./assets/icons8-file-48.png">ファイル
+          </a>
+          <div class="fileMenu" id="fileMenu">
+            <a href="" class="fileMenuOption" id="fileMenuOptionImportFileButton">開く</a>
+              <div class="fileOptionMenu" id="importFileMenu">
+                <a href="" class="fileMenuOption" id="inputVideoFileButton2">ビデオ</a>
+                <a href="" class="fileMenuOption" id="inputCommentFileButton">コメント</a>
+              </div>
+            <a href="" class="fileMenuOption" id="fileMenuOptionExportFileButton">書き出し</a>
+              <div class="fileOptionMenu" id="exportFileMenu">
+                <a href="" class="fileMenuOption" id="outputCommentFileButton">全てのコメント</a>
+                <a href="" class="fileMenuOption" id="outputSelectedCommentsAsFileButton">選択したコメント</a>
+              </div>
+            <a href="" class="fileMenuOption" id="fileMenuOptionBackButton">TOP画面へ戻る（終了）</a>
+          </div>
+          <div class="optionPartition"></div>
+          <div>
+            <div style="display: flex;">
+              <a href="" class="optionButton" id="toggleHatsuwaButton">発話</a>
+              <a href="" class="optionButton" id="toggleCommentButton">コメント</a>
+              <a href="" class="optionButton" id="toggleDisplayButton">表示</a>
+            </div>
+            <div style="background-color: white; height: 30px; border-radius: 15px; width: 100%; display: flex; line-height: 30px; padding: 0 0 0 10px;">
+              <!-- 発話関連ボタン -->
+              <a href="" class="optionButton hidden" id="releaseSelectionButton">選択を解除</a>
+              <a href="" class="optionButton hidden" id="positionAdjustmentButton">選択範囲をきちんと描画</a>
+              <a href="" class="optionButton hidden" id="roughdraw">全範囲をざっくり描画</a>
+              <!-- コメント関連ボタン -->
+              <a href="" class="optionButton hidden" id="showOrHideSelectedCommentsButton">選択したコメントの表示/非表示を切り替え</a>
+              <a href="" class="optionButton hidden" id="deleteSelectedCommentsButton">選択したコメントを削除</a>
+              <a href="" class="optionButton hidden" id="editCategoryButton">カテゴリを編集</a>
+              <a href="" class="optionButton hidden" id="showOrHideCommentOptionButton">オプション欄の表示を切り替え</a>
+              <!-- 表示関連ボタン -->
+               <a href="" class="optionButton hidden" id="changeNumOfCharsPerRowButton">一行あたりの文字数を変更</a>
+               <a href="" class="optionButton hidden" id="changeFontButton">フォント設定</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="transcriptArea" class="layerTranscript">
+        <div id="headerArea">
+          <!-- ヘッダ行エリア -->
+        </div>
+        <div id="scrollable-div">
+          <div id="dataArea">
+            <!-- データ列エリア -->
+          </div>
+            <!-- コメント描画エリア -->
+          <div id="commentArea" class="layerComment"></div>
+        </div>
+      </div>
+  
+      <!-- TODO:プチ設定エリア -->
+      <div id="editContainer" style="position: relative; top: 600px;">
+          <!-- 一行あたり文字数 -->
+          <!-- <label>一行あたり文字数<input type="text" id="charNumPerRow" /></label>
+          <button id="charNumChange">文字数変更を反映</button> -->
+          <!-- フォントセレクタ -->
+          <!-- <select id="fontSelector">
+            <option value="gothic">Gothic</option>
+            <option value="mincho">Mincho</option>
+            <option value="monospace">Monospace</option>
+          </select>	-->
+          <!-- フォントサイズセレクタ -->
+          <!-- <label for="fontSizeSelector">font size: </label> -->
+          <!-- <select id="fontSizeSelector">
+            <option value="10">10</option>
+            <option value="12" selected>12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+          </select> -->
+      </div>
+  
+      <!-- 発話描画エリア -->
+      <div id="transcriptArea" class="layerTranscript">
+        <div id="headerArea">
+          <!-- ヘッダ行エリア -->
+        </div>
+        <div id="scrollable-div">
+          <div id="dataArea">
+            <!-- データ列エリア -->
+          </div>
+            <!-- コメント描画エリア -->
+          <div id="commentArea" class="layerComment"></div>
+        </div>
+      </div>
+    </div>
+
+    
+    
+    <!-- <div class="pageFooter">
+      © 2025 Your Company Name. All rights reserved.
+    </div> -->
+
+    <!-- <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('top.html')
+                .then(response => response.text())
+                .then(html => {
+                    const contentDiv = document.getElementById('content');
+                    contentDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Failed to load top.html', error);
+                });
+        });
+    </script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/encoding-japanese/2.0.0/encoding.min.js"></script>
+  <!-- ファイルの読み込み -->
+  <script src="./main.js" type="module"></script>
+  <!-- コメント表示領域をドラッグ可能にする -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	</body>
+</html>
+
+<!-- :::CSS(NOTE:JSより先にかく！) -->
